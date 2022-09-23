@@ -1,0 +1,517 @@
+from typing import List, Dict, Any, Optional, Tuple, Set
+from os import path
+from pathlib import Path
+import json
+import numpy
+import copy
+from nen.Problem import Problem
+from nen.util.util import RESULT_ROOT
+from nen.util.evenness_indicator import EvennessIndicator
+from jmetal.util.archive import NonDominatedSolutionsArchive
+from jmetal.core.solution import BinarySolution
+from jmetal.core.quality_indicator import InvertedGenerationalDistance, HyperVolume
+
+
+class NDArchive:
+    """ [summary] NDArchive, short for Non Dominated (Solution) Archive, maintain a pareto solution set.
+    It is initialized with variables num and objectives num.
+    """
+    # config
+    ROUND_PRECISION = 2
+
+    def __init__(self, variables_num: int, objectives_num: int):
+        # record the number of variables and objectives
+        self.variables_num: int = variables_num
+        self.objectives_num: int = objectives_num
+        # the archive
+        self.archive = NonDominatedSolutionsArchive()
+
+    def add(self, solution: BinarySolution) -> bool:
+        """add [summary] add a solution into nd archive.
+        """
+        # check wether solution is feasible
+        if sum(solution.constraints) > 0: return False
+        # check variables size and objectives size
+        assert len(solution.variables[0]) == self.variables_num
+        assert len(solution.objectives) == self.objectives_num
+        # round objectives with NDArchive.ROUND_PRECISION
+        solution.objectives = [round(x, NDArchive.ROUND_PRECISION) for x in solution.objectives]
+        return self.archive.add(solution)
+
+    def set_solution_list(self, solution_list: List[BinarySolution]) -> None:
+        """set_solution_list [summary] set solutions directly without any checks.
+        """
+        self.archive.solution_list = solution_list
+
+    def __len__(self) -> int:
+        return len(self.archive.solution_list)
+
+    @staticmethod
+    def dominate(s1: BinarySolution, s2: BinarySolution) -> bool:
+        equal = True
+        for i, o1 in enumerate(s1.objectives):
+            o1 = round(o1, NDArchive.ROUND_PRECISION)
+            o2 = round(s2.objectives[i], NDArchive.ROUND_PRECISION)
+            if o1 > o2: return False
+            elif o1 < o2:
+                equal = False
+        return not equal
+
+    @property
+    def solution_list(self) -> List[BinarySolution]:
+        """solution_list [summary] return the list of solutions
+        """
+        return self.archive.solution_list
+
+    @staticmethod
+    def bool_list_to_str(bool_list: List[bool]) -> str:
+        """bool_list_to_str [summary] convert bool list to a 0/1 string.
+        """
+        return ''.join(['1' if element else '0' for element in bool_list])
+
+    @staticmethod
+    def str_to_bool_list(zero_one_str: str) -> List[bool]:
+        """str_to_bool_list [summary] convert a 0/1 string to bool list.
+        """
+        return [True if element == '1' else False for element in zero_one_str]
+
+    @staticmethod
+    def float_list_to_str(float_list: List[float]) -> str:
+        """float_list_to_str [summary] convert a float list to a string.
+        """
+        return ' '.join([str(round(element, NDArchive.ROUND_PRECISION)) for element in float_list])
+
+    @staticmethod
+    def str_to_float_list(float_list_str: str) -> List[float]:
+        """str_to_float_list [summary] convert str to float list.
+        """
+        return [float(element) for element in float_list_str.strip().split() if element]
+
+
+class Result(NDArchive):
+    """Result [summary] Result corresponds with the class Problem, it manages the solutions,
+    elapsed time and other infomation with a single solving on a Problem.
+    """
+    def __init__(self, problem: Problem) -> None:
+        super().__init__(problem.variables_num, problem.objectives_num)
+        self.elapsed: float = 0.0
+        self.info: Dict[str, Any] = {}
+
+    @property
+    def single(self) -> Optional[BinarySolution]:
+        """single [summary] use Result as a single solution.
+        """
+        if len(self.solution_list) == 0:
+            return None
+        else:
+            return self.solution_list[0]
+
+
+class MethodResult:
+    """ [summary] MethodResult is a record for a ceratin method solving on a certain problem
+    with 1 or more iterations. It would record method parameters, solving elapsed time(s) and archive(s).
+
+    Note that, one MethodResult might contain serveral archives and so on for iteration > 1.
+    """
+    def __init__(self, name: str, parent_path: str, problem: Problem) -> None:
+        self.name: str = name
+        self.parent_path: str = parent_path
+        self.path: str = path.join(parent_path, name)
+        self.problem: Problem = problem
+        self.iteration: int = 0
+        self.info: Dict[str, Any] = {}
+
+        self.method_result: Optional[Result] = None
+        self.results: List[Result] = []
+
+    def obj_file_name(self, index: int) -> str:
+        return path.join(self.path, '{}.obj.txt'.format(index))
+
+    def var_file_name(self, index: int) -> str:
+        return path.join(self.path, '{}.var.txt'.format(index))
+
+    def info_file_name(self) -> str:
+        return path.join(self.path, '{}.info.json'.format(self.name))
+
+    def add(self, result: Result) -> None:
+        """add [summary] add a result in MethodResult.
+        """
+        self.iteration += 1
+        self.results.append(result)
+
+    def get_result(self, index: int) -> Result:
+        """get_archive [summary] get the certain Result within the iteration.
+        """
+        return self.results[index]
+
+    def get_solution_list(self, index: int) -> List[BinarySolution]:
+        """get_solution_list [summary] get the certain solution list of an archive with given index.
+        """
+        return self.get_result(index).solution_list
+
+    def get_method_result(self) -> Optional[Result]:
+        """get_method_result [summary] get the method result, remember to make method result first.
+        """
+        return self.method_result
+
+    def get_method_solution_list(self) -> List[BinarySolution]:
+        """get_method_solution_list [summary] get the method solution list.
+        """
+        if self.method_result is not None:
+            return self.method_result.solution_list
+        else:
+            return []
+
+    def get_elapseds(self) -> List[float]:
+        """get_elapseds [summary] get elapseds time for each iteration.
+        """
+        return [result.elapsed for result in self.results]
+
+    def make_method_result(self) -> None:
+        """make_method_result [summary] make the method result with all solutions of every archives.
+        """
+        # initialize method result
+        self.method_result = Result(self.problem)
+        # add each solution and count up the elapsed time
+        for result in self.results:
+            self.method_result.elapsed += result.elapsed
+            for solution in result.solution_list:
+                self.method_result.add(solution)
+
+    def dump_result(self, index: int) -> None:
+        """dump_result [summary] dump the result archive into .obj and .var files
+        (which contain objectives and variables according to the same order).
+        """
+        # check dump path
+        assert path.isdir(self.path)
+        # prepare ordered objectives, sorted by first value in objectives
+        solutions = self.get_solution_list(index)
+        solutions.sort(key=lambda x: x.objectives[0])
+        # dump objectives
+        with open(self.obj_file_name(index), 'w+') as obj_file:
+            for solution in solutions:
+                obj_file.write(NDArchive.float_list_to_str(solution.objectives) + '\n')
+        # dump variables
+        with open(self.var_file_name(index), 'w+') as var_file:
+            for solution in solutions:
+                var_file.write(NDArchive.bool_list_to_str(solution.variables[0]) + '\n')
+
+    def load_result(self, index: int, evaluate: bool) -> None:
+        """load_result [summary] load the result with archive (objectives and variables) from files (.obj and .var).
+        It would involve problem infomation, thus need a problem.
+
+        If evaluate is True, solutions would be loaded from variables via problem.evaluate.
+        It would check if a solution is feasible and it still loads objectives but just for checking.
+        If the evaluate is False, then solutions are loaded form both variables and objectives,
+        at the same time, assume the solutions is feasible.
+        """
+        # prepare load files
+        assert path.isdir(self.path)
+        assert path.isfile(self.obj_file_name(index))
+        assert path.isfile(self.var_file_name(index))
+        # check index
+        assert index == len(self.results)
+        # prepare the variables list and objectives list
+        variables_list: List[List[bool]] = []
+        objectives_list: List[List[float]] = []
+        # load variables
+        with open(self.var_file_name(index), 'r') as var_file:
+            for line in var_file:
+                if line.strip() == '': continue
+                variables = NDArchive.str_to_bool_list(line.strip())
+                assert len(variables) == self.problem.variables_num
+                variables_list.append(variables)
+        # load objectives
+        with open(self.obj_file_name(index), 'r') as obj_file:
+            for line in obj_file:
+                if line.strip() == '': continue
+                objectives = NDArchive.str_to_float_list(line.strip())
+                assert len(objectives) == self.problem.objectives_num
+                objectives_list.append(objectives)
+        assert len(objectives_list) == len(variables_list)
+        # prepare list of BinarySolution
+        solution_list: List[BinarySolution] = []
+        if evaluate:
+            for index in range(len(variables_list)):
+                values = {self.problem.variables[i]: variables_list[index][i]
+                          for i in range(self.problem.variables_num)}
+                solution = self.problem.evaluate(values)
+                assert solution.constraints[0] == 0
+                for i in range(self.problem.objectives_num):
+                    assert round(solution.objectives[i], NDArchive.ROUND_PRECISION) == objectives_list[index][i]
+                solution_list.append(solution)
+        else:
+            for index in range(len(variables_list)):
+                solution = self.problem._empty_solution()
+                solution.variables = [variables_list[index]]
+                solution.objectives = objectives_list[index]
+                if self.problem.constraints_num > 0:
+                    solution.constraints[0] = 0
+                solution_list.append(solution)
+        # append to archives
+        result = Result(self.problem)
+        # archive.set_solution_list(solution_list)
+        for solution in solution_list:
+            result.add(solution)
+        self.results.append(result)
+
+    def dump_info(self) -> None:
+        """dump_info [summary] dump all info (except for solutions) into a json file
+        """
+        # write elapeds into info
+        self.info['iteration'] = len(self.results)
+        self.info['elapseds'] = [result.elapsed for result in self.results]
+        # dump into file
+        with open(self.info_file_name(), 'w+') as info_out:
+            json.dump(self.info, info_out)
+            info_out.close()
+
+    def load_info(self) -> Tuple[int, List[float]]:
+        """load_info [summary] load info from file, return iteration number and elapseds.
+        """
+        with open(self.info_file_name(), 'r') as info_in:
+            self.info = json.load(info_in)
+            info_in.close()
+        return self.info['iteration'], self.info['elapseds']
+
+    def dump(self) -> None:
+        """dump [summary] dump achives (<index>.obj.txt, <index>.var.txt) and info (.info.json).
+        """
+        # prepare folder
+        Path(self.path).mkdir(parents=True, exist_ok=True)
+        # dump info file
+        self.dump_info()
+        # dump archives
+        for index in range(self.info['iteration']):
+            self.dump_result(index)
+
+    def load(self, evaluate: bool = True) -> None:
+        """load [summary] load the MethodResult from files, indicated by info file.
+        Evaluate is True as we want to load solutions from variables via evaluation.
+        """
+        # check folder
+        assert path.isdir(self.path)
+        # load info
+        self.iteration, elapseds = self.load_info()
+        assert len(elapseds) == self.iteration
+        # load results
+        for index in range(self.iteration):
+            self.load_result(index, evaluate)
+            self.results[index].elapsed = elapseds[index]
+        assert len(self.results) == self.iteration
+
+
+class HashableObjectives:
+    """ [summary] HashableObjectives is a hashable term for float list.
+    """
+    def __init__(self, solution: BinarySolution) -> None:
+        self.objectives = [round(x, NDArchive.ROUND_PRECISION) for x in solution.objectives]
+        self.code = hash(tuple([int(x) for x in self.objectives]))
+
+    def __hash__(self) -> int:
+        return self.code
+
+    def __eq__(self, another: object) -> bool:
+        if not isinstance(another, HashableObjectives): return False
+        if self.__hash__() != another.__hash__(): return False
+        for ind, obj in enumerate(self.objectives):
+            if round(obj, NDArchive.ROUND_PRECISION) != round(another.objectives[ind], NDArchive.ROUND_PRECISION):
+                return False
+        return True
+
+
+class ProblemArchive:
+    """ [summary] ProblemArchive presents the pareto front of the problem,
+    made up by solutions in every solving results' archives.
+    """
+    indicators = ['igd', 'hv', 'sp']
+
+    def __init__(self, problem: Problem, method_archives: Dict[str, Result]) -> None:
+        """__init__ [summary] ProblemArchive is initialized by the problem and archives.
+        """
+        self.problem: Problem = problem
+        self.method_archives: Dict[str, Result] = method_archives
+        self.archive: NDArchive = NDArchive(problem.variables_num, problem.objectives_num)
+        self.objectives_set: Set[HashableObjectives] = set()
+
+        # make pareto front from each archive
+        for result in method_archives.values():
+            for solution_ in result.solution_list:
+                self.archive.add(copy.copy(solution_))
+        # make objective set
+        for solution in self.archive.solution_list:
+            self.objectives_set.add(HashableObjectives(solution))
+
+        # convert to ndarray
+        self.archive_array: numpy.ndarray = ProblemArchive.archive_to_array(self.archive)
+        self.method_archives_array: Dict[str, numpy.ndarray] = \
+            {k: ProblemArchive.archive_to_array(v) for k, v in self.method_archives.items()}
+
+    @staticmethod
+    def archive_to_array(archive: NDArchive) -> numpy.ndarray:
+        return numpy.array([archive.solution_list[i].objectives for i in range(len(archive))])
+
+    def solutions_count(self) -> Dict[str, int]:
+        """solutions_count [summary] count how many solutions in each solving results.
+        """
+        return {k: len(v.solution_list) for k, v in self.method_archives.items()}
+
+    def on_pareto_count(self) -> Dict[str, int]:
+        """on_pareto_count [summary] count how many solutions are on problem pareto front
+        from each solving result.
+        """
+        counter: Dict[str, int] = {}
+        for obj_name, result in self.method_archives.items():
+            counter[obj_name] = 0
+            for solution in result.solution_list:
+                if HashableObjectives(solution) in self.objectives_set:
+                    counter[obj_name] += 1
+        return counter
+
+    def reference_point(self) -> List[float]:
+        """reference_point [summary] find the reference point from pareto front, not all found solutions.
+        """
+        solutions = self.archive.solution_list
+        reference_point = []
+        for ite in range(self.problem.objectives_num):
+            reference_point.append(max([solutions[i].objectives[ite] for i in range(len(solutions))]) + 1.0)
+        return reference_point
+
+    def compute_igd(self) -> Dict[str, float]:
+        scores: Dict[str, float] = {}
+        for name, solutions in self.method_archives_array.items():
+            if len(solutions) < 1: scores[name] = -1.0
+            else: scores[name] = InvertedGenerationalDistance(self.archive_array).compute(solutions)
+        return scores
+
+    def compute_hv(self) -> Dict[str, float]:
+        reference_point = self.reference_point()
+        scores: Dict[str, float] = {}
+        for name, solutions in self.method_archives_array.items():
+            scores[name] = HyperVolume(reference_point).compute(solutions)
+        return scores
+
+    def compute_sp(self) -> Dict[str, float]:
+        reference_point = self.reference_point()
+        scores: Dict[str, float] = {}
+        for name, solutions in self.method_archives_array.items():
+            scores[name] = EvennessIndicator(reference_point).compute(solutions)
+        return scores
+
+    def compute(self, indicators: List[str]) -> List[Dict[str, float]]:
+        results: List[Dict[str, float]] = []
+        for indicator in indicators:
+            results.append(getattr(self, 'compute_{}'.format(indicator))())
+        return results
+
+    def compute_all(self) -> List[Dict[str, float]]:
+        return self.compute(ProblemArchive.indicators)
+
+
+class ProblemResult:
+    """ [summary] ProblemResult is a result manager for a problem solved with one or several solvers.
+    It provids methods for load/dump files, prepare problem archives, and compute scores on them.
+    """
+    def __init__(self, name: str, problem: Problem, result_path: str = '') -> None:
+        self.name: str = name
+        self.path: str = ''
+        if result_path == '':
+            self.path = path.join(RESULT_ROOT, self.name)
+        else:
+            self.path = path.join(RESULT_ROOT, result_path, self.name)
+        self.problem: Problem = problem
+
+        self.methods_results: Dict[str, MethodResult] = {}
+
+    def method_result(self, method_name: str) -> MethodResult:
+        """method_result [summary] generate a method result with given name and inside this problem result.
+        """
+        return MethodResult(method_name, self.path, self.problem)
+
+    def add(self, method_result: MethodResult) -> None:
+        """add [summary] add a MethodResult into Problem Result
+        """
+        method_name = method_result.name
+        assert method_name not in self.methods_results
+        self.methods_results[method_name] = method_result
+
+    def dump(self) -> None:
+        """dump [summary] dump to files.
+        """
+        Path(self.path).mkdir(parents=True, exist_ok=True)
+        for result in self.methods_results.values():
+            result.dump()
+
+    def load(self, methods: List[str], evaluate: bool = True) -> None:
+        """load [summary] load from a folder with the same name.
+        """
+        assert path.isdir(self.path)
+        # load method results with their names
+        for method in methods:
+            self.methods_results[method] = MethodResult(method, self.path, self.problem)
+            self.methods_results[method].load(evaluate)
+            self.methods_results[method].make_method_result()
+
+    @staticmethod
+    def average_of_dicts(scores: List[Dict[str, float]]) -> Dict[str, float]:
+        result: Dict[str, float] = {key: 0.0 for key in scores[0]}
+        for score in scores:
+            for key in result:
+                result[key] += score[key]
+        iteration = len(scores)
+        for key in result:
+            result[key] /= iteration
+        return result
+
+    def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
+        """union_average_compare [summary] return union method compared with average method with scores indicated by
+        [elapsed time, found, front, igd, hv, spacing].
+        """
+        assert union_method in self.methods_results
+        assert average_method in self.methods_results
+        # prepare union result
+        union_method_result = self.methods_results[union_method]
+        if union_method_result.method_result is None:
+            union_method_result.make_method_result()
+        union_result = union_method_result.method_result
+        assert union_result is not None
+        # prepare average results
+        average_method_result = self.methods_results[average_method]
+        iteration = average_method_result.iteration
+        average_elapsed = sum(average_method_result.get_elapseds()) / iteration
+        average_results = average_method_result.results
+        # compare
+        elapsed = {union_method: union_result.elapsed, average_method: average_elapsed}
+        found = {union_method: len(union_result),
+                 average_method: (sum([len(r) for r in average_results]) / iteration)}
+        front_all: List[Dict[str, float]] = []
+        igd_all: List[Dict[str, float]] = []
+        hv_all: List[Dict[str, float]] = []
+        sp_all: List[Dict[str, float]] = []
+        for i in range(iteration):
+            average_result = average_results[i]
+            problem_archive = \
+                ProblemArchive(self.problem, {union_method: union_result, average_method: average_result})
+            front_all.append({k: float(v) for k, v in problem_archive.on_pareto_count().items()})
+            igd_all.append(problem_archive.compute_igd())
+            hv_all.append(problem_archive.compute_hv())
+            sp_all.append(problem_archive.compute_sp())
+        # collect scores
+        scores = [elapsed, found, ProblemResult.average_of_dicts(front_all),
+                  ProblemResult.average_of_dicts(igd_all),
+                  ProblemResult.average_of_dicts(hv_all),
+                  ProblemResult.average_of_dicts(sp_all)]
+        return scores
+
+    @staticmethod
+    def result_compare(problem: Problem, method_results: Dict[str, Result]) -> List[Dict[str, float]]:
+        """result_compare [summary] compare archives, return scores are ordered as:
+            front, igd, hv, spacing.
+        """
+        problem_archive = ProblemArchive(problem, method_results)
+        # calculate or count the scores
+        front = {k: float(v) for k, v in problem_archive.on_pareto_count().items()}
+        igd = problem_archive.compute_igd()
+        hv = problem_archive.compute_hv()
+        sp = problem_archive.compute_sp()
+        return [front, igd, hv, sp]
