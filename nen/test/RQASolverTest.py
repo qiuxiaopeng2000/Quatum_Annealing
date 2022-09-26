@@ -3,11 +3,11 @@ import random
 from datetime import datetime
 from jmetal.core.solution import BinarySolution
 from nen.Problem import Problem, LP, QP
-from nen.Solver.ExactWSOSolver import ExactWSOSolver
+from nen.Solver.RQAWSOSolver import RQAWSOSolver
 from nen.Solver.ExactWSOQPSolver import ExactWSOQPSolver
 
 
-class ExactQPSolveTest(unittest.TestCase):
+class RQASolveTest(unittest.TestCase):
     # config
     LOOP_TIMES = 30
 
@@ -28,10 +28,10 @@ class ExactQPSolveTest(unittest.TestCase):
             lp = LP(problem_name, problem.objectives_order)
             qp = QP(problem_name, problem.objectives_order)
             # random weights
-            for _ in range(ExactQPSolveTest.LOOP_TIMES):
+            for _ in range(RQASolveTest.LOOP_TIMES):
                 weights = self.random_weights(problem.objectives_order)
                 ws = {problem.objectives_order[i]: weights[i] for i in range(problem.objectives_num)}
-                lr = ExactWSOSolver.solve(lp, ws)
+                lr = RQAWSOSolver.solve(lp, ws)
                 qr = ExactWSOQPSolver.solve(qp, ws, 1e5)
                 ls = lr.single
                 qs = qr.single

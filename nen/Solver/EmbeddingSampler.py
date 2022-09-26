@@ -3,7 +3,7 @@ import dimod
 import minorminer
 from dimod.sampleset import SampleSet
 from dimod.binary_quadratic_model import BinaryQuadraticModel
-from dwave.system import DWaveSampler
+from dwave.system import DWaveSampler, ReverseAdvanceComposite
 from dwave.embedding import unembed_sampleset, EmbeddedStructure
 from dwave.system.warnings import WarningHandler, WarningAction
 from functools import partial
@@ -12,16 +12,17 @@ from nen.Problem import Problem
 from nen.Term import Quadratic
 from nen.Solver.MetaSolver import SolverUtil
 
-
 Sample = Any
 
 
 class EmbeddingSampler:
     """ [summary] Composite Embedding and Sampling.
     """
+
     def __init__(self) -> None:
         # choose the sampler
         self.sampler = DWaveSampler(solver='Advantage_system4.1')
+        self.reverse_sampler = ReverseAdvanceComposite(self.sampler)
 
         # set the parameters
         self.parameters = self.sampler.parameters.copy()
@@ -166,11 +167,11 @@ class EmbeddingSampler:
             selected_state = select(sampleset)[0]
             initial_state = {u: selected_state[v] for v, chain in embedding.items() for u in chain}
             # sample
-            response = self.sampler.sample(bqm_embedded,
-                                           num_reads=num_reads,
-                                           reinitialize_state=True,
-                                           initial_state=initial_state,
-                                           anneal_schedule=anneal_schedule)
+            response = self.reverse_sampler.sample(bqm_embedded,
+                                                   num_reads=num_reads,
+                                                   reinitialize_state=True,
+                                                   initial_state=initial_state,
+                                                   anneal_schedule=anneal_schedule)
             # unembed
             async_unembed = partial(EmbeddingSampler.async_unembed_complete,
                                     embedding=embedding,
