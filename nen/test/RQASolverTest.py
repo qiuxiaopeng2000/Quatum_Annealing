@@ -2,9 +2,11 @@ import unittest
 import random
 from datetime import datetime
 from jmetal.core.solution import BinarySolution
+
+from nen import Quadratic
 from nen.Problem import Problem, LP, QP
+from nen.Solver import EmbeddingSampler, SolverUtil
 from nen.Solver.RQAWSOSolver import RQAWSOSolver
-from nen.Solver.ExactWSOQPSolver import ExactWSOQPSolver
 
 
 class RQASolveTest(unittest.TestCase):
@@ -16,33 +18,28 @@ class RQASolveTest(unittest.TestCase):
         sum_weights = sum(weights)
         return [w / sum_weights for w in weights]
 
-    def wso(self, objs, weights):
+    def caculate_wso(self, objs, weights):
         return sum([objs[i] * weights[i] for i in range(len(objs))])
+
+    def caculate_penalty(self, wso, qp):
+        penalty = EmbeddingSampler.calculate_penalty(wso, qp.constraint_sum)
+        return penalty
 
     def test_qp_solving(self) -> None:
         random.seed(datetime.now())
-        for problem_name in ['Drupal', 'ms', 'rp', 'WebPortal']:
+        for problem_name in ['rp']:
             # prepare problems
             problem = Problem(problem_name)
             problem.vectorize()
-            lp = LP(problem_name, problem.objectives_order)
             qp = QP(problem_name, problem.objectives_order)
+
             # random weights
             for _ in range(RQASolveTest.LOOP_TIMES):
                 weights = self.random_weights(problem.objectives_order)
                 ws = {problem.objectives_order[i]: weights[i] for i in range(problem.objectives_num)}
-                lr = RQAWSOSolver.solve(lp, ws)
-                qr = ExactWSOQPSolver.solve(qp, ws, 1e5)
-                ls = lr.single
-                qs = qr.single
-                if ls is None and qs is None:
-                    print('skipped')
-                    continue
-                elif ls is None or qs is None:
-                    assert False
-                else:
-                    assert isinstance(ls, BinarySolution)
-                    assert isinstance(qs, BinarySolution)
-                    sl = self.wso(ls.objectives, weights)
-                    sr = self.wso(qs.objectives, weights)
-                    assert abs(sl - sr) < 1e-6, (sl, sr, ls.variables, qs.variables)
+                wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, ws))
+                penalty = self.caculate_penalty(wso, qp)
+                anneal_schedule = [[0.0, 1.0], [10.0, 0.5], [20, 1.0]]
+                rqaw = RQAWSOSolver.solve(qp, ws, penalty, self.LOOP_TIMES, anneal_schedule, 1)
+                rqa = rqaw.single
+

@@ -96,6 +96,8 @@ class Problem:
             objectives_order = list(self.objectives.keys())
         self.vectorize_objectives(objectives_order)
 
+
+
     def vectorize_values(self, values: Dict[str, bool]) -> Mat:
         """vectorize_values [summary] make variables value (mapping variable name to bool value)
         a vector (one-line numpy matrix).
@@ -117,6 +119,19 @@ class Problem:
             for var, coef in self.objectives[obj_name].items():
                 if values[var]: obj_values[obj_index] += coef
         return obj_values
+
+    def evaluate_single_objective(self, values: Dict[str, bool], weights: Dict[str, float]) -> float:
+        """evaluate-single-objective [summary] evaluate single-objective
+        with the sum of objectives list with variables values.
+        """
+        sum_obj = 0
+        obj_values: List[float] = [0.0] * len(self.objectives_index)
+        for obj_name, obj_index in self.objectives_index.items():
+            for var, coef in self.objectives[obj_name].items():
+                if values[var]:
+                    obj_values[obj_index] += coef
+                    sum_obj += obj_values[obj_index] * weights[obj_name]
+        return sum_obj
 
     def evaluate_constraints(self, values: Dict[str, bool], violated_count: bool) -> int:
         """evaluate_constraints [summary] evaluate violated constriants count with variables values.
@@ -146,7 +161,20 @@ class Problem:
         obj_values = self.evaluate_objectives(values)
         # evaluate violated
         violated = self.evaluate_constraints(values, violated_count)
-        return (obj_values, violated)
+        return obj_values, violated
+
+    def _wso_evaluate(self, values: Dict[str, bool], weights: Dict[str, float], violated_count: bool = True) -> Tuple[float, int]:
+        """_evaluate [summary] evaluate a solution with variables values.
+        The violated constraint would be count as a number when violated_count is True,
+        otherwise it would only indicate feasible (0) or infeasible(1).
+
+        Return (objective values, violated)
+        """
+        # evaluate objectives
+        obj_values = self.evaluate_single_objective(values, weights)
+        # evaluate violated
+        violated = self.evaluate_constraints(values, violated_count)
+        return obj_values, violated
 
     def _empty_solution(self) -> BinarySolution:
         """_empty_solution [summary] prepare a empty BinarySolution.
@@ -173,6 +201,17 @@ class Problem:
         # NOTE: note that jmetal use variables in this way, variables: [[True, False, True, ...]]
         solution.variables = [self.listize_values(values)]
         solution.objectives, solution.constraints[0] = self._evaluate(values, self.violateds_count)
+        return solution
+
+    def wso_evaluate(self, values: Dict[str, bool], weights: Dict[str, float]) -> BinarySolution:
+        """evaluate [summary] evaluate a solution with variables values.
+        Return a BinarySolution from jmetal.
+        """
+        # prepare a BinarySolution
+        solution = self._empty_solution()
+        # NOTE: note that jmetal use variables in this way, variables: [[True, False, True, ...]]
+        solution.variables = [self.listize_values(values)]
+        solution.objectives, solution.constraints[0] = self._wso_evaluate(values, weights, self.violateds_count)
         return solution
 
     def evaluate_solution(self, solution: BinarySolution) -> BinarySolution:

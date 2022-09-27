@@ -171,7 +171,7 @@ class EmbeddingSampler:
                                                    num_reads=num_reads,
                                                    reinitialize_state=True,
                                                    initial_state=initial_state,
-                                                   anneal_schedule=anneal_schedule)
+                                                   anneal_schedules=anneal_schedule)
             # unembed
             async_unembed = partial(EmbeddingSampler.async_unembed_complete,
                                     embedding=embedding,
@@ -180,7 +180,8 @@ class EmbeddingSampler:
             sampleset = dimod.SampleSet.from_future(response, async_unembed)
             sampleset_list.append(sampleset)
             # compare current set and last set
-            if dominate(last_set, sampleset): break
+            if dominate(last_set, sampleset):
+                break
         return sampleset_list
 
     @staticmethod
