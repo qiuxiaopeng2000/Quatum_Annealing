@@ -21,7 +21,8 @@ anneal_schedule = [[[0.0, 1.0], [t, 0.5], [20, 1.0]] for t in (5, 10, 15)]
 result = RQAWSOSolver.solve(problem=problem, weights=weights,
                             penalty=penalty, num_reads=100,
                             max_reverse_loop=max_reverse_loop,
-                            anneal_schedule=anneal_schedule)
+                            anneal_schedule=anneal_schedule,
+                            is_single=True)
 
 # add result to method result, problem result
 problem_result = ProblemResult('ms', problem)

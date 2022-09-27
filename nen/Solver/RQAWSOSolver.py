@@ -52,7 +52,7 @@ class RQAWSOSolver:
             solution: BinarySolution
             if is_single:
                 solution = problem.wso_evaluate(values, weights)
-            else :
+            else:
                 solution = problem.evaluate(values)
             result.add(solution)
             key = NDArchive.bool_list_to_str(solution.variables[0])

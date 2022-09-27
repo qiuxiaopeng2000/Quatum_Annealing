@@ -42,4 +42,5 @@ class RQASolveTest(unittest.TestCase):
                 anneal_schedule = [[0.0, 1.0], [10.0, 0.5], [20, 1.0]]
                 rqaw = RQAWSOSolver.solve(qp, ws, penalty, self.LOOP_TIMES, anneal_schedule, 1)
                 rqa = rqaw.single
+                assert isinstance(rqa, Optional[BinarySolution])
 
