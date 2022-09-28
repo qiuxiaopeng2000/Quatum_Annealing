@@ -40,8 +40,9 @@ class RQAWSOSolver:
                                       dominate=EmbeddingSampler.engery_compare,
                                       num_reads=num_reads)
         print("finish reverse quantum annealing")
-        # use the one before the last sampleset
-        sampleset = samplesets[-2]
+        # use the last sampleset
+        # beacause in the samplesets, the later data is better
+        sampleset = samplesets[-1]
         elapsed = sum([EmbeddingSampler.get_qpu_time(sampleset) for sampleset in samplesets])
         # get results
         result = Result(problem)
@@ -54,7 +55,7 @@ class RQAWSOSolver:
                 solution = problem.wso_evaluate(values, weights)
             else:
                 solution = problem.evaluate(values)
-            result.add(solution)
+            result.wso_add(solution)
             key = NDArchive.bool_list_to_str(solution.variables[0])
             if key not in result.info['occurence']:
                 result.info['occurence'][key] = str(occurrence)

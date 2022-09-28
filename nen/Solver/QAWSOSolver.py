@@ -30,8 +30,8 @@ class QAWSOSolver:
         if 'occurence' not in result.info:
             result.info['occurence'] = {}
         for values, occurrence in EmbeddingSampler.get_values_and_occurrence(sampleset, problem.variables):
-            solution = problem.evaluate(values)
-            result.add(solution)
+            solution = problem.wso_evaluate(values, weights)
+            result.wso_add(solution)
             key = NDArchive.bool_list_to_str(solution.variables[0])
             if key not in result.info['occurence']:
                 result.info['occurence'][key] = str(occurrence)

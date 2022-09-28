@@ -171,10 +171,10 @@ class Problem:
         Return (objective values, violated)
         """
         # evaluate objectives
-        obj_values = self.evaluate_single_objective(values, weights)
+        obj_value = self.evaluate_single_objective(values, weights)
         # evaluate violated
         violated = self.evaluate_constraints(values, violated_count)
-        return obj_values, violated
+        return obj_value, violated
 
     def _empty_solution(self) -> BinarySolution:
         """_empty_solution [summary] prepare a empty BinarySolution.

@@ -27,7 +27,7 @@ class NDArchive:
         self.archive = NonDominatedSolutionsArchive()
 
     def add(self, solution: BinarySolution) -> bool:
-        """add [summary] add a solution into nd archive.
+        """add [summary] add a non-dominant solution into nd archive.
         """
         # check wether solution is feasible
         if sum(solution.constraints) > 0: return False
@@ -37,6 +37,19 @@ class NDArchive:
         # round objectives with NDArchive.ROUND_PRECISION
         solution.objectives = [round(x, NDArchive.ROUND_PRECISION) for x in solution.objectives]
         return self.archive.add(solution)
+
+    def wso_add(self, solution: BinarySolution) -> bool:
+        """add [summary] add a solution in a single problem into nd archive.
+        """
+        # check wether solution is feasible
+        if sum(solution.constraints) > 0: return False
+        # check variables size and objectives size
+        assert len(solution.variables[0]) == self.variables_num
+        assert len(solution.objectives) == self.objectives_num
+        # round objectives with NDArchive.ROUND_PRECISION
+        solution.objectives = [round(x, NDArchive.ROUND_PRECISION) for x in solution.objectives]
+        self.solution_list.append(solution)
+        return True
 
     def set_solution_list(self, solution_list: List[BinarySolution]) -> None:
         """set_solution_list [summary] set solutions directly without any checks.

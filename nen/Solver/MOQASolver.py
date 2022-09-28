@@ -53,10 +53,11 @@ class MOQASolver:
                 result.add(solution)
         # add into method result
         result.elapsed = sum(elapseds)
-        if 'solving info' not in result.info:
-            result.info['solving info'] = [sampleset.info]
-        else:
-            result.info['solving info'].append(sampleset.info)
+        for sampleset in samplesets:
+            if 'solving info' not in result.info:
+                result.info['solving info'] = [sampleset.info]
+            else:
+                result.info['solving info'].append(sampleset.info)
         # storage parameters
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads
@@ -112,10 +113,11 @@ class MOQASolver:
                 result.add(solution)
         # add into method result
         result.elapsed = sum([EmbeddingSampler.get_qpu_time(sampleset) for sampleset in samplesets])
-        if 'solving info' not in result.info:
-            result.info['solving info'] = [sampleset.info]
-        else:
-            result.info['solving info'].append(sampleset.info)
+        for sampleset in samplesets:
+            if 'solving info' not in result.info:
+                result.info['solving info'] = [sampleset.info]
+            else:
+                result.info['solving info'].append(sampleset.info)
         # storage parameters
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads

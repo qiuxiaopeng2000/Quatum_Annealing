@@ -156,7 +156,7 @@ class EmbeddingSampler:
                                 bqm=bqm,
                                 warninghandler=warninghandler)
         sampleset = dimod.SampleSet.from_future(response, async_unembed)
-        sampleset_list.append(sampleset)
+        # sampleset_list.append(sampleset)
 
         # reverse anneal
         for i in range(max_reverse_loop):
@@ -181,7 +181,10 @@ class EmbeddingSampler:
             sampleset_list.append(sampleset)
             # compare current set and last set
             if dominate(last_set, sampleset):
+                sampleset_list.append(last_set)
                 break
+            else:
+                sampleset_list.append(sampleset)
         return sampleset_list
 
     @staticmethod
