@@ -253,7 +253,9 @@ class PymooProblem(ElementwiseProblem):
             objs.append(x * ai for _, ai in obj_content.items())
 
         # constrain
-        cons = [x * self.problem.constraints]
+        cons = []
+        for c in self.problem.constraints:
+            cons.append([x * c])
 
         out["F"] = np.column_stack(objs)
         out["G"] = np.column_stack(cons)

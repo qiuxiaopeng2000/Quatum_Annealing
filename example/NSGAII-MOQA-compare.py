@@ -31,7 +31,7 @@ qp = QP(name, order)
 # ea_result = MethodResult('ga', problem_result.path, problem)
 # ea_result.load()
 result1 = GASolver.GASolver.solve(iterations=10, populationSize=500, maxEvaluations=100000, crossoverProbability=0.8,
-                                    mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
+                                  mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
 ga_result = MethodResult('ga', problem_result.path, qp)
 ga_result.add(result1)
 
