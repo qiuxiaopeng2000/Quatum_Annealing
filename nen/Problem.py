@@ -265,7 +265,7 @@ class LP(Problem):
     """LP [summary] LP, short for Linear Problem.
     """
     TYPE = 'LP'
-
+ 
     def __init__(self, name: str, objectives_order: List[str] = []) -> None:
         super().__init__(name=name)
         # vectorize the problem
@@ -277,7 +277,7 @@ class LP(Problem):
 
     def info(self) -> None:
         super().info()
- 
+
     def get_objectives(self) -> List[Dict[str, float]]:
         return [self.objectives[obj_name] for obj_name in self.objectives_order]
 
