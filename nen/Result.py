@@ -305,6 +305,7 @@ class MethodResult:
         """load [summary] load the MethodResult from files, indicated by info file.
         Evaluate is True as we want to load solutions from variables via evaluation.
         """
+        print(self.path)
         # check folder
         assert path.isdir(self.path)
         # load info
