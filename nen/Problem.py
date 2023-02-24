@@ -255,7 +255,7 @@ class PymooProblem(ElementwiseProblem):
         # constrain
         cons = []
         for c in self.problem.constraints:
-            cons.append([x * c.left - x * c.right])
+            cons.append([x * c.left.astype(np.float) - x * c.right.astype(np.float)])
 
         out["F"] = np.column_stack(objs)
         out["G"] = np.column_stack(cons)
@@ -265,7 +265,7 @@ class LP(Problem):
     """LP [summary] LP, short for Linear Problem.
     """
     TYPE = 'LP'
- 
+
     def __init__(self, name: str, objectives_order: List[str] = []) -> None:
         super().__init__(name=name)
         # vectorize the problem
