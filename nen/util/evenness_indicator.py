@@ -11,6 +11,7 @@ from typing import List, Dict, Set
 from jmetal.core.solution import FloatSolution, Solution
 from jmetal.core.quality_indicator import QualityIndicator
 
+
 class EvennessIndicator(QualityIndicator):
     def __init__(self, reference_front: np.array = None):
         super(EvennessIndicator, self).__init__(is_minimization=True)

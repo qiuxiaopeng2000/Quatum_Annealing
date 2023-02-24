@@ -67,7 +67,6 @@ class MOQASolver:
             # else:
             #     samplesets.append(r_sampleset)
 
-
         # put samples into result
         result = Result(problem)
         for sampleset in samplesets:

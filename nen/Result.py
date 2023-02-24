@@ -10,6 +10,7 @@ from nen.util.evenness_indicator import EvennessIndicator
 from jmetal.util.archive import NonDominatedSolutionsArchive
 from jmetal.core.solution import BinarySolution
 from jmetal.core.quality_indicator import InvertedGenerationalDistance, HyperVolume
+import math
 
 
 class NDArchive:
@@ -25,6 +26,7 @@ class NDArchive:
         self.objectives_num: int = objectives_num
         # the archive
         self.archive = NonDominatedSolutionsArchive()
+        self.total_num_anneals = 0
 
     def add(self, solution: BinarySolution) -> bool:
         """add [summary] add a non-dominant solution into nd archive.
@@ -36,6 +38,7 @@ class NDArchive:
         assert len(solution.objectives) == self.objectives_num
         # round objectives with NDArchive.ROUND_PRECISION
         solution.objectives = [round(x, NDArchive.ROUND_PRECISION) for x in solution.objectives]
+        self.total_num_anneals += 1
         return self.archive.add(solution)
 
     def wso_add(self, solution: BinarySolution) -> bool:
@@ -381,6 +384,12 @@ class ProblemArchive:
                     counter[obj_name] += 1
         return counter
 
+    def p_solve(self) -> Dict[str, float]:
+        """p_solve [summary] calculate the probability of solving a problem
+        """
+        pareto_count = self.on_pareto_count()
+        return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
+
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
         """
@@ -409,6 +418,14 @@ class ProblemArchive:
         scores: Dict[str, float] = {}
         for name, solutions in self.method_archives_array.items():
             scores[name] = EvennessIndicator(reference_point).compute(solutions)
+        return scores
+
+    def compute_tts(self) -> Dict[str, float]:
+        # reference_point = self.reference_point()
+        scores: Dict[str, float] = {}
+        for name, solutions in self.method_archives_array.items():
+            scores[name] = (math.log(1 - 0.99) / math.log(1 - self.p_solve()[name])) * \
+                           self.method_archives[name].elapsed
         return scores
 
     def compute(self, indicators: List[str]) -> List[Dict[str, float]]:
@@ -501,6 +518,7 @@ class ProblemResult:
         igd_all: List[Dict[str, float]] = []
         hv_all: List[Dict[str, float]] = []
         sp_all: List[Dict[str, float]] = []
+        tts_all: List[Dict[str, float]] = []
         for i in range(iteration):
             average_result = average_results[i]
             problem_archive = \
@@ -509,11 +527,13 @@ class ProblemResult:
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())
             sp_all.append(problem_archive.compute_sp())
+            tts_all.append(problem_archive.compute_tts())
         # collect scores
         scores = [elapsed, found, ProblemResult.average_of_dicts(front_all),
                   ProblemResult.average_of_dicts(igd_all),
                   ProblemResult.average_of_dicts(hv_all),
-                  ProblemResult.average_of_dicts(sp_all)]
+                  ProblemResult.average_of_dicts(sp_all),
+                  ProblemResult.average_of_dicts(tts_all)]
         return scores
 
     @staticmethod
