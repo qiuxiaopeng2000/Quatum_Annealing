@@ -272,16 +272,19 @@ class PymooProblem(ElementwiseProblem):
             objs.append(x * ai for _, ai in obj_content.items())
 
         # constrain
-
         ordered_constrains: List[List[float]] = [[0.0] * len(self.problem.variables) for _ in
                                                  range(len(self.constraints_lp))]
         for index, constrain in enumerate(self.constraints_lp):
-            for var, coef in constrain.coef.items():
-                pos = self.problem.variables_index[var]
-                ordered_constrains[index][pos] = coef * x[pos] - constrain.rhs
+            for vars, coef in constrain.coef.items():
+                for i in range(len(vars)):
+                    pos = self.problem.variables_index[vars[i]]
+                    ordered_constrains[index][pos] = coef
+        cons = []
+        for index, constrain in enumerate(self.constraints_lp):
+            cons.append(np.dot(ordered_constrains[index], x) - constrain.rhs)
 
         out["F"] = np.column_stack(objs)
-        out["G"] = np.column_stack(Mat(ordered_constrains).T)
+        out["G"] = np.column_stack(cons)
 
 
 class LP(Problem):
