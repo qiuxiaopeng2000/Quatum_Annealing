@@ -15,6 +15,7 @@ class Problem:
     """
     def __init__(self, name: str = '') -> None:
         # record the name
+        self.constrains_index: Dict[str, int] = {}
         self.name: str = name
         # problem content
         self.variables: List[str] = []
@@ -89,6 +90,21 @@ class Problem:
         self.objectives_order = objectives_order
         self.objectives_num = len(objectives_order)
         self.objectives = {name: self.objectives[name] for name in objectives_order}
+
+    # def vectorize_constrains(self, constrains_order: List[Linear]) -> None:
+    #     """vectorize_constrain [summary] make constrains a vectorize (in numpy) to accelerate speed.
+    #     """
+    #     assert self.variables_index is not None
+    #     # collect objectives and check if objectives order is legal
+    #     ordered_constrains: List[List[float]] = [[0.0] * len(self.variables) for _ in range(len(constrains_order))]
+    #     for index, constrain in enumerate(constrains_order):
+    #         for var, coef in constrain.coef.items():
+    #             ordered_constrains[index][self.variables_index[var]] = coef
+    #     self.constrains_matrix = Mat(constrains_order).T
+    #     # set objectives attributes
+    #     self.constrains_order = constrains_order
+    #     self.constrains_num = len(constrains_order)
+    #     self.objectives = {name: self.objectives[name] for name in constrains_order}
 
     def vectorize(self, objectives_order: List[str] = []) -> None:
         """vectorize [summary] vectorize the variables and objectives
@@ -243,6 +259,9 @@ class PymooProblem(ElementwiseProblem):
         self.n_obj = problem.objectives_num
         self.n_ieq_constr = problem.constraints_num
         self.problem = problem
+        self.constraints_lp: List[Linear] = []
+        for constraint in self.problem.constraints:
+            self.constraints_lp += constraint.to_linear()
 
         super().__init__(n_var=self.n_var, n_obj=self.n_obj, n_ieq_constr=self.n_ieq_constr, **kwargs)
 
@@ -253,12 +272,16 @@ class PymooProblem(ElementwiseProblem):
             objs.append(x * ai for _, ai in obj_content.items())
 
         # constrain
-        cons = []
-        for c in self.problem.constraints:
-            cons.append([x * c.left.astype(np.float) - x * c.right.astype(np.float)])
+
+        ordered_constrains: List[List[float]] = [[0.0] * len(self.problem.variables) for _ in
+                                                 range(len(self.constraints_lp))]
+        for index, constrain in enumerate(self.constraints_lp):
+            for var, coef in constrain.coef.items():
+                pos = self.problem.variables_index[var]
+                ordered_constrains[index][pos] = coef * x[pos] - constrain.rhs
 
         out["F"] = np.column_stack(objs)
-        out["G"] = np.column_stack(cons)
+        out["G"] = np.column_stack(Mat(ordered_constrains).T)
 
 
 class LP(Problem):

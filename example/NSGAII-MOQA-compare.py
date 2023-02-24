@@ -5,7 +5,7 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
-from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
+from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
 from nen.Solver import JarSolver, MOQASolver, GASolver
 
 name = 'ms'
@@ -18,21 +18,12 @@ problem.vectorize(order)
 # prepare the problem result folder before solving
 problem_result = ProblemResult(name, problem, result_folder)
 qp = QP(name, order)
+lp = LP(name, order)
 
 # solve with NSGA-II
-# JarSolver.solve(
-#     solver_name='NSGAII', config_name='tmp_config',
-#     problem=name, objectiveOrder=order, iterations=10,
-#     populationSize=500, maxEvaluations=100000,
-#     crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
-#     resultFolder=result_folder, methodName='ga'
-# )
-# # load results
-# ea_result = MethodResult('ga', problem_result.path, problem)
-# ea_result.load()
 result1 = GASolver.GASolver.solve(iterations=10, populationSize=500, maxEvaluations=100000, crossoverProbability=0.8,
                                   mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
-ga_result = MethodResult('ga', problem_result.path, qp)
+ga_result = MethodResult('ga', problem_result.path, lp)
 ga_result.add(result1)
 
 
