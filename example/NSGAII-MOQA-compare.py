@@ -1,13 +1,9 @@
 # Put this file at Nen/ (Project Root Path)
 import sys
-# import os
-# curPath = os.path.abspath(os.path.dirname(__file__))
-# rootPath = os.path.split(curPath)[0]
-# sys.path.append(rootPath)
-from os import path
-from pathlib import Path
-ROOT_DIR = path.dirname(Path(__file__).parent.parent)
-sys.path.append(ROOT_DIR)
+import os
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
 from nen.Solver import JarSolver, MOQASolver
