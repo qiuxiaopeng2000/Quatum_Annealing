@@ -13,5 +13,8 @@ LIB_DIR = path.join(ROOT_DIR, 'lib')
 # Dump Path
 DUMP_DIR = path.join(ROOT_DIR, 'dump')
 
+# Solver Path
+SOLVER_DIR = path.join(ROOT_DIR, 'nen')
+
 # float precision
 FLOAT_PRECISION = 1e-6
