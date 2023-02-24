@@ -277,7 +277,7 @@ class LP(Problem):
 
     def info(self) -> None:
         super().info()
-
+ 
     def get_objectives(self) -> List[Dict[str, float]]:
         return [self.objectives[obj_name] for obj_name in self.objectives_order]
 
