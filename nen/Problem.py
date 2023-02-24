@@ -4,6 +4,8 @@ from numpy import matrix as Mat
 from jmetal.core.solution import BinarySolution
 from nen.DescribedProblem import DescribedProblem
 from nen.Term import Constraint, Linear, Quadratic
+from pymoo.core.problem import ElementwiseProblem
+import numpy as np
 
 
 class Problem:
@@ -95,8 +97,6 @@ class Problem:
         if len(objectives_order) == 0:
             objectives_order = list(self.objectives.keys())
         self.vectorize_objectives(objectives_order)
-
-
 
     def vectorize_values(self, values: Dict[str, bool]) -> Mat:
         """vectorize_values [summary] make variables value (mapping variable name to bool value)
@@ -235,6 +235,28 @@ class Problem:
                 else:
                     objective[var] = (obj_weight * coef)
         return objective
+
+
+class PymooProblem(ElementwiseProblem):
+    def __init__(self, problem: Problem, **kwargs):
+        self.n_var = problem.variables_num
+        self.n_obj = problem.objectives_num
+        self.n_ieq_constr = problem.constraints_num
+        self.problem = problem
+
+        super().__init__(n_var=self.n_var, n_obj=self.n_obj, n_ieq_constr=self.n_ieq_constr, **kwargs)
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        # objective
+        objs = []
+        for obj_name, obj_content in self.problem.objectives.items():
+            objs.append(x * ai for _, ai in obj_content.items())
+
+        # constrain
+        cons = [x * self.problem.constraints]
+
+        out["F"] = np.column_stack(objs)
+        out["G"] = np.column_stack(cons)
 
 
 class LP(Problem):

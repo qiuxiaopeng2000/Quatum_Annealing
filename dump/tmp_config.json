@@ -1,0 +1,14 @@
+{
+  "problem": "ms",
+  "objectiveOrder": [
+    "cost",
+    "revenue"
+  ],
+  "iterations": 10,
+  "populationSize": 500,
+  "maxEvaluations": 100000,
+  "crossoverProbability": 0.8,
+  "mutationProbability": 0.02,
+  "resultFolder": "ms-ea-example",
+  "methodName": "ga"
+}

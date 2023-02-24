@@ -6,7 +6,7 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
-from nen.Solver import JarSolver, MOQASolver
+from nen.Solver import JarSolver, MOQASolver, GASolver
 
 name = 'ms'
 order = ['cost', 'revenue']
@@ -17,28 +17,33 @@ problem.vectorize(order)
 
 # prepare the problem result folder before solving
 problem_result = ProblemResult(name, problem, result_folder)
+qp = QP(name, order)
 
 # solve with NSGA-II
-JarSolver.solve(
-    solver_name='NSGAII', config_name='tmp_config',
-    problem=name, objectiveOrder=order, iterations=10,
-    populationSize=500, maxEvaluations=100000,
-    crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
-    resultFolder=result_folder, methodName='ga'
-)
-# load results
-ea_result = MethodResult('ga', problem_result.path, problem)
-ea_result.load()
+# JarSolver.solve(
+#     solver_name='NSGAII', config_name='tmp_config',
+#     problem=name, objectiveOrder=order, iterations=10,
+#     populationSize=500, maxEvaluations=100000,
+#     crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
+#     resultFolder=result_folder, methodName='ga'
+# )
+# # load results
+# ea_result = MethodResult('ga', problem_result.path, problem)
+# ea_result.load()
+result1 = GASolver.GASolver.solve(iterations=10, populationSize=500, maxEvaluations=100000, crossoverProbability=0.8,
+                                    mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
+ga_result = MethodResult('ga', problem_result.path, qp)
+ga_result.add(result1)
+
 
 # solve with cplex
-qp = QP(name, order)
 result = MOQASolver.solve(qp, sample_times=10, num_reads=100)
-ex_result = MethodResult('moqp', problem_result.path, qp)
-ex_result.add(result)
+qp_result = MethodResult('moqp', problem_result.path, qp)
+qp_result.add(result)
 
 # dump the results
-problem_result.add(ea_result)
-problem_result.add(ex_result)
+problem_result.add(ga_result)
+problem_result.add(qp_result)
 problem_result.dump()
 
 # compare
