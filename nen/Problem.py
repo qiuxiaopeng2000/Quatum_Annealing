@@ -276,11 +276,12 @@ class PymooProblem(ElementwiseProblem):
                                                  range(len(self.constraints_lp))]
         for index, constrain in enumerate(self.constraints_lp):
             for vars, coef in constrain.coef.items():
-                print(len(vars))
-                print(vars)
-                for i in range(len(vars)):
-                    pos = self.problem.variables_index[vars[i]]
-                    ordered_constrains[index][pos] = coef
+                # print(len(vars))
+                # print(vars)
+
+                assert vars in self.problem.variables_index.keys()
+                pos = self.problem.variables_index[vars]
+                ordered_constrains[index][pos] = coef
         cons = []
         for index, constrain in enumerate(self.constraints_lp):
             cons.append(np.dot(ordered_constrains[index], x) - constrain.rhs)
