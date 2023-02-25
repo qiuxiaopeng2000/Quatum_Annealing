@@ -228,7 +228,7 @@ class Problem:
         # NOTE: note that jmetal use variables in this way, variables: [[True, False, True, ...]]
         solution.variables = [self.listize_values(values)]
         solution.objectives, solution.constraints[0] = self._wso_evaluate(values, weights, self.violateds_count)
-        return solution 
+        return solution
 
     def evaluate_solution(self, solution: BinarySolution) -> BinarySolution:
         """evaluate_solution [summary] evaluate a given solution and return itself.
@@ -276,6 +276,8 @@ class PymooProblem(ElementwiseProblem):
                                                  range(len(self.constraints_lp))]
         for index, constrain in enumerate(self.constraints_lp):
             for vars, coef in constrain.coef.items():
+                print(len(vars))
+                print(vars)
                 for i in range(len(vars)):
                     pos = self.problem.variables_index[vars[i]]
                     ordered_constrains[index][pos] = coef

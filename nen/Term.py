@@ -13,7 +13,8 @@ class Linear:
         self.rhs = rhs
 
     def __str__(self):
-        if not self.coef: return '<empty linear constraint>'
+        if not self.coef:
+            return '<empty linear constraint>'
         s = ''
         first = True
         for k, v in self.coef.items():
