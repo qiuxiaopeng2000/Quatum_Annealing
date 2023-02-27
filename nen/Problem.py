@@ -24,6 +24,8 @@ class Problem:
         self.variables_num: int = 0
         self.objectives_num: int = 0
         self.constraints_num: int = 0
+        self.eq_constraints_num: int = 0
+        self.ieq_constraints_num: int = 0
 
         # evaluate all constraints or just indicate infeasible (1)
         self.violateds_count: bool = True
@@ -45,6 +47,10 @@ class Problem:
         for constraint_str_list in dp.constraints:
             assert len(constraint_str_list) == 3
             left, sense, right = constraint_str_list
+            if sense == '=':
+                self.eq_constraints_num += 1
+            else:
+                self.ieq_constraints_num += 1
             if sense == '<=' or sense == '=':
                 self.constraints.append(Constraint(left, sense, int(right)))
             else:
@@ -52,6 +58,7 @@ class Problem:
         self.variables_num = len(self.variables)
         self.objectives_num = len(self.objectives)
         self.constraints_num = len(self.constraints)
+        assert self.ieq_constraints_num + self.eq_constraints_num == self.constraints_num, "ieq_constraints_num + eq_constraints_num is wrong!"
 
     def info(self) -> None:
         print('name: {}'.format(self.name))
@@ -252,42 +259,67 @@ class Problem:
                     objective[var] = (obj_weight * coef)
         return objective
 
+    def convert_to_BinarySolution(self, bool_solution: List[bool]) -> Dict[str, bool]:
+        bs: Dict[str, bool] = {}
+        for index, sol in enumerate(bool_solution):
+            bs[self.variables[index]] = sol
+        return bs
+
 
 class PymooProblem(ElementwiseProblem):
     def __init__(self, problem: Problem, **kwargs):
         self.n_var = problem.variables_num
         self.n_obj = problem.objectives_num
-        self.n_ieq_constr = problem.constraints_num
+        self.n_ieq_constr = problem.ieq_constraints_num
+        self.n_eq_constr = problem.eq_constraints_num
         self.problem = problem
         self.constraints_lp: List[Linear] = []
+        self.vars = problem.variables
+
+        self.objs = []
+        self.cons = []
+
         for constraint in self.problem.constraints:
             self.constraints_lp += constraint.to_linear()
 
-        super().__init__(n_var=self.n_var, n_obj=self.n_obj, n_ieq_constr=self.n_ieq_constr, **kwargs)
+        xl = [0.0 * self.problem.variables_num]
+        xu = [1.0 * self.problem.variables_num]
+
+        super().__init__(n_var=self.n_var, n_obj=self.n_obj, n_ieq_constr=self.n_ieq_constr, vars=self.vars,
+                         n_eq_constr=self.n_eq_constr, xl=xl, xu=xu, **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
+        """
+        Assuming the Algorithm has variability size N, the input variable x is a one-dimensional
+        matrix with the length N.
+        """
         # objective
         objs = []
         for obj_name, obj_content in self.problem.objectives.items():
-            objs.append(x * ai for _, ai in obj_content.items())
+            num = []
+            for k, v in obj_content.items():
+                num.append(v)
+            assert len(x) == len(num), "objective's vars num is not equal x!"
+            # auto transpose
+            objs.append(np.dot(x, num))
+        self.objs = objs
 
         # constrain
         ordered_constrains: List[List[float]] = [[0.0] * len(self.problem.variables) for _ in
                                                  range(len(self.constraints_lp))]
         for index, constrain in enumerate(self.constraints_lp):
-            for vars, coef in constrain.coef.items():
-                # print(len(vars))
-                # print(vars)
-
-                assert vars in self.problem.variables_index.keys()
-                pos = self.problem.variables_index[vars]
+            for var, coef in constrain.coef.items():
+                assert var in self.problem.variables_index.keys()
+                pos = self.problem.variables_index[var]
                 ordered_constrains[index][pos] = coef
         cons = []
         for index, constrain in enumerate(self.constraints_lp):
-            cons.append(np.dot(ordered_constrains[index], x) - constrain.rhs)
+            assert len(ordered_constrains[0]) == len(x), "constraints' vars num is not equal x!"
+            cons.append(np.dot(x, ordered_constrains[index]) - constrain.rhs)
+        self.cons = cons
 
-        out["F"] = np.column_stack(objs)
-        out["G"] = np.column_stack(cons)
+        out["F"] = objs
+        out["G"] = cons
 
 
 class LP(Problem):

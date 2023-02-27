@@ -6,7 +6,8 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
-from nen.Solver import JarSolver, MOQASolver, GASolver
+from nen.Solver import MOQASolver, GASolver
+
 
 name = 'ms'
 order = ['cost', 'revenue']

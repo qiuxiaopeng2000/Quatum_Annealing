@@ -4,6 +4,9 @@ from pathlib import Path
 import json
 import numpy
 import copy
+
+import numpy as np
+
 from nen.Problem import Problem
 from nen.util.util import RESULT_ROOT
 from nen.util.evenness_indicator import EvennessIndicator
