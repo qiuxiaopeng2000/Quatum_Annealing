@@ -7,8 +7,8 @@ from nen.Solver.MetaSolver import SolverUtil
 from nen.Solver.EmbeddingSampler import EmbeddingSampler
 
 
-class QAWSOSolver:
-    """ [summary] QAWSOSolver, stands for Quantum Annealling Weighted Sum Objective Solver.
+class SOQA:
+    """ [summary] SOQA, stands for Quantum Annealling Weighted Sum Objective Solver as Single Objective Problem.
 
     The Quantum Annealling Solver is implemeneted with D-Wave Leap,
     make sure the environment is configured successfully accordingly.
