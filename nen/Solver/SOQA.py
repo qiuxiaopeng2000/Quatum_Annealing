@@ -14,8 +14,11 @@ class SOQA:
     make sure the environment is configured successfully accordingly.
     """
     @staticmethod
-    def solve(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int, sample_times: int = 1) -> Result:
+    def solve(problem: QP, weights: Dict[str, float], num_reads: int, sample_times: int = 1) -> Result:
         result = Result(problem)
+        wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
+        # calculate the penalty and add constraints to objective with penalty
+        penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
         for _ in range(sample_times):
             res = SOQA.solve_once(problem, weights, penalty, num_reads)
             result.add(res.single)

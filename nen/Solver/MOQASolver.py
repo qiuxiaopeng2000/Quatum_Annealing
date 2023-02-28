@@ -2,10 +2,7 @@ from functools import partial
 from typing import Dict, List
 from random import random
 
-from dimod import BinaryQuadraticModel
-from dwave.system import ReverseAdvanceComposite
-from dwave.system.composites import embedding
-
+# from dwave.system import ReverseAdvanceComposite
 
 from nen.Term import Constraint, Quadratic
 from nen.Problem import QP

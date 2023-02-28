@@ -28,7 +28,7 @@ ga_result = MethodResult('ga', problem_result.path, qp)
 ga_result.add(result1)
 
 # solve with cplex
-result = SOQA.solve(qp, )
+result = SOQA.solve(problem=qp, weights=weights, num_reads=100)
 qp_result = MethodResult('moqp', problem_result.path, qp)
 qp_result.add(result)
 
