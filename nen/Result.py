@@ -109,7 +109,7 @@ class NDArchive:
 
 class Result(NDArchive):
     """Result [summary] Result corresponds with the class Problem, it manages the solutions,
-    elapsed time and other infomation with a single solving on a Problem.
+    elapsed time and other information with a single solving on a Problem.
     """
     def __init__(self, problem: Problem) -> None:
         super().__init__(problem.variables_num, problem.objectives_num)

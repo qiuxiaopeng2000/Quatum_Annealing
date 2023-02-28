@@ -11,6 +11,12 @@ from nen.Result import Result
 
 
 class GASolver:
+    """ [summary] GASolver, stands for Multi-Objective Genetic Algorithm Solver,
+        it adopts random weighted sum of objectives and use Genetic Algorithm to solve problem for several times.
+
+        The Genetic Algorithm Solver is implemented with 'pymoo' python package,
+        make sure the environment is configured successfully accordingly.
+        """
     @staticmethod
     def solve(problem: Problem, populationSize: int, maxEvaluations: int, iterations: int,
               seed: int, crossoverProbability: float, mutationProbability: int,

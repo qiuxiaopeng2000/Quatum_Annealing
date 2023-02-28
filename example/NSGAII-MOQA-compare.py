@@ -6,7 +6,8 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
-from nen.Solver import MOQASolver, GASolver
+from nen.Solver.MOQASolver import MOQASolver
+from nen.Solver.GASolver import GASolver
 
 
 name = 'ms'
@@ -22,7 +23,7 @@ qp = QP(name, order)
 lp = LP(name, order)
 
 # solve with NSGA-II
-result1 = GASolver.GASolver.solve(iterations=10, populationSize=500, maxEvaluations=100000, crossoverProbability=0.8,
+result1 = GASolver.solve(iterations=10, populationSize=500, maxEvaluations=100000, crossoverProbability=0.8,
                                   mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
 ga_result = MethodResult('ga', problem_result.path, lp)
 ga_result.add(result1)

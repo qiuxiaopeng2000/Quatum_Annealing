@@ -4,7 +4,7 @@ from nen.Solver.ExactIECSolver import ExactIECSolver
 from nen.Solver.ExactWSOSolver import ExactWSOSolver
 from nen.Solver.ExactECQPSolver import ExactECQPSolver
 from nen.Solver.SolRep3DSolver import SolRep3DSolver
-from nen.Solver.QAWSOSolver import QAWSOSolver
+from nen.Solver.SOQA import SOQA
 from nen.Solver.RQAWSOSolver import RQAWSOSolver
 from nen.Solver.MOQASolver import MOQASolver
 from nen.Solver.RandomSolver import SolutionGenerator, RandomSolver
@@ -20,5 +20,5 @@ __all__ = ['SolutionGenerator', 'SolverUtil', 'RandomSolver', 'JarSolver',
            'EmbeddingSampler',
            'ExactWSOSolver', 'ExactWSOQPSolver',
            'ExactECSolver', 'ExactIECSolver', 'ExactECQPSolver', 'SolRep3DSolver',
-           'QAWSOSolver', 'RQAWSOSolver', 'MOQASolver',
+           'SOQA', 'RQAWSOSolver', 'MOQASolver',
            'SAQPSolver', 'SASolver', 'TabuQPSolver']
