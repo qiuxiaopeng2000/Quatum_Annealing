@@ -14,7 +14,20 @@ class SOQA:
     make sure the environment is configured successfully accordingly.
     """
     @staticmethod
-    def solve(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int) -> Result:
+    def solve(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int, sample_times: int = 1) -> Result:
+        result = Result(problem)
+        for _ in range(sample_times):
+            res = SOQA.solve_once(problem, weights, penalty, num_reads)
+            result.add(res.single)
+            result.info['occurence'] = res.info['occurence']
+            result.info['solving info'].append(res.info['solving info'])
+        result.info['weights'] = weights
+        result.info['penalty'] = penalty
+        result.info['num_reads'] = num_reads
+        return result
+
+    @staticmethod
+    def solve_once(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int) -> Result:
         """solve [summary] solve single objective qp (applied wso technique), return Result.
         """
         # prepare wso objective
@@ -27,16 +40,20 @@ class SOQA:
         sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
         # get results
         result = Result(problem)
+        solution_list = []
         if 'occurence' not in result.info:
             result.info['occurence'] = {}
         for values, occurrence in EmbeddingSampler.get_values_and_occurrence(sampleset, problem.variables):
-            solution = problem.wso_evaluate(values, weights)
-            result.wso_add(solution)
+            solution = problem.evaluate(values)
+            solution_list.append(solution)
+
             key = NDArchive.bool_list_to_str(solution.variables[0])
             if key not in result.info['occurence']:
                 result.info['occurence'][key] = str(occurrence)
             else:
                 result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
+        best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
+        result.add(best_solution)
         result.elapsed = elapsed
         if 'solving info' not in result.info:
             result.info['solving info'] = [sampleset.info]
