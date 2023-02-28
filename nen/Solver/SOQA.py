@@ -21,7 +21,7 @@ class SOQA:
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
         for _ in range(sample_times):
             res = SOQA.solve_once(problem, weights, penalty, num_reads)
-            result.add(res.single)
+            result.solution_list.append(res.single)
             result.info['occurence'] = res.info['occurence']
             result.info['solving info'].append(res.info['solving info'])
         result.info['weights'] = weights

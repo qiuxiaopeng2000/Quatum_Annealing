@@ -1,11 +1,12 @@
 from typing import List, Dict, Any, Optional, Tuple, Set
 from os import path
 from pathlib import Path
+from scipy import stats
 import json
 import numpy
 import copy
-
 import numpy as np
+
 
 from nen.Problem import Problem
 from nen.util.util import RESULT_ROOT
@@ -157,6 +158,18 @@ class MethodResult:
         """
         self.iteration += 1
         self.results.append(result)
+
+    def get_wso_objective(self, weights: List[float]) -> List[float]:
+        """get_wso_objective [summary] calculate the wso_objective as result of single-objective
+        """
+        objective = []
+        for solution in self.method_result.solution_list:
+            assert len(solution.objectives) == len(weights)
+            obj = 0.0
+            for i in range(solution.number_of_objectives):
+                obj += (solution.objectives[i] * weights[i])
+            objective.append(obj)
+        return objective
 
     def get_result(self, index: int) -> Result:
         """get_archive [summary] get the certain Result within the iteration.
@@ -496,6 +509,29 @@ class ProblemResult:
         for key in result:
             result[key] /= iteration
         return result
+
+    def statistical_analysis(self, method1: str, method2: str, weights: Dict[str, float]):
+        """
+        p_value [summary] return statistical analysis of two solutions with two different methods indicated by
+        [statistic: float, p_value: float, mean: float, std: float, max: float: min: float].
+        """
+        assert method1 in self.methods_results
+        assert method2 in self.methods_results
+        method1_result = self.methods_results[method1]
+        method2_result = self.methods_results[method2]
+        assert len(method1_result.method_result.solution_list) == len(method2_result.method_result.solution_list)
+        # 'alternative' is Alternative Hypothesis
+        w = []
+        for k, v in weights.items():
+            w.append(v)
+        method1_objective = method1_result.get_wso_objective(w)
+        method2_objective = method2_result.get_wso_objective(w)
+        statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative="less")
+        mean = {np.mean(method1_objective), np.mean(method2_objective)}
+        std = {np.std(method1_objective), np.std(method2_objective)}
+        max_num = {np.max(method1_objective), np.max(method2_objective)}
+        min_num = {np.min(method1_objective), np.min(method2_objective)}
+        return statistic, pvalue, mean, std, max_num, min_num
 
     def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
         """union_average_compare [summary] return union method compared with average method with scores indicated by

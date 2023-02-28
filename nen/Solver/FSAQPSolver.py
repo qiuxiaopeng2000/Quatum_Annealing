@@ -11,6 +11,16 @@ from nen.Solver.SASolver import SASolver
 class FSAQPSolver:
     """ [summary] Fast Simulated Annealing Quadratic Programming Solver.
     """
+
+    @staticmethod
+    def solve(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
+              L: int = 300, max_stay: int = 150, sample_times: int = 1) -> Result:
+        result = Result(problem)
+        for _ in range(sample_times):
+            res = FSAQPSolver.solve_once(problem, weights, t_max, t_min, L, max_stay)
+            result.solution_list.append(res.single)
+        return result
+
     @staticmethod
     def quadratic_to_fitness(H: Quadratic):
         """quadratic_to_fitness [summary] convert Quadratic function to fitness function,
@@ -76,11 +86,4 @@ class FSAQPSolver:
         result.elapsed = end - start
         return result
 
-    @staticmethod
-    def solve(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
-              L: int = 300, max_stay: int = 150, sample_times: int = 1) -> Result:
-        result = Result(problem)
-        for _ in range(sample_times):
-            res = FSAQPSolver.solve_once(problem, weights, t_max, t_min, L, max_stay)
-            result.add(res.single)
-        return result
+
