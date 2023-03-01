@@ -21,7 +21,7 @@ problem_result = ProblemResult(name, problem, result_folder)
 lp = LP(name, order)
 
 # solve with NSGA-II
-result = GASolver.solve(iterations=10, populationSize=100, maxEvaluations=100000, crossoverProbability=0.8,
+result = GASolver.solve(iterations=1000, populationSize=100, maxEvaluations=100000, crossoverProbability=0.8,
                         mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
 ga_result = MethodResult('ga', problem_result.path, lp)
 ga_result.add(result)
