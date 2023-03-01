@@ -31,7 +31,7 @@ ga_result.add(result1)
 
 # solve with cplex
 result = MOQASolver.solve(qp, sample_times=10, num_reads=100)
-qp_result = MethodResult('moqp', problem_result.path, qp)
+qp_result = MethodResult('moqa', problem_result.path, qp)
 qp_result.add(result)
 
 # dump the results
@@ -40,7 +40,7 @@ problem_result.add(qp_result)
 problem_result.dump()
 
 # compare
-scores = problem_result.union_average_compare(union_method='moqp', average_method='ga')
+scores = problem_result.union_average_compare(union_method='moqa', average_method='ga')
 table = Visualizer.tabulate_single_problem(
     name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
     scores, {'elapsed time': 2, 'found': 2, 'front': 2, 'igd': 2, 'hv': 2, 'spacing': 2, 'tts': 6}
