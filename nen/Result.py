@@ -405,8 +405,9 @@ class ProblemArchive:
     def p_solve(self) -> Dict[str, float]:
         """p_solve [summary] calculate the probability of solving a problem
         """
-        pareto_count = self.on_pareto_count()
-        return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
+        # pareto_count = self.on_pareto_count()
+        # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
+        return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
@@ -441,9 +442,15 @@ class ProblemArchive:
     def compute_tts(self) -> Dict[str, float]:
         # reference_point = self.reference_point()
         scores: Dict[str, float] = {}
-        for name, solutions in self.method_archives_array.items():
-            scores[name] = (math.log(1 - 0.99) / math.log(1 - self.p_solve()[name])) * \
-                           self.method_archives[name].elapsed
+        p_solve = self.p_solve()
+        for name, _ in self.method_archives_array.items():
+            if p_solve[name] == 0:
+                scores[name] = math.inf
+            elif p_solve[name] == 1:
+                scores[name] = -math.inf
+            else:
+                scores[name] = (math.log(1 - 0.99) / math.log(1 - p_solve[name])) * self.method_archives[name].elapsed
+
         return scores
 
     def compute(self, indicators: List[str]) -> List[Dict[str, float]]:

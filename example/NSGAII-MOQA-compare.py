@@ -43,6 +43,6 @@ problem_result.dump()
 scores = problem_result.union_average_compare(union_method='moqp', average_method='ga')
 table = Visualizer.tabulate_single_problem(
     name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
-    scores, {'elapsed time': 2, 'found': 2, 'front': 2, 'igd': 2, 'hv': 0, 'spacing': 2, 'tts': 6}
+    scores, {'elapsed time': 2, 'found': 2, 'front': 2, 'igd': 2, 'hv': 2, 'spacing': 2, 'tts': 6}
 )
 Visualizer.tabluate(table, 'compare-example.csv')
