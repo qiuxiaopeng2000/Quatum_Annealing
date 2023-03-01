@@ -36,7 +36,8 @@ class NDArchive:
         """add [summary] add a non-dominant solution into nd archive.
         """
         # check wether solution is feasible
-        if sum(solution.constraints) > 0: return False
+        # if sum(solution.constraints) > 0:
+        #     return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
         assert len(solution.objectives) == self.objectives_num

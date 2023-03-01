@@ -12,7 +12,7 @@ from nen.Solver.GASolver import GASolver
 
 name = 'ms'
 order = ['cost', 'revenue']
-result_folder = 'ms-ea-example'
+result_folder = 'QA-GA-example'
 
 problem = Problem(name)
 problem.vectorize(order)
@@ -24,7 +24,7 @@ lp = LP(name, order)
 
 # solve with NSGA-II
 result1 = GASolver.solve(iterations=10, populationSize=500, maxEvaluations=100000, crossoverProbability=0.8,
-                                  mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
+                         mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
 ga_result = MethodResult('ga', problem_result.path, lp)
 ga_result.add(result1)
 

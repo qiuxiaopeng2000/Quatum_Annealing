@@ -4,7 +4,7 @@ from numpy import matrix as Mat
 from jmetal.core.solution import BinarySolution
 from nen.DescribedProblem import DescribedProblem
 from nen.Term import Constraint, Linear, Quadratic
-from pymoo.core.problem import ElementwiseProblem
+from pymoo.core.problem import Problem as Pro
 import numpy as np
 
 
@@ -266,7 +266,10 @@ class Problem:
         return bs
 
 
-class PymooProblem(ElementwiseProblem):
+class PymooProblem(Pro):
+    """
+    PymooProblem [summary] convert Problem formal to run in pymoo package.
+    """
     def __init__(self, problem: Problem, **kwargs):
         self.n_var = problem.variables_num
         self.n_obj = problem.objectives_num
@@ -282,8 +285,8 @@ class PymooProblem(ElementwiseProblem):
         for constraint in self.problem.constraints:
             self.constraints_lp += constraint.to_linear()
 
-        xl = [0.0 * self.problem.variables_num]
-        xu = [1.0 * self.problem.variables_num]
+        xl = [0.0 for _ in range(self.problem.variables_num)]
+        xu = [1.0 for _ in range(self.problem.variables_num)]
 
         super().__init__(n_var=self.n_var, n_obj=self.n_obj, n_ieq_constr=self.n_ieq_constr, vars=self.vars,
                          n_eq_constr=self.n_eq_constr, xl=xl, xu=xu, **kwargs)
@@ -299,8 +302,9 @@ class PymooProblem(ElementwiseProblem):
             num = []
             for k, v in obj_content.items():
                 num.append(v)
-            assert len(x) == len(num), "objective's vars num is not equal x!"
+            assert len(x[0]) == len(num), "objective's vars num is not equal x!"
             # auto transpose
+
             objs.append(np.dot(x, num))
         self.objs = objs
 
@@ -314,7 +318,7 @@ class PymooProblem(ElementwiseProblem):
                 ordered_constrains[index][pos] = coef
         cons = []
         for index, constrain in enumerate(self.constraints_lp):
-            assert len(ordered_constrains[0]) == len(x), "constraints' vars num is not equal x!"
+            assert len(ordered_constrains[0]) == len(x[0]), "constraints' vars num is not equal x!"
             cons.append(np.dot(x, ordered_constrains[index]) - constrain.rhs)
         self.cons = cons
 

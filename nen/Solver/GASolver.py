@@ -20,13 +20,14 @@ class GASolver:
     @staticmethod
     def solve(problem: Problem, populationSize: int, maxEvaluations: int, iterations: int,
               seed: int, crossoverProbability: float, mutationProbability: int,
-              verbose: bool = False):
+              verbose: bool = False) -> Result:
         """
         seed : integer
             The random seed to be used.
         verbose : bool
             Whether output should be printed or not.
-
+        populationSize : integer
+            Equivalent to 'num_reads' in QA
         Returns
         --------
         res.X: Design space values are
@@ -61,8 +62,10 @@ class GASolver:
                        return_least_infeasible=True)
         result = Result(problem)
         result.elapsed = res.exec_time
-        val = list(res.X.flatten())
-        values = problem.convert_to_BinarySolution(val)
-        solution = problem.evaluate(values)
-        result.add(solution)
+        for sol in res.X:
+            val = list(sol.flatten())
+            values = problem.convert_to_BinarySolution(val)
+            solution = problem.evaluate(values)
+            result.add(solution)
+        return result
 
