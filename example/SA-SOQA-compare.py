@@ -23,7 +23,7 @@ qp = QP(name, order)
 weights = {'cost': 1/2, 'revenue': 1/2}
 
 # solve with Genetic Algorithm
-result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.01, L=300, max_stay=150)
+result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=10, t_min=0.1, L=300, max_stay=150)
 ga_result = MethodResult('sa', problem_result.path, qp)
 ga_result.add(result1)
 
@@ -44,5 +44,4 @@ table = Visualizer.tabulate_single_problem(
     scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8}
 )
 Visualizer.tabluate(table, 'so-sa-compare-example.csv')
-
 

@@ -1,4 +1,7 @@
 from typing import Dict, List
+
+import numpy as np
+
 from nen.Problem import QP
 from nen.Result import Result
 from nen.Solver.EmbeddingSampler import EmbeddingSampler
@@ -44,7 +47,9 @@ class FSAQPSolver:
 
         def F(x: List[bool]) -> float:
             fitness: float = H.constant
+            x = np.array(x).flatten().tolist()
             for k, v in H.linear.items():
+                # temp = x[variables_map[k]]
                 if bool(x[variables_map[k]]):
                     fitness += v
             for (k1, k2), v in H.quadratic.items():
@@ -73,11 +78,14 @@ class FSAQPSolver:
         # sample with sko.SA (default = FSA)
         fitness, variables = FSAQPSolver.quadratic_to_fitness(H)
         start = SolverUtil.time()
-        x0 = SASolver.randomSolution(problem)
+        x0 = SASolver.randomSolution(problem).variables
         sampler = SA(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0)
         best_x, _ = sampler.run()
         end = SolverUtil.time()
         # restore the result
+        shape = best_x.shape
+        print(shape)
+        best_x = np.array(best_x).flatten().tolist()
         values: Dict[str, bool] = {}
         for ind, val in enumerate(best_x):
             values[variables[ind]] = bool(val)

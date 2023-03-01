@@ -34,7 +34,7 @@ class Quadratic:
     Notes that, the square of a binary variable equals to itself, x1 * x1 == x1,
     thus pairs such as (x1, x1) is illegal.
     """
-    def __init__(self, quadratic={}, linear={}, constant=0) -> None:
+    def __init__(self, quadratic={}, linear={}, constant=0.0) -> None:
         self.quadratic = quadratic
         self.linear = linear
         self.constant = constant
