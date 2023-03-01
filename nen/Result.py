@@ -405,9 +405,9 @@ class ProblemArchive:
     def p_solve(self) -> Dict[str, float]:
         """p_solve [summary] calculate the probability of solving a problem
         """
-        # pareto_count = self.on_pareto_count()
-        # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
-        return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
+        pareto_count = self.on_pareto_count()
+        return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
+        # return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.

@@ -285,8 +285,8 @@ class PymooProblem(Pro):
         for constraint in self.problem.constraints:
             self.constraints_lp += constraint.to_linear()
 
-        xl = [0.0 for _ in range(self.problem.variables_num)]
-        xu = [1.0 for _ in range(self.problem.variables_num)]
+        xl = [0 for _ in range(self.problem.variables_num)]
+        xu = [1 for _ in range(self.problem.variables_num)]
 
         super().__init__(n_var=self.n_var, n_obj=self.n_obj, n_ieq_constr=self.n_ieq_constr, vars=self.vars,
                          n_eq_constr=self.n_eq_constr, xl=xl, xu=xu, **kwargs)

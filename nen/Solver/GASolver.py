@@ -1,5 +1,7 @@
 from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.operators.crossover.pntx import TwoPointCrossover
 from pymoo.operators.crossover.sbx import SBX
+from pymoo.operators.mutation.bitflip import BitflipMutation
 from pymoo.operators.mutation.pm import PolynomialMutation
 from pymoo.operators.sampling.rnd import BinaryRandomSampling
 from pymoo.optimize import minimize
@@ -44,19 +46,17 @@ class GASolver:
         res.time: The time required to run the algorithm
         """
         termination = DefaultMultiObjectiveTermination(
-            xtol=1e-8,
-            cvtol=1e-6,
-            ftol=0.0025,
-            period=30,
             n_max_gen=iterations,
             n_max_evals=maxEvaluations
         )
         pro = PymooProblem(problem)
         alg = NSGA2(pop_size=populationSize,
-                    n_offsprings=10,
+                    # n_offsprings=10,
                     sampling=BinaryRandomSampling(),
-                    crossover=SBX(prob=crossoverProbability, eta=15),
-                    mutation=PolynomialMutation(eta=20, prob=mutationProbability),
+                    # crossover=SBX(prob=crossoverProbability, eta=15),
+                    crossover=TwoPointCrossover(),
+                    # mutation=PolynomialMutation(eta=20, prob=mutationProbability),
+                    mutation=BitflipMutation(),
                     eliminate_duplicates=True)
         res = minimize(pro, alg, termination, seed=seed, verbose=verbose,
                        return_least_infeasible=True)
