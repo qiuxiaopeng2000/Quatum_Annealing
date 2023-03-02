@@ -23,7 +23,7 @@ qp = QP(name, order)
 lp = LP(name, order)
 
 # solve with NSGA-II
-result1 = GASolver.solve(iterations=50, populationSize=100, maxEvaluations=5000, crossoverProbability=0.8,
+result1 = GASolver.solve(iterations=100, populationSize=100, maxEvaluations=10000, crossoverProbability=0.8,
                          mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
 ga_result = MethodResult('ga', problem_result.path, lp)
 ga_result.add(result1)
@@ -45,4 +45,4 @@ table = Visualizer.tabulate_single_problem(
     name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
     scores, {'elapsed time': 2, 'found': 2, 'front': 2, 'igd': 2, 'hv': 2, 'spacing': 2, 'tts': 6}
 )
-Visualizer.tabluate(table, 'compare-example.csv')
+Visualizer.tabluate(table, 'mo-ga-compare-example.csv')
