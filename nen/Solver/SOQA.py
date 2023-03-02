@@ -24,8 +24,14 @@ class SOQA:
             res = SOQA.solve_once(problem, weights, penalty, num_reads)
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
-            result.info['occurence'] = res.info['occurence']
-            result.info['solving info'].append(res.info['solving info'])
+            if 'occurence' not in result.info:
+                result.info['occurence'] = {}
+            else:
+                result.info['occurence'] = res.info['occurence']
+            if 'solving info' not in result.info:
+                result.info['solving info'] = res.info['solving info']
+            else:
+                result.info['solving info'].append(res.info['solving info'])
         result.info['weights'] = weights
         result.info['penalty'] = penalty
         result.info['num_reads'] = num_reads

@@ -539,7 +539,8 @@ class ProblemResult:
         std = {np.std(method1_objective), np.std(method2_objective)}
         max_num = {np.max(method1_objective), np.max(method2_objective)}
         min_num = {np.min(method1_objective), np.min(method2_objective)}
-        return statistic, pvalue, mean, std, max_num, min_num
+        elapsed = {method1_result.method_result.elapsed, method2_result.method_result.elapsed}
+        return statistic, pvalue, mean, std, max_num, min_num, elapsed
 
     def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
         """union_average_compare [summary] return union method compared with average method with scores indicated by

@@ -85,8 +85,8 @@ class FSAQPSolver:
         best_x, _ = sampler.run()
         end = SolverUtil.time()
         # restore the result
-        shape = best_x.shape
-        print(shape)
+        # shape = best_x.shape
+        # print(shape)
         best_x = np.array(best_x).flatten().tolist()
         values: Dict[str, bool] = {}
         for ind, val in enumerate(best_x):
@@ -95,5 +95,4 @@ class FSAQPSolver:
         result.add(problem.evaluate(values))
         result.elapsed = end - start
         return result
-
 
