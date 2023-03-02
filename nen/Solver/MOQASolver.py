@@ -25,6 +25,7 @@ class MOQASolver:
     def solve(problem: QP, sample_times: int, num_reads: int) -> Result:
         """solve [summary] solve qp, results are recorded in result.
         """
+        print("start MOQA to solve multi-objective problem!!!")
         # scale objectives and get the basic
         basic_weights = SolverUtil.scaled_weights(problem.objectives)
         # sample for sample_times times
@@ -81,6 +82,7 @@ class MOQASolver:
         # storage parameters
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads
+        print("MOQA end!!!")
         return result
 
     @staticmethod

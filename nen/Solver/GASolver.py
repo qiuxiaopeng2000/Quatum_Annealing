@@ -45,6 +45,7 @@ class GASolver:
         res.history: The history of the algorithm. (only if save_history has been enabled during the algorithm initialization)
         res.time: The time required to run the algorithm
         """
+        print("start Genetic Algorithm to solve multi-objective problem!!!")
         termination = DefaultMultiObjectiveTermination(
             n_max_gen=iterations,
             n_max_evals=maxEvaluations
@@ -67,5 +68,6 @@ class GASolver:
             values = problem.convert_to_BinarySolution(val)
             solution = problem.evaluate(values)
             result.add(solution)
+        print("Genetic Algorithm end!!!")
         return result
 

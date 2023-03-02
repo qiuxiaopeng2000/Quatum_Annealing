@@ -15,6 +15,7 @@ class SOQA:
     """
     @staticmethod
     def solve(problem: QP, weights: Dict[str, float], num_reads: int, sample_times: int = 1) -> Result:
+        print("start SOQA to solve single-problem!!!")
         result = Result(problem)
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
         # calculate the penalty and add constraints to objective with penalty
@@ -27,6 +28,7 @@ class SOQA:
         result.info['weights'] = weights
         result.info['penalty'] = penalty
         result.info['num_reads'] = num_reads
+        print("SOQA end!!!")
         return result
 
     @staticmethod
