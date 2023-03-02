@@ -23,6 +23,7 @@ class SOQA:
         for _ in range(sample_times):
             res = SOQA.solve_once(problem, weights, penalty, num_reads)
             result.solution_list.append(res.single)
+            result.elapsed += res.elapsed
             result.info['occurence'] = res.info['occurence']
             result.info['solving info'].append(res.info['solving info'])
         result.info['weights'] = weights

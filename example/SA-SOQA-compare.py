@@ -12,7 +12,7 @@ from nen.Solver.SOQA import SOQA
 
 name = 'ms'
 order = ['cost', 'revenue']
-result_folder = 'ms-ea-example'
+result_folder = 'so-sa-example'
 
 problem = Problem(name)
 problem.vectorize(order)
@@ -23,12 +23,12 @@ qp = QP(name, order)
 weights = {'cost': 1/2, 'revenue': 1/2}
 
 # solve with Genetic Algorithm
-result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=10, t_min=0.1, L=300, max_stay=150)
+result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=300, max_stay=150, sample_times=1000)
 ga_result = MethodResult('sa', problem_result.path, qp)
 ga_result.add(result1)
 
 # solve with cplex
-result = SOQA.solve(problem=qp, weights=weights, num_reads=100)
+result = SOQA.solve(problem=qp, weights=weights, num_reads=10, sample_times=1000)
 so_result = MethodResult('soqp', problem_result.path, qp)
 so_result.add(result)
 
