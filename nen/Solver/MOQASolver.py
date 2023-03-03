@@ -24,6 +24,10 @@ class MOQASolver:
     @staticmethod
     def solve(problem: QP, sample_times: int, num_reads: int) -> Result:
         """solve [summary] solve qp, results are recorded in result.
+        num_reads:
+            read the num of solution from the solver result, not all the solution on the pareto.
+        sample_times:
+            run the Multi-objectives Quantum Annealing Algorithm times.
         """
         print("start MOQA to solve multi-objective problem!!!")
         # scale objectives and get the basic

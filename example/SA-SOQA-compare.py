@@ -28,7 +28,7 @@ sa_result = MethodResult('sa', problem_result.path, qp)
 sa_result.add(result1)
 
 # solve with cplex
-result = SOQA.solve(problem=qp, weights=weights, num_reads=10000, sample_times=10)
+result = SOQA.solve(problem=qp, weights=weights, num_reads=1000, sample_times=10)
 so_result = MethodResult('soqp', problem_result.path, qp)
 so_result.add(result)
 
