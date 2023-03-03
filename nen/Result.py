@@ -200,16 +200,20 @@ class MethodResult:
         """
         return [result.elapsed for result in self.results]
 
-    def make_method_result(self) -> None:
+    def make_method_result(self, single_flag: bool) -> None:
         """make_method_result [summary] make the method result with all solutions of every archives.
+        single_flag: a flag to whether judgment is a sign of a single-objective problem
         """
         # initialize method result
         self.method_result = Result(self.problem)
         # add each solution and count up the elapsed time
         for result in self.results:
             self.method_result.elapsed += result.elapsed
-            for solution in result.solution_list:
-                self.method_result.add(solution)
+            if single_flag:
+                for solution in result.solution_list:
+                    self.method_result.solution_list.append(solution)
+                else:
+                    self.method_result.add(solution)
 
     def dump_result(self, index: int) -> None:
         """dump_result [summary] dump the result archive into .obj and .var files
@@ -528,9 +532,9 @@ class ProblemResult:
         method1_result = self.methods_results[method1]
         method2_result = self.methods_results[method2]
         if method1_result.method_result is None:
-            method1_result.make_method_result()
+            method1_result.make_method_result(single_flag=True)
         if method2_result.method_result is None:
-            method2_result.make_method_result()
+            method2_result.make_method_result(single_flag=True)
         assert len(method1_result.method_result.solution_list) == len(method2_result.method_result.solution_list)
         # 'alternative' is Alternative Hypothesis
         w = []
@@ -555,7 +559,7 @@ class ProblemResult:
         # prepare union result
         union_method_result = self.methods_results[union_method]
         if union_method_result.method_result is None:
-            union_method_result.make_method_result()
+            union_method_result.make_method_result(single_flag=False)
         union_result = union_method_result.method_result
         assert union_result is not None
         # prepare average results
