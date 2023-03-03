@@ -49,27 +49,6 @@ class MOQASolver:
             samplesets.append(sampleset)
             elapseds.append(elapsed)
 
-            # # reverse anneal
-            # reverse_sampler = ReverseAdvanceComposite(sampler)
-            # bqm = BinaryQuadraticModel.from_qubo(qubo)
-            # embedding, bqm_embedded = sampler.embed(bqm)
-            # last_set = sampleset
-            # # select one from last set as initial state
-            # selected_state = EmbeddingSampler.select_by_energy(sampleset)[0]
-            # initial_state = {u: selected_state[v] for v, chain in embedding.items() for u in chain}
-            # # sample
-            # r_sampleset, r_elapsed = reverse_sampler.sample(bqm,
-            #                                                 num_reads=num_reads,
-            #                                                 reinitialize_state=True,
-            #                                                 initial_state=initial_state,
-            #                                                 anneal_schedules=anneal_schedule)
-            # # samplesets.append(r_sampleset)
-            # # compare current set and last set
-            # if EmbeddingSampler.engery_compare(last_set, r_sampleset):
-            #     samplesets.append(last_set)
-            # else:
-            #     samplesets.append(r_sampleset)
-
         # put samples into result
         result = Result(problem)
         for sampleset in samplesets:
@@ -97,3 +76,24 @@ class MOQASolver:
         random_weights = {k: random() for k in basic_weights}
         sum_weights = sum(random_weights.values())
         return {k: (random_weights[k] / sum_weights) * v for k, v in basic_weights.items()}
+
+# # reverse anneal
+# reverse_sampler = ReverseAdvanceComposite(sampler)
+# bqm = BinaryQuadraticModel.from_qubo(qubo)
+# embedding, bqm_embedded = sampler.embed(bqm)
+# last_set = sampleset
+# # select one from last set as initial state
+# selected_state = EmbeddingSampler.select_by_energy(sampleset)[0]
+# initial_state = {u: selected_state[v] for v, chain in embedding.items() for u in chain}
+# # sample
+# r_sampleset, r_elapsed = reverse_sampler.sample(bqm,
+#                                                 num_reads=num_reads,
+#                                                 reinitialize_state=True,
+#                                                 initial_state=initial_state,
+#                                                 anneal_schedules=anneal_schedule)
+# # samplesets.append(r_sampleset)
+# # compare current set and last set
+# if EmbeddingSampler.engery_compare(last_set, r_sampleset):
+#     samplesets.append(last_set)
+# else:
+#     samplesets.append(r_sampleset)

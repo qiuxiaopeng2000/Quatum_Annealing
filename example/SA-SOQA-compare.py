@@ -23,12 +23,13 @@ qp = QP(name, order)
 weights = {'cost': 1/2, 'revenue': 1/2}
 
 # solve with Genetic Algorithm
-result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.1, L=50, max_stay=10, sample_times=10)
+result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.1, L=1,
+                            max_stay=20, sample_times=5, num_reads=1000)
 sa_result = MethodResult('sa', problem_result.path, qp)
 sa_result.add(result1)
 
 # solve with cplex
-result = SOQA.solve(problem=qp, weights=weights, num_reads=2000, sample_times=10)
+result = SOQA.solve(problem=qp, weights=weights, num_reads=1000, sample_times=5, step_count=10)
 so_result = MethodResult('soqp', problem_result.path, qp)
 so_result.add(result)
 

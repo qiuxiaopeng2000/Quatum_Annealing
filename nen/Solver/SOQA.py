@@ -14,14 +14,16 @@ class SOQA:
     make sure the environment is configured successfully accordingly.
     """
     @staticmethod
-    def solve(problem: QP, weights: Dict[str, float], num_reads: int, sample_times: int = 1) -> Result:
+    def solve(problem: QP, weights: Dict[str, float], num_reads: int, step_count: int, sample_times: int = 1) -> Result:
         print("start SOQA to solve single-problem!!!")
         result = Result(problem)
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
         # calculate the penalty and add constraints to objective with penalty
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
+        assert num_reads / step_count == 0
+        num_ = int(num_reads / step_count)
         for _ in range(sample_times):
-            res = SOQA.solve_once(problem, weights, penalty, num_reads)
+            res = SOQA.solve_once(problem=problem, weights=weights, penalty=penalty, sample_times=step_count, num_reads=num_)
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
             if 'occurence' not in result.info:
@@ -39,7 +41,7 @@ class SOQA:
         return result
 
     @staticmethod
-    def solve_once(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int) -> Result:
+    def solve_once(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int, sample_times: int) -> Result:
         """solve [summary] solve single objective qp (applied wso technique), return Result.
         """
         # prepare wso objective
@@ -48,29 +50,34 @@ class SOQA:
         objective = Constraint.quadratic_weighted_add(1, penalty, Quadratic(linear=wso), problem.constraint_sum)
         qubo = Constraint.quadratic_to_qubo_dict(objective)
         # Solve in QA
-        sampler = EmbeddingSampler()
-        sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
-        # get results
         result = Result(problem)
+        samplesets = []
+        sampler = EmbeddingSampler()
+        for _ in range(sample_times):
+            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
+            result.elapsed += elapsed
+            samplesets.append(sampleset)
+        # get results
         solution_list = []
-        if 'occurence' not in result.info:
-            result.info['occurence'] = {}
-        for values, occurrence in EmbeddingSampler.get_values_and_occurrence(sampleset, problem.variables):
-            solution = problem.evaluate(values)
-            solution_list.append(solution)
-
-            key = NDArchive.bool_list_to_str(solution.variables[0])
-            if key not in result.info['occurence']:
-                result.info['occurence'][key] = str(occurrence)
+        for sampleset in samplesets:
+            if 'solving info' not in result.info:
+                result.info['solving info'] = [sampleset.info]
             else:
-                result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
+                result.info['solving info'].append(sampleset.info)
+            if 'occurence' not in result.info:
+                result.info['occurence'] = {}
+            for values, occurrence in EmbeddingSampler.get_values_and_occurrence(sampleset, problem.variables):
+                solution = problem.evaluate(values)
+                solution_list.append(solution)
+
+                key = NDArchive.bool_list_to_str(solution.variables[0])
+                if key not in result.info['occurence']:
+                    result.info['occurence'][key] = str(occurrence)
+                else:
+                    result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
         best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
         result.add(best_solution)
-        result.elapsed = elapsed
-        if 'solving info' not in result.info:
-            result.info['solving info'] = [sampleset.info]
-        else:
-            result.info['solving info'].append(sampleset.info)
+
         # storage parameters
         result.info['weights'] = weights
         result.info['penalty'] = penalty

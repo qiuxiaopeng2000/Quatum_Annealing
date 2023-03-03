@@ -226,6 +226,7 @@ class EmbeddingSampler:
     @staticmethod
     def get_qpu_time(sampleset: SampleSet) -> float:
         """get_qpu_time [summary] get qpu time from sampleset
+        The unit is seconds
         """
         return sampleset.info['timing']['qpu_sampling_time'] / 1000_000
 

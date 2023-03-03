@@ -17,11 +17,11 @@ class FSAQPSolver:
 
     @staticmethod
     def solve(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
-              L: int = 300, max_stay: int = 150, sample_times: int = 1) -> Result:
+              L: int = 300, max_stay: int = 150, sample_times: int = 1, num_reads: int = 1000) -> Result:
         print("start Simulated Annealing to solve single-problem!!!")
         result = Result(problem)
         for _ in range(sample_times):
-            res = FSAQPSolver.solve_once(problem, weights, t_max, t_min, L, max_stay)
+            res = FSAQPSolver.solve_once(problem, weights, t_max, t_min, L, max_stay, num_reads)
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
         print("Simulated Annealing end!!!")
@@ -63,15 +63,14 @@ class FSAQPSolver:
         return F, variables
 
     @staticmethod
-    def solve_once(problem: QP, weights: Dict[str, float],
-                   t_max: float, t_min: float, L: int = 300, max_stay: int = 150) -> Result:
+    def solve_once(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
+                   L: int = 300, max_stay: int = 150, num_reads: int = 1000) -> Result:
         """
         t_max: initial temperature
         t_min: end temperature
         L: num of iteration under every temperature
         max_stay: stop if best_y stay unchanged over max_stay_counter times
         """
-
         # check arguments
         assert t_min < t_max
         # modelling
@@ -82,7 +81,7 @@ class FSAQPSolver:
         fitness, variables = FSAQPSolver.quadratic_to_fitness(H)
         start = SolverUtil.time()
         x0 = SASolver.randomSolution(problem).variables
-        sampler = SA(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0)
+        sampler = SA(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0, num_reads=num_reads)
         best_x, _ = sampler.run()
         end = SolverUtil.time()
         # restore the result
