@@ -212,7 +212,8 @@ class MethodResult:
             if single_flag:
                 for solution in result.solution_list:
                     self.method_result.solution_list.append(solution)
-                else:
+            else:
+                for solution in result.solution_list:
                     self.method_result.add(solution)
 
     def dump_result(self, index: int) -> None:
