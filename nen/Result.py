@@ -527,6 +527,10 @@ class ProblemResult:
         assert method2 in self.methods_results
         method1_result = self.methods_results[method1]
         method2_result = self.methods_results[method2]
+        if method1_result.method_result is None:
+            method1_result.make_method_result()
+        if method2_result.method_result is None:
+            method2_result.make_method_result()
         assert len(method1_result.method_result.solution_list) == len(method2_result.method_result.solution_list)
         # 'alternative' is Alternative Hypothesis
         w = []

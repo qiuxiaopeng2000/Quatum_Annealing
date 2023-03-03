@@ -23,6 +23,7 @@ class FSAQPSolver:
         for _ in range(sample_times):
             res = FSAQPSolver.solve_once(problem, weights, t_max, t_min, L, max_stay)
             result.solution_list.append(res.single)
+            result.elapsed += res.elapsed
         print("Simulated Annealing end!!!")
         return result
 

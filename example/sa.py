@@ -12,7 +12,7 @@ from nen.Solver.FSAQPSolver import FSAQPSolver
 
 name = 'ms'
 order = ['cost', 'revenue']
-result_folder = 'ms-ea-example'
+result_folder = 'sa'
 
 problem = Problem(name)
 problem.vectorize(order)
@@ -23,12 +23,13 @@ qp = QP(name, order)
 weights = {'cost': 1/2, 'revenue': 1/2}
 
 # solve with Genetic Algorithm
-result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.01, L=300, max_stay=150)
-ga_result = MethodResult('sa', problem_result.path, qp)
-ga_result.add(result1)
+result = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.01, L=10, max_stay=5, sample_times=1)
+sa_result = MethodResult('sa', problem_result.path, qp)
+sa_result.add(result)
 
 # dump the results
-problem_result.add(ga_result)
+problem_result.add(sa_result)
 problem_result.dump()
+print(sa_result.results[0].elapsed)
 
 
