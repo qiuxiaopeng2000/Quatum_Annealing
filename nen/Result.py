@@ -544,11 +544,11 @@ class ProblemResult:
         method1_objective = method1_result.get_wso_objective(w)
         method2_objective = method2_result.get_wso_objective(w)
         statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative="less")
-        mean = {np.mean(method1_objective), np.mean(method2_objective)}
-        std = {np.std(method1_objective), np.std(method2_objective)}
-        max_num = {np.max(method1_objective), np.max(method2_objective)}
-        min_num = {np.min(method1_objective), np.min(method2_objective)}
-        elapsed = {method1_result.method_result.elapsed, method2_result.method_result.elapsed}
+        mean = {method1: np.mean(method1_objective), method2: np.mean(method2_objective)}
+        std = {method1: np.std(method1_objective), method2: np.std(method2_objective)}
+        max_num = {method1: np.max(method1_objective), method2: np.max(method2_objective)}
+        min_num = {method1: np.min(method1_objective), method2: np.min(method2_objective)}
+        elapsed = {method1: method1_result.method_result.elapsed, method2: method2_result.method_result.elapsed}
         return statistic, pvalue, mean, std, max_num, min_num, elapsed
 
     def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
