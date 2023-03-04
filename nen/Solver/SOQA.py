@@ -20,7 +20,7 @@ class SOQA:
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
         # calculate the penalty and add constraints to objective with penalty
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
-        assert num_reads / step_count == 0
+        assert num_reads % step_count == 0
         num_ = int(num_reads / step_count)
         for _ in range(sample_times):
             res = SOQA.solve_once(problem=problem, weights=weights, penalty=penalty, sample_times=step_count, num_reads=num_)
