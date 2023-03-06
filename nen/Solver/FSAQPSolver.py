@@ -7,7 +7,8 @@ from nen.Result import Result
 from nen.Solver.EmbeddingSampler import EmbeddingSampler
 from nen.Term import Quadratic, Constraint
 from nen.Solver.MetaSolver import SolverUtil
-from sko.SA import SA
+# from sko.SA import SA
+from nen.Solver.SA import SA
 from nen.Solver.SASolver import SASolver
 
 
@@ -17,7 +18,7 @@ class FSAQPSolver:
 
     @staticmethod
     def solve(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
-              L: int = 300, max_stay: int = 150, sample_times: int = 1, num_reads: int = 1000) -> Result:
+              L: int = 300, max_stay: int = 150, sample_times: int = 1, num_reads: int = 1e30) -> Result:
         print("start Simulated Annealing to solve single-problem!!!")
         result = Result(problem)
         for _ in range(sample_times):
@@ -64,7 +65,7 @@ class FSAQPSolver:
 
     @staticmethod
     def solve_once(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
-                   L: int = 300, max_stay: int = 150, num_reads: int = 1000) -> Result:
+                   L: int = 300, max_stay: int = 150, num_reads: int = 1e30) -> Result:
         """
         t_max: initial temperature
         t_min: end temperature
