@@ -23,7 +23,7 @@ qp = QP(name, order)
 weights = {'cost': 1/2, 'revenue': 1/2}
 
 # solve with Genetic Algorithm
-result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=10,
+result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=300,
                             max_stay=20, sample_times=30, num_reads=1000)
 sa_result = MethodResult('sa', problem_result.path, qp)
 sa_result.add(result1)
