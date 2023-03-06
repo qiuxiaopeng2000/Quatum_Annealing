@@ -232,7 +232,7 @@ class EmbeddingSampler:
 
     @staticmethod
     def select_by_energy(sampleset: SampleSet) -> Sample:
-        """select_by_energy [summary] return the sampling with lowest engery.
+        """select_by_energy [summary] return the sampling with the lowest energy.
         """
         return sampleset.first
 

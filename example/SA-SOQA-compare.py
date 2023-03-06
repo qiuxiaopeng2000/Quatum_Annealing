@@ -24,12 +24,12 @@ weights = {'cost': 1/2, 'revenue': 1/2}
 
 # solve with Genetic Algorithm
 result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=1,
-                            max_stay=20, sample_times=5, num_reads=1000)
+                            max_stay=20, sample_times=30, num_reads=10000)
 sa_result = MethodResult('sa', problem_result.path, qp)
 sa_result.add(result1)
 
 # solve with cplex
-result = SOQA.solve(problem=qp, weights=weights, num_reads=1000, sample_times=5, step_count=10)
+result = SOQA.solve(problem=qp, weights=weights, num_reads=10000, sample_times=30, step_count=10)
 so_result = MethodResult('soqp', problem_result.path, qp)
 so_result.add(result)
 
@@ -46,3 +46,7 @@ table = Visualizer.tabulate_single_problem(
 )
 Visualizer.tabluate(table, 'so-sa-compare-example.csv')
 
+from hybrid.decomposers import EnergyImpactDecomposer
+from hybrid import ArgMin
+import hybrid
+hybrid.State.from_problem()
