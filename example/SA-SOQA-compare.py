@@ -41,7 +41,7 @@ problem_result.dump()
 # compare
 scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights)
 table = Visualizer.tabulate_single_problem(
-    name, ['soqp', 'sa'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
+    name, ['sa', 'soqp'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
     scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}
 )
 Visualizer.tabluate(table, 'so-sa-compare-example.csv')
