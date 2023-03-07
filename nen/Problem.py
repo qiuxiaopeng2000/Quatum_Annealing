@@ -140,7 +140,8 @@ class Problem:
         obj_values: List[float] = [0.0] * len(self.objectives_index)
         for obj_name, obj_index in self.objectives_index.items():
             for var, coef in self.objectives[obj_name].items():
-                if values[var]: obj_values[obj_index] += coef
+                if values[var]:
+                    obj_values[obj_index] += coef
         return obj_values
 
     def evaluate_single_objective(self, values: Dict[str, bool], weights: Dict[str, float]) -> float:

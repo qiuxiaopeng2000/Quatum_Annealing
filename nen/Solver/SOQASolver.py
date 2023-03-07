@@ -67,7 +67,7 @@ class SOQA:
             if 'occurence' not in result.info:
                 result.info['occurence'] = {}
             for values, occurrence in EmbeddingSampler.get_values_and_occurrence(sampleset, problem.variables):
-                solution = problem.evaluate(values)
+                solution = problem.wso_evaluate(values, weights)
                 solution_list.append(solution)
 
                 key = NDArchive.bool_list_to_str(solution.variables[0])

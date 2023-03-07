@@ -93,7 +93,7 @@ class FSAQPSolver:
         for ind, val in enumerate(best_x):
             values[variables[ind]] = bool(val)
         result = Result(problem)
-        result.add(problem.evaluate(values))
+        result.add(problem.wso_evaluate(values, weights))
         result.elapsed = end - start
         return result
 
