@@ -94,6 +94,6 @@ class FSAQPSolver:
             values[variables[ind]] = bool(val)
         result = Result(problem)
         result.add(problem.wso_evaluate(values, weights))
-        result.elapsed = end - start
+        result.elapsed = (end - start) / L
         return result
 

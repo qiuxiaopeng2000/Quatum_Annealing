@@ -23,13 +23,13 @@ qp = QP(name, order)
 weights = {'cost': 1/2, 'revenue': 1/2}
 
 # solve with Genetic Algorithm
-result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=10,
-                            max_stay=50, sample_times=10, num_reads=1000)
+result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=300,
+                            max_stay=100, sample_times=10, num_reads=1000)
 sa_result = MethodResult('sa', problem_result.path, qp)
 sa_result.add(result1)
 
 # solve with cplex
-result = SOQA.solve(problem=qp, weights=weights, num_reads=1000, sample_times=10, step_count=1)
+result = SOQA.solve(problem=qp, weights=weights, sample_times=10, step_count=1000, num_reads=1000)
 so_result = MethodResult('soqp', problem_result.path, qp)
 so_result.add(result)
 
@@ -45,5 +45,3 @@ table = Visualizer.tabulate_single_problem(
     scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}
 )
 Visualizer.tabluate(table, 'so-sa-compare-example.csv')
-
-
