@@ -1,12 +1,7 @@
-from functools import partial
 from typing import Dict, List
-from random import random
+from dwave.system import LeapHybridBQMSampler
 
-from dimod import BinaryQuadraticModel
-from dwave.system import ReverseAdvanceComposite, LeapHybridBQMSampler
-from dwave.system.composites import embedding
-
-from nen.Solver import MOQASolver
+from nen.Solver import MOQASolver, SOQA
 from nen.Term import Constraint, Quadratic
 from nen.Problem import QP
 from nen.Result import Result, NDArchive
@@ -24,8 +19,8 @@ class HybridSolver:
     """
 
     @staticmethod
-    def solve(problem: QP, sample_times: int, num_reads: int, is_single: bool) -> Result:
-        """solve [summary] solve qp, results are recorded in result.
+    def solve(problem: QP, sample_times: int, num_reads: int) -> Result:
+        """solve [summary] solve multi-objective qp, results are recorded in result.
         """
         # scale objectives and get the basic
         basic_weights = SolverUtil.scaled_weights(problem.objectives)
@@ -47,16 +42,10 @@ class HybridSolver:
             elapseds.append(elapsed)
         # put samples into result
         result = Result(problem)
-        if not is_single:
-            for sampleset in samplesets:
-                for values in EmbeddingSampler.get_values(sampleset, problem.variables):
-                    solution = problem.evaluate(values)
-                    result.add(solution)
-        else:
-            for sampleset in samplesets:
-                for values in EmbeddingSampler.get_values(sampleset, problem.variables):
-                    solution = problem.wso_evaluate(values)
-                    result.wso_add(solution)
+        for sampleset in samplesets:
+            for values in EmbeddingSampler.get_values(sampleset, problem.variables):
+                solution = problem.evaluate(values)
+                result.add(solution)
         # add into method result
         result.elapsed = sum(elapseds)
         for sampleset in samplesets:
@@ -69,7 +58,8 @@ class HybridSolver:
         result.info['num_reads'] = num_reads
         return result
 
-    def single_solve(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int) -> Result:
+    @staticmethod
+    def single_solve(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int, sample_times: int) -> Result:
         """solve [summary] solve single objective qp (applied wso technique), return Result.
         """
         # prepare wso objective
@@ -77,21 +67,35 @@ class HybridSolver:
         # add constraints to objective with penalty
         objective = Constraint.quadratic_weighted_add(1, penalty, Quadratic(linear=wso), problem.constraint_sum)
         qubo = Constraint.quadratic_to_qubo_dict(objective)
+        result = Result(problem)
+        samplesets = []
         # Solve in QA
         sampler = LeapHybridBQMSampler()
-        sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
+        for _ in range(sample_times):
+            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
+            result.elapsed += elapsed
+            samplesets.append(sampleset)
         # get results
-        result = Result(problem)
-        if 'occurence' not in result.info:
-            result.info['occurence'] = {}
-        for values in EmbeddingSampler.get_values(sampleset, problem.variables):
-            solution = problem.wso_evaluate(values, weights)
-            result.wso_add(solution)
-        result.elapsed = elapsed
-        if 'solving info' not in result.info:
-            result.info['solving info'] = [sampleset.info]
-        else:
-            result.info['solving info'].append(sampleset.info)
+        solution_list = []
+        for sampleset in samplesets:
+            if 'solving info' not in result.info:
+                result.info['solving info'] = [sampleset.info]
+            else:
+                result.info['solving info'].append(sampleset.info)
+            if 'occurence' not in result.info:
+                result.info['occurence'] = {}
+            for values, occurrence in EmbeddingSampler.get_values_and_occurrence(sampleset, problem.variables):
+                solution = problem.wso_evaluate(values, weights)
+                solution_list.append(solution)
+
+                key = NDArchive.bool_list_to_str(solution.variables[0])
+                if key not in result.info['occurence']:
+                    result.info['occurence'][key] = str(occurrence)
+                else:
+                    result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
+        best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
+        result.add(best_solution)
+
         # storage parameters
         result.info['weights'] = weights
         result.info['penalty'] = penalty
