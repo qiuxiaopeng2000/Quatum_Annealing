@@ -59,20 +59,46 @@ class HybridSolver:
         return result
 
     @staticmethod
-    def single_solve(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int, sample_times: int) -> Result:
-        """solve [summary] solve single objective qp (applied wso technique), return Result.
-        """
+    def single_solve(problem: QP, weights: Dict[str, float], num_reads: int, sample_times: int, step_count: int) -> Result:
+        print("start Hybrid Solver to solve single-problem!!!")
+        result = Result(problem)
         # prepare wso objective
-        wso = SolverUtil.weighted_sum_objective(problem.objectives, weights)
+        wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
+        penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
         # add constraints to objective with penalty
         objective = Constraint.quadratic_weighted_add(1, penalty, Quadratic(linear=wso), problem.constraint_sum)
         qubo = Constraint.quadratic_to_qubo_dict(objective)
+        assert num_reads % step_count == 0
+        num_ = int(num_reads / step_count)
+        for _ in range(sample_times):
+            res = HybridSolver.solve_once(problem=problem, weights=weights, QUBO=qubo, sample_times=step_count,
+                                          num_reads=num_)
+            result.solution_list.append(res.single)
+            result.elapsed += res.elapsed
+            if 'occurence' not in result.info:
+                result.info['occurence'] = {}
+            else:
+                result.info['occurence'] = res.info['occurence']
+            if 'solving info' not in result.info:
+                result.info['solving info'] = res.info['solving info']
+            else:
+                result.info['solving info'].append(res.info['solving info'])
+        result.info['weights'] = weights
+        result.info['penalty'] = penalty
+        result.info['num_reads'] = num_reads
+        print("Hybrid Solver end!!!")
+        return result
+
+    @staticmethod
+    def solve_once(problem: QP, weights: Dict[str, float], num_reads: int, sample_times: int, QUBO) -> Result:
+        """solve [summary] solve single objective qp (applied wso technique), return Result.
+        """
         result = Result(problem)
         samplesets = []
         # Solve in QA
         sampler = LeapHybridBQMSampler()
         for _ in range(sample_times):
-            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
+            sampleset, elapsed = sampler.sample(QUBO, num_reads=num_reads)
             result.elapsed += elapsed
             samplesets.append(sampleset)
         # get results
@@ -95,9 +121,4 @@ class HybridSolver:
                     result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
         best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
         result.add(best_solution)
-
-        # storage parameters
-        result.info['weights'] = weights
-        result.info['penalty'] = penalty
-        result.info['num_reads'] = num_reads
         return result

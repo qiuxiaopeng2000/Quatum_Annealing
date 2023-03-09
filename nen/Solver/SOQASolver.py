@@ -15,6 +15,20 @@ class SOQA:
     """
     @staticmethod
     def solve(problem: QP, weights: Dict[str, float], num_reads: int, step_count: int, sample_times: int = 1) -> Result:
+        """
+        Parameters
+        -------------
+        problem: QP
+            the problem to be solved
+        weights: Dict[str, float]
+            weights to convert a multi-objective problem into a single-objective problem
+        num_reads: int
+            total solution numbers per execution
+        step_count: int
+            The number of times the algorithm calls the sampler loop sampling per execution
+        sample_times: int
+            loop execution SOQA times
+        """
         print("start SOQA to solve single-problem!!!")
         result = Result(problem)
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
@@ -77,11 +91,6 @@ class SOQA:
                     result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
         best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
         result.add(best_solution)
-
-        # storage parameters
-        result.info['weights'] = weights
-        result.info['penalty'] = penalty
-        result.info['num_reads'] = num_reads
         return result
 
     @staticmethod
