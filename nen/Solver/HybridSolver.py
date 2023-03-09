@@ -129,8 +129,10 @@ class HybridSolver:
         # Solve in QA
         sampler = hybrid.HybridSampler(workflow)
         for _ in range(sample_times):
+            start = SolverUtil.time()
             sampleset = sampler.sample(bqm)
-            elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
+            end = SolverUtil.time()
+            elapsed = start - end
             result.elapsed += elapsed
             samplesets.append(sampleset)
         # get results
