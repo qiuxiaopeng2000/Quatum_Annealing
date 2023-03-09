@@ -37,7 +37,7 @@ class HybridSolver:
             objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
             qubo = Constraint.quadratic_to_qubo_dict(objective)
             # Solve in Hybrid-QA
-            sampler = LeapHybridSampler()
+            sampler = EmbeddingSampler(sampler=LeapHybridSampler())
             sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
             samplesets.append(sampleset)
             elapseds.append(elapsed)
@@ -98,7 +98,7 @@ class HybridSolver:
         result = Result(problem)
         samplesets = []
         # Solve in QA
-        sampler = LeapHybridSampler()
+        sampler = EmbeddingSampler(sampler=LeapHybridSampler())
         for _ in range(sample_times):
             sampleset, elapsed = sampler.sample(QUBO, num_reads=num_reads)
             result.elapsed += elapsed

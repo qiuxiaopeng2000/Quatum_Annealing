@@ -19,9 +19,9 @@ class EmbeddingSampler:
     """ [summary] Composite Embedding and Sampling.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, sampler=DWaveSampler(solver='Advantage_system4.1')) -> None:
         # choose the sampler
-        self.sampler = DWaveSampler(solver='Advantage_system4.1')
+        self.sampler = sampler
         self.reverse_sampler = ReverseAdvanceComposite(self.sampler)
 
         # set the parameters
