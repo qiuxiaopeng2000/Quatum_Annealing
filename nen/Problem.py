@@ -148,14 +148,16 @@ class Problem:
         """evaluate-single-objective [summary] evaluate single-objective
         with the sum of objectives list with variables values.
         """
-        sum_obj: List[float] = [0.0]
+        sum_obj = 0.0
+        res: List[float] = [0.0]
         obj_values: List[float] = [0.0] * len(self.objectives_index)
         for obj_name, obj_index in self.objectives_index.items():
             for var, coef in self.objectives[obj_name].items():
                 if values[var]:
                     obj_values[obj_index] += coef
                     sum_obj += obj_values[obj_index] * weights[obj_name]
-        return sum_obj
+        res.append(sum_obj)
+        return res
 
     def evaluate_constraints(self, values: Dict[str, bool], violated_count: bool) -> int:
         """evaluate_constraints [summary] evaluate violated constriants count with variables values.
