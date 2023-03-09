@@ -68,7 +68,7 @@ class HybridSolver:
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
         # add constraints to objective with penalty
-        objective = Constraint.quadratic_weighted_add(1, penalty, Quadratic(linear=wso), problem.constraint_sum)
+        objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
         qubo = Constraint.quadratic_to_qubo_dict(objective)
         assert num_reads % step_count == 0
         num_ = int(num_reads / step_count)
@@ -98,7 +98,7 @@ class HybridSolver:
         result = Result(problem)
         samplesets = []
         # Solve in QA
-        sampler = LeapHybridBQMSampler()
+        sampler = LeapHybridSampler()
         for _ in range(sample_times):
             sampleset, elapsed = sampler.sample(QUBO, num_reads=num_reads)
             result.elapsed += elapsed
