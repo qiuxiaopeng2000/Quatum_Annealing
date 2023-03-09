@@ -1,4 +1,6 @@
 from typing import Dict, List
+
+import hybrid
 from dwave.system import LeapHybridSampler
 
 from nen.Solver import MOQASolver, SOQA
@@ -37,7 +39,7 @@ class HybridSolver:
             objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
             qubo = Constraint.quadratic_to_qubo_dict(objective)
             # Solve in Hybrid-QA
-            sampler = EmbeddingSampler(sampler=LeapHybridSampler())
+            sampler = LeapHybridSampler()
             sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
             samplesets.append(sampleset)
             elapseds.append(elapsed)
@@ -70,11 +72,20 @@ class HybridSolver:
         # add constraints to objective with penalty
         objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
         qubo = Constraint.quadratic_to_qubo_dict(objective)
+
+        # define the workflow
+        workflow = hybrid.Loop(
+            hybrid.Race(
+                hybrid.InterruptableTabuSampler(),
+                hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='bfs')
+                | hybrid.QPUSubproblemAutoEmbeddingSampler()
+                | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3)
+
         assert num_reads % step_count == 0
         num_ = int(num_reads / step_count)
         for _ in range(sample_times):
             res = HybridSolver.solve_once(problem=problem, weights=weights, QUBO=qubo, sample_times=step_count,
-                                          num_reads=num_)
+                                          num_reads=num_, workflow=workflow)
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
             if 'occurence' not in result.info:
@@ -92,15 +103,16 @@ class HybridSolver:
         return result
 
     @staticmethod
-    def solve_once(problem: QP, weights: Dict[str, float], num_reads: int, sample_times: int, QUBO) -> Result:
+    def solve_once(problem: QP, weights: Dict[str, float], num_reads: int,
+                   sample_times: int, QUBO, workflow) -> Result:
         """solve [summary] solve single objective qp (applied wso technique), return Result.
         """
         result = Result(problem)
         samplesets = []
         # Solve in QA
-        sampler = EmbeddingSampler(sampler=LeapHybridSampler())
+        sampler = EmbeddingSampler(hybrid.HybridSampler(workflow))
         for _ in range(sample_times):
-            sampleset, elapsed = sampler.sample(QUBO, num_reads=num_reads)
+            sampleset, elapsed = sampler.sample(QUBO)
             result.elapsed += elapsed
             samplesets.append(sampleset)
         # get results
