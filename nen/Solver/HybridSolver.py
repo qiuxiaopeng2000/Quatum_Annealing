@@ -1,5 +1,5 @@
 from typing import Dict, List
-from dwave.system import LeapHybridBQMSampler
+from dwave.system import LeapHybridSampler
 
 from nen.Solver import MOQASolver, SOQA
 from nen.Term import Constraint, Quadratic
@@ -37,7 +37,7 @@ class HybridSolver:
             objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
             qubo = Constraint.quadratic_to_qubo_dict(objective)
             # Solve in Hybrid-QA
-            sampler = LeapHybridBQMSampler()
+            sampler = LeapHybridSampler()
             sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
             samplesets.append(sampleset)
             elapseds.append(elapsed)
