@@ -22,6 +22,7 @@ class HybridSolver:
     def solve(problem: QP, sample_times: int, num_reads: int) -> Result:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
+        print("start Hybrid Solver to solve multi-objective problem!!!")
         # scale objectives and get the basic
         basic_weights = SolverUtil.scaled_weights(problem.objectives)
         # sample for sample_times times
@@ -56,6 +57,7 @@ class HybridSolver:
         # storage parameters
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads
+        print("Hybrid Solver end!!!")
         return result
 
     @staticmethod
