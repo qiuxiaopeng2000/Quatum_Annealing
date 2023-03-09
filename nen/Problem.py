@@ -144,11 +144,11 @@ class Problem:
                     obj_values[obj_index] += coef
         return obj_values
 
-    def evaluate_single_objective(self, values: Dict[str, bool], weights: Dict[str, float]) -> float:
+    def evaluate_single_objective(self, values: Dict[str, bool], weights: Dict[str, float]) -> List[float]:
         """evaluate-single-objective [summary] evaluate single-objective
         with the sum of objectives list with variables values.
         """
-        sum_obj = 0
+        sum_obj: List[float] = [0.0]
         obj_values: List[float] = [0.0] * len(self.objectives_index)
         for obj_name, obj_index in self.objectives_index.items():
             for var, coef in self.objectives[obj_name].items():
@@ -187,7 +187,7 @@ class Problem:
         violated = self.evaluate_constraints(values, violated_count)
         return obj_values, violated
 
-    def _wso_evaluate(self, values: Dict[str, bool], weights: Dict[str, float], violated_count: bool = True) -> Tuple[float, int]:
+    def _wso_evaluate(self, values: Dict[str, bool], weights: Dict[str, float], violated_count: bool = True) -> Tuple[List[float], int]:
         """_evaluate [summary] evaluate a solution with variables values.
         The violated constraint would be count as a number when violated_count is True,
         otherwise it would only indicate feasible (0) or infeasible(1).
