@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 import hybrid
+from dimod import BinaryQuadraticModel
 from dwave.system import LeapHybridSampler
 
 from nen.Solver import MOQASolver, SOQA
@@ -38,9 +39,22 @@ class HybridSolver:
             penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
             objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
             qubo = Constraint.quadratic_to_qubo_dict(objective)
+            # convert qubo to bqm
+            bqm = BinaryQuadraticModel.from_qubo(qubo)
+
+            # define the workflow
+            workflow = hybrid.Loop(
+                hybrid.Race(
+                    hybrid.SimulatedAnnealingProblemSampler(num_reads=num_reads),
+                    hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='pfs')
+                    | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=num_reads)
+                    | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3)
+
             # Solve in Hybrid-QA
-            sampler = LeapHybridSampler()
-            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
+            sampler = hybrid.HybridSampler(workflow)
+            sampleset = sampler.sample(bqm)
+            elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
+
             samplesets.append(sampleset)
             elapseds.append(elapsed)
         # put samples into result
@@ -72,19 +86,22 @@ class HybridSolver:
         # add constraints to objective with penalty
         objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
         qubo = Constraint.quadratic_to_qubo_dict(objective)
+        # convert qubo to bqm
+        bqm = BinaryQuadraticModel.from_qubo(qubo)
+
+        assert num_reads % step_count == 0
+        num_ = int(num_reads / step_count)
 
         # define the workflow
         workflow = hybrid.Loop(
             hybrid.Race(
-                hybrid.InterruptableTabuSampler(),
-                hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='bfs')
-                | hybrid.QPUSubproblemAutoEmbeddingSampler()
+                hybrid.SimulatedAnnealingProblemSampler(num_reads=num_),
+                hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='pfs')
+                | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=num_)
                 | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3)
 
-        assert num_reads % step_count == 0
-        num_ = int(num_reads / step_count)
         for _ in range(sample_times):
-            res = HybridSolver.solve_once(problem=problem, weights=weights, QUBO=qubo, sample_times=step_count,
+            res = HybridSolver.solve_once(problem=problem, weights=weights, bqm=bqm, sample_times=step_count,
                                           num_reads=num_, workflow=workflow)
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
@@ -104,15 +121,16 @@ class HybridSolver:
 
     @staticmethod
     def solve_once(problem: QP, weights: Dict[str, float], num_reads: int,
-                   sample_times: int, QUBO, workflow) -> Result:
+                   sample_times: int, bqm, workflow) -> Result:
         """solve [summary] solve single objective qp (applied wso technique), return Result.
         """
         result = Result(problem)
         samplesets = []
         # Solve in QA
-        sampler = EmbeddingSampler(hybrid.HybridSampler(workflow))
+        sampler = hybrid.HybridSampler(workflow)
         for _ in range(sample_times):
-            sampleset, elapsed = sampler.sample(QUBO)
+            sampleset = sampler.sample(bqm)
+            elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
             result.elapsed += elapsed
             samplesets.append(sampleset)
         # get results
