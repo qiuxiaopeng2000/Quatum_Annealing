@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import hybrid
 from dimod import BinaryQuadraticModel
-# from dwave.system import LeapHybridSampler
+from dwave.system import LeapHybridSampler
 
 from nen.Solver import MOQASolver, SOQA
 from nen.Term import Constraint, Quadratic
@@ -130,7 +130,8 @@ class HybridSolver:
         sampler = hybrid.HybridSampler(workflow)
         for _ in range(sample_times):
             start = SolverUtil.time()
-            sampleset = sampler.sample(bqm)
+            respone = sampler.sample(bqm)
+            sampleset = respone.from_future(respone)
             end = SolverUtil.time()
             elapsed = end - start
             result.elapsed += elapsed
@@ -138,6 +139,7 @@ class HybridSolver:
         # get results
         solution_list = []
         iteration = 0
+        assert len(samplesets) == sample_times
         for sampleset in samplesets:
             iteration += 1
             print(iteration, '++++++++++')
