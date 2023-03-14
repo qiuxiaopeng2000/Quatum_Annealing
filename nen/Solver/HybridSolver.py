@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import hybrid
 from dimod import BinaryQuadraticModel
-from dwave.system import LeapHybridSampler
+# from dwave.system import LeapHybridSampler
 
 from nen.Solver import MOQASolver, SOQA
 from nen.Term import Constraint, Quadratic
@@ -132,12 +132,15 @@ class HybridSolver:
             start = SolverUtil.time()
             sampleset = sampler.sample(bqm)
             end = SolverUtil.time()
-            elapsed = start - end
+            elapsed = end - start
             result.elapsed += elapsed
             samplesets.append(sampleset)
         # get results
         solution_list = []
+        iteration = 0
         for sampleset in samplesets:
+            iteration += 1
+            print(iteration, '++++++++++')
             if 'solving info' not in result.info:
                 result.info['solving info'] = [sampleset.info]
             else:

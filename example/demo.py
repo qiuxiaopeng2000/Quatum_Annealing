@@ -1,7 +1,7 @@
 import sys
 
 import dimod
-import hybrid
+import hybrid_test
 
 
 # load a problem
