@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import hybrid
 from dimod import BinaryQuadraticModel
-from dwave.system import LeapHybridSampler
+# from dwave.system import LeapHybridSampler
 
 from nen.Solver import MOQASolver, SOQA
 from nen.Term import Constraint, Quadratic
@@ -53,6 +53,8 @@ class HybridSolver:
             # Solve in Hybrid-QA
             sampler = hybrid.HybridSampler(workflow)
             sampleset = sampler.sample(bqm)
+            while len(sampleset.record) == 0:
+                sampleset = sampler.sample(bqm)
             elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
 
             samplesets.append(sampleset)
@@ -123,17 +125,21 @@ class HybridSolver:
     def solve_once(problem: QP, weights: Dict[str, float], num_reads: int,
                    sample_times: int, bqm, workflow) -> Result:
         """solve [summary] solve single objective qp (applied wso technique), return Result.
+        the result return from hybrid.HybridSampler is an object of 'concurrent.futures.Future',
+        not an object of 'dimod.SampleSet', so we need to convert the result to  'dimod.SampleSet' by 'from_future'
         """
         result = Result(problem)
         samplesets = []
         # Solve in QA
         sampler = hybrid.HybridSampler(workflow)
         for _ in range(sample_times):
-            start = SolverUtil.time()
-            respone = sampler.sample(bqm)
-            sampleset = respone.from_future(respone)
-            end = SolverUtil.time()
-            elapsed = end - start
+            # start = SolverUtil.time()
+            sampleset = sampler.sample(bqm)
+            while len(sampleset.record) == 0:
+                sampleset = sampler.sample(bqm)
+            # end = SolverUtil.time()
+            # elapsed = end - start
+            elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
             result.elapsed += elapsed
             samplesets.append(sampleset)
         # get results
