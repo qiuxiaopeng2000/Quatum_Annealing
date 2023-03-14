@@ -141,21 +141,11 @@ class HybridSolver:
         for sampleset in samplesets:
             iteration += 1
             print(iteration, '++++++++++')
-            if 'solving info' not in result.info:
-                result.info['solving info'] = [sampleset.info]
-            else:
-                result.info['solving info'].append(sampleset.info)
-            if 'occurence' not in result.info:
-                result.info['occurence'] = {}
             for values, occurrence in EmbeddingSampler.get_values_and_occurrence(sampleset, problem.variables):
                 solution = problem.wso_evaluate(values, weights)
                 solution_list.append(solution)
-
-                key = NDArchive.bool_list_to_str(solution.variables[0])
-                if key not in result.info['occurence']:
-                    result.info['occurence'][key] = str(occurrence)
-                else:
-                    result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
         best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
         result.add(best_solution)
+        result.info['sample_times'] = sample_times
+        result.info['num_reads'] = num_reads
         return result
