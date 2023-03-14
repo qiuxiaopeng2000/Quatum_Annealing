@@ -52,10 +52,15 @@ class HybridSolver:
 
             # Solve in Hybrid-QA
             sampler = hybrid.HybridSampler(workflow)
+            start = SolverUtil.time()
             sampleset = sampler.sample(bqm)
+            end = SolverUtil.time()
             while len(sampleset.record) == 0:
                 sampleset = sampler.sample(bqm)
-            elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
+            if sampleset.info.get('timing'):
+                elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
+            else:
+                elapsed = end - start
 
             samplesets.append(sampleset)
             elapseds.append(elapsed)
@@ -133,13 +138,15 @@ class HybridSolver:
         # Solve in QA
         sampler = hybrid.HybridSampler(workflow)
         for _ in range(sample_times):
-            # start = SolverUtil.time()
+            start = SolverUtil.time()
             sampleset = sampler.sample(bqm)
             while len(sampleset.record) == 0:
                 sampleset = sampler.sample(bqm)
-            # end = SolverUtil.time()
-            # elapsed = end - start
-            elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
+            end = SolverUtil.time()
+            if sampleset.info.get('timing'):
+                elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
+            else:
+                elapsed = end - start
             result.elapsed += elapsed
             samplesets.append(sampleset)
         # get results
