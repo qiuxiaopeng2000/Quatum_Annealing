@@ -1,5 +1,10 @@
 # Exp. Outline
 
+data: 
+small-scale problems：'Baan', 'ms', 'rp' (small than 100 variables)
+
+large-scale problems: classic, realistic
+
 ## E1. Single-Objective TTS
 
 * penalty -> TTS
