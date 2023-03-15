@@ -1,7 +1,8 @@
 # Exp. Outline
 
 data: 
-NRP: 'Baan'-100, 'ms'-50, 'rp'-25, classic, realistic
+NRP: 'Baan'-100, 'ms'-50, 'rp'-25, 'classic-1'-240, 'classic-2'-1120, 'realistic-e1'-4038, 'realistic-g1'-3135,'realistic-m1'-4828
+
 FSP: 'Amazon'-79, 'WebPortal'-43, 'BerkeleyDB'-13, 'ERS'-36, 'Drupal'-48, 'E-shop'-290
 
 将数据从变量规模从小到大排列
