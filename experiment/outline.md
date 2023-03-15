@@ -13,6 +13,7 @@ large-scale problems: classic, realistic
 ## E2. SOQA-SA Comp.
 
 * Comparison: p_value, means, std, TTS
+* SOQA: 
 > 由于样本没有服从正态分布且是匹配的，因此使用[Wilcoxon ranksum test](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ranksums.html#scipy.stats.ranksums)检验
 > 
 > 若样本满足正态分布且是匹配的，则使用[t-test](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_rel.html#scipy.stats.ttest_rel)
@@ -26,3 +27,4 @@ large-scale problems: classic, realistic
 ## E3. MOQA
 
 * Comparison: TTS ,hv, igd, sp
+* MOQA: num_reads = 100, sample_times = 5
