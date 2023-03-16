@@ -43,10 +43,11 @@ class Problem:
         dp = DescribedProblem()
         dp.load(name)
         self.variables = dp.variables
+        self.objectives = dp.objectives
         for k, v in dp.objectives.items():
             for var in dp.variables:
                 self.objectives[k][var] = v[var] if var in v else 0.0
-        self.objectives = dp.objectives
+
         for constraint_str_list in dp.constraints:
             assert len(constraint_str_list) == 3
             left, sense, right = constraint_str_list

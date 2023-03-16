@@ -9,7 +9,8 @@ from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
 from nen.Solver.MOQASolver import MOQASolver
 from nen.Solver.GASolver import GASolver
 
-names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
+# names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
+names_NRP = ['classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
 names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Amazon', 'E-shop']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 for name in names_NRP:
