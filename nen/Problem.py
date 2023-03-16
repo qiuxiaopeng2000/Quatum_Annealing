@@ -51,7 +51,7 @@ class Problem:
         for constraint_str_list in dp.constraints:
             assert len(constraint_str_list) == 3
             left, sense, right = constraint_str_list
-            if sense == '=':
+            if sense == '=' or sense == '<=>':
                 self.eq_constraints_num += 1
             else:
                 self.ieq_constraints_num += 1
@@ -280,23 +280,31 @@ class PymooProblem(Pro):
     def __init__(self, problem: Problem, **kwargs):
         self.n_var = problem.variables_num
         self.n_obj = problem.objectives_num
-        self.n_ieq_constr = problem.ieq_constraints_num
-        self.n_eq_constr = problem.eq_constraints_num
+        # self.n_ieq_constr = problem.ieq_constraints_num
+        # self.n_eq_constr = problem.eq_constraints_num
         self.problem = problem
         self.constraints_lp: List[Linear] = []
         self.vars = problem.variables
-
+        self.n_eq_constr = 0
+        self.n_ieq_constr = 0
         self.objs = []
         self.cons = []
 
         for constraint in self.problem.constraints:
             self.constraints_lp += constraint.to_linear()
+        # self.problem.constraints = self.constraints_lp
+
+        for constraint in self.constraints_lp:
+            if constraint.sense == '=':
+                self.n_eq_constr += 1
+            else:
+                self.n_ieq_constr += 1
 
         xl = [0 for _ in range(self.problem.variables_num)]
         xu = [1 for _ in range(self.problem.variables_num)]
 
-        super().__init__(n_var=self.n_var, n_obj=self.n_obj, n_ieq_constr=self.n_ieq_constr, vars=self.vars,
-                         n_eq_constr=self.n_eq_constr, xl=xl, xu=xu, **kwargs)
+        super().__init__(n_var=self.n_var, n_obj=self.n_obj, vars=self.vars,  n_ieq_constr=self.n_ieq_constr,
+                         n_constr=len(self.constraints_lp), n_eq_constr=self.n_eq_constr, xl=xl, xu=xu, **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
         """
