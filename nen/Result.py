@@ -210,6 +210,7 @@ class MethodResult:
         # add each solution and count up the elapsed time
         for result in self.results:
             self.method_result.elapsed += result.elapsed
+            self.method_result.iterations += result.iterations
             if single_flag:
                 for solution in result.solution_list:
                     self.method_result.solution_list.append(solution)

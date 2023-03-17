@@ -29,7 +29,7 @@ class MOQASolver:
         sample_times:
             run the Multi-objectives Quantum Annealing Algorithm times.
         """
-        print("start MOQA to solve multi-objective problem!!!")
+        print("start MOQA to solve {} multi-objective problem!!!".format(problem.name))
         # scale objectives and get the basic
         basic_weights = SolverUtil.scaled_weights(problem.objectives)
         # sample for sample_times times
@@ -66,6 +66,7 @@ class MOQASolver:
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads
         result.iterations = sample_times
+        result.total_num_anneals = sample_times * num_reads
         print("MOQA end!!!")
         return result
 
