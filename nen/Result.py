@@ -211,6 +211,7 @@ class MethodResult:
         for result in self.results:
             self.method_result.elapsed += result.elapsed
             self.method_result.iterations += result.iterations
+            self.method_result.total_num_anneals += result.total_num_anneals
             if single_flag:
                 for solution in result.solution_list:
                     self.method_result.solution_list.append(solution)
@@ -414,7 +415,7 @@ class ProblemArchive:
         """
         # pareto_count = self.on_pareto_count()
         # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
-        return {k: len(v.solution_list) / (v.total_num_anneals / v.iterations) for k, v in self.method_archives.items()}
+        return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
@@ -450,13 +451,15 @@ class ProblemArchive:
         # reference_point = self.reference_point()
         scores: Dict[str, float] = {}
         p_solve = self.p_solve()
-        for name, _ in self.method_archives_array.items():
+
+        for name, res in self.method_archives.items():
+            assert 0 <= p_solve[name] <= 1
             if p_solve[name] == 0:
                 scores[name] = math.inf
             elif p_solve[name] == 1:
                 scores[name] = 0
             else:
-                scores[name] = (math.log(1 - 0.99) / math.log(1 - p_solve[name])) * self.method_archives[name].elapsed
+                scores[name] = (math.log(1 - 0.99) / math.log(1 - p_solve[name])) * (res.elapsed / res.iterations)
 
         return scores
 

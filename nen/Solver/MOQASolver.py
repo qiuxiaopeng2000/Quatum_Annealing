@@ -29,7 +29,7 @@ class MOQASolver:
         sample_times:
             run the Multi-objectives Quantum Annealing Algorithm times.
         """
-        print("start MOQA to solve {} multi-objective problem!!!".format(problem.name))
+        print("{} start MOQA to solve multi-objective problem!!!".format(problem.name))
         # scale objectives and get the basic
         basic_weights = SolverUtil.scaled_weights(problem.objectives)
         # sample for sample_times times
@@ -45,6 +45,8 @@ class MOQASolver:
             qubo = Constraint.quadratic_to_qubo_dict(objective)
             # Solve in QA
             sampler = EmbeddingSampler()
+            # read num_reads from once sample, but not all meet the criteria
+            # so the number return less than num_reads
             sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
             samplesets.append(sampleset)
             elapseds.append(elapsed)
