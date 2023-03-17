@@ -467,7 +467,7 @@ class ProblemArchive:
         results: List[Dict[str, float]] = []
         for indicator in indicators:
             results.append(getattr(self, 'compute_{}'.format(indicator))())
-        return results
+        return results 
 
     def compute_all(self) -> List[Dict[str, float]]:
         return self.compute(ProblemArchive.indicators)
