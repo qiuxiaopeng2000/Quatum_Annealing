@@ -208,6 +208,7 @@ class MethodResult:
         # initialize method result
         self.method_result = Result(self.problem)
         # add each solution and count up the elapsed time
+        self.method_result.total_num_anneals = 0
         for result in self.results:
             self.method_result.elapsed += result.elapsed
             self.method_result.iterations += result.iterations
@@ -467,7 +468,7 @@ class ProblemArchive:
         results: List[Dict[str, float]] = []
         for indicator in indicators:
             results.append(getattr(self, 'compute_{}'.format(indicator))())
-        return results 
+        return results
 
     def compute_all(self) -> List[Dict[str, float]]:
         return self.compute(ProblemArchive.indicators)
