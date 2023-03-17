@@ -65,6 +65,7 @@ class MOQASolver:
         # storage parameters
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads
+        result.iterations = sample_times
         print("MOQA end!!!")
         return result
 

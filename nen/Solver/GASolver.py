@@ -68,6 +68,7 @@ class GASolver:
                 values = problem.convert_to_BinarySolution(val)
                 solution = problem.evaluate(values)
                 result.add(solution)
+        result.iterations = iterations
         print("Genetic Algorithm end!!!")
         return result
 

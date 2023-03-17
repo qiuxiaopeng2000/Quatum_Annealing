@@ -31,6 +31,7 @@ class NDArchive:
         # the archive
         self.archive = NonDominatedSolutionsArchive()
         self.total_num_anneals = 0
+        self.iterations = 0
 
     def add(self, solution: BinarySolution) -> bool:
         """add [summary] add a non-dominant solution into nd archive.
@@ -410,9 +411,9 @@ class ProblemArchive:
     def p_solve(self) -> Dict[str, float]:
         """p_solve [summary] calculate the probability of solving a problem
         """
-        pareto_count = self.on_pareto_count()
-        return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
-        # return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
+        # pareto_count = self.on_pareto_count()
+        # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
+        return {k: len(v.solution_list) / (v.total_num_anneals / v.iterations) for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
@@ -452,7 +453,7 @@ class ProblemArchive:
             if p_solve[name] == 0:
                 scores[name] = math.inf
             elif p_solve[name] == 1:
-                scores[name] = -math.inf
+                scores[name] = 0
             else:
                 scores[name] = (math.log(1 - 0.99) / math.log(1 - p_solve[name])) * self.method_archives[name].elapsed
 
@@ -510,7 +511,7 @@ class ProblemResult:
         for method in methods:
             self.methods_results[method] = MethodResult(method, self.path, self.problem)
             self.methods_results[method].load(evaluate)
-            self.methods_results[method].make_method_result()
+            self.methods_results[method].make_method_result(single_flag=False)
 
     @staticmethod
     def average_of_dicts(scores: List[Dict[str, float]]) -> Dict[str, float]:
@@ -570,12 +571,16 @@ class ProblemResult:
         assert union_result is not None
         # prepare average results
         average_method_result = self.methods_results[average_method]
-        iteration = average_method_result.iteration
+
+        iteration = sum(r.iterations for r in average_method_result.results)
+        iteration1 = sum(r.iterations for r in union_method_result.results)
+        assert iteration1 == iteration
+
         average_elapsed = sum(average_method_result.get_elapseds()) / iteration
         average_results = average_method_result.results
         # compare
-        elapsed = {union_method: union_result.elapsed, average_method: average_elapsed}
-        found = {union_method: len(union_result),
+        elapsed = {union_method: union_result.elapsed / iteration, average_method: average_elapsed}
+        found = {union_method: len(union_result) / iteration,
                  average_method: (sum([len(r) for r in average_results]) / iteration)}
         front_all: List[Dict[str, float]] = []
         igd_all: List[Dict[str, float]] = []
