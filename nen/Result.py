@@ -577,21 +577,22 @@ class ProblemResult:
         # prepare average results
         average_method_result = self.methods_results[average_method]
 
-        iteration = sum(r.iterations for r in average_method_result.results)
         iteration1 = sum(r.iterations for r in union_method_result.results)
-        assert iteration1 == iteration
+        iteration2 = sum(r.iterations for r in average_method_result.results)
+        assert iteration1 == iteration2
 
-        average_elapsed = sum(average_method_result.get_elapseds()) / iteration
+        average_elapsed = sum(average_method_result.get_elapseds()) / iteration2
         average_results = average_method_result.results
         # compare
-        elapsed = {union_method: union_result.elapsed / iteration, average_method: average_elapsed}
-        found = {union_method: len(union_result) / iteration,
-                 average_method: (sum([len(r) for r in average_results]) / iteration)}
+        elapsed = {union_method: union_result.elapsed / iteration2, average_method: average_elapsed}
+        found = {union_method: len(union_result) / iteration2,
+                 average_method: (sum([len(r) for r in average_results]) / iteration2)}
         front_all: List[Dict[str, float]] = []
         igd_all: List[Dict[str, float]] = []
         hv_all: List[Dict[str, float]] = []
         sp_all: List[Dict[str, float]] = []
         tts_all: List[Dict[str, float]] = []
+        iteration = average_method_result.iteration
         for i in range(iteration):
             average_result = average_results[i]
             problem_archive = \
