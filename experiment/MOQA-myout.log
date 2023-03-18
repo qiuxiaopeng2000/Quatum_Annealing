@@ -1,0 +1,50 @@
+nohup: ignoring input
+BerkeleyDB start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+BerkeleyDB start MOQA to solve multi-objective problem!!!
+MOQA end!!!
+ERS start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+ERS start MOQA to solve multi-objective problem!!!
+MOQA end!!!
+WebPortal start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+WebPortal start MOQA to solve multi-objective problem!!!
+MOQA end!!!
+Amazon start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+Amazon start MOQA to solve multi-objective problem!!!
+MOQA end!!!
+E-Shop start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+E-Shop start MOQA to solve multi-objective problem!!!
+MOQA end!!!
+rp start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+rp start MOQA to solve multi-objective problem!!!
+MOQA end!!!
+ms start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+ms start MOQA to solve multi-objective problem!!!
+MOQA end!!!
+Baan start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+Baan start MOQA to solve multi-objective problem!!!
+MOQA end!!!
+classic-1 start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+classic-1 start MOQA to solve multi-objective problem!!!
+MOQA end!!!
+classic-2 start Genetic Algorithm to solve multi-objective problem!!!
+Genetic Algorithm end!!!
+classic-2 start MOQA to solve multi-objective problem!!!
+Traceback (most recent call last):
+  File "MOQA.py", line 74, in <module>
+    result = MOQASolver.solve(qp, sample_times=5, num_reads=100)
+  File "/home/qiu/optimization/Quatum_Annealing/nen/Solver/MOQASolver.py", line 50, in solve
+    sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
+  File "/home/qiu/optimization/Quatum_Annealing/nen/Solver/EmbeddingSampler.py", line 96, in sample
+    embedding, bqm_embedded = self.embed(bqm)
+  File "/home/qiu/optimization/Quatum_Annealing/nen/Solver/EmbeddingSampler.py", line 56, in embed
+    raise ValueError("no embedding found")
+ValueError: no embedding found
