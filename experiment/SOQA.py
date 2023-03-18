@@ -10,7 +10,7 @@ from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
 from nen.Solver.FSAQPSolver import FSAQPSolver
 from nen.Solver.SOQASolver import SOQA
 
-names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Amazon', 'E-Shop']
+names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
 order_NRP = ['cost', 'revenue']

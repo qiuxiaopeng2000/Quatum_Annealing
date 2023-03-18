@@ -461,7 +461,7 @@ class ProblemArchive:
             elif p_solve[name] == 1:
                 scores[name] = 0
             else:
-                scores[name] = (math.log(1 - 0.99) / math.log(1 - p_solve[name])) * (res.elapsed / res.iterations)
+                scores[name] = (math.log(1 - 0.99) / math.log(1 - p_solve[name])) * res.elapsed
 
         return scores
 
@@ -561,7 +561,7 @@ class ProblemResult:
         std = {method1: np.std(method1_objective), method2: np.std(method2_objective)}
         max_num = {method1: np.max(method1_objective), method2: np.max(method2_objective)}
         min_num = {method1: np.min(method1_objective), method2: np.min(method2_objective)}
-        elapsed = {method1: method1_result.method_result.elapsed / iterations, method2: method2_result.method_result.elapsed / iterations}
+        elapsed = {method1: method1_result.method_result.elapsed, method2: method2_result.method_result.elapsed}
         return statistics, pvalues, mean, std, max_num, min_num, elapsed
 
     def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
@@ -583,12 +583,12 @@ class ProblemResult:
         iteration2 = sum(r.iterations for r in average_method_result.results)
         assert iteration1 == iteration2
 
-        average_elapsed = sum(average_method_result.get_elapseds()) / iteration2
+        average_elapsed = sum(average_method_result.get_elapseds())
         average_results = average_method_result.results
         # compare
-        elapsed = {union_method: union_result.elapsed / iteration2, average_method: average_elapsed}
-        found = {union_method: len(union_result) / iteration2,
-                 average_method: (sum([len(r) for r in average_results]) / iteration2)}
+        elapsed = {union_method: union_result.elapsed, average_method: average_elapsed}
+        found = {union_method: len(union_result),
+                 average_method: (sum([len(r) for r in average_results]))}
         front_all: List[Dict[str, float]] = []
         igd_all: List[Dict[str, float]] = []
         hv_all: List[Dict[str, float]] = []
