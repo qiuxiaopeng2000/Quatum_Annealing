@@ -16,7 +16,7 @@ names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'real
 order_NRP = ['cost', 'revenue']
 
 for name in names_FSP:
-    order = names_FSP
+    order = order_FSP
     result_folder = 'so-sa-{}'.format(name)
 
     problem = Problem(name)
