@@ -10,11 +10,13 @@ from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
 from nen.Solver.FSAQPSolver import FSAQPSolver
 from nen.Solver.SOQASolver import SOQA
 
-names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
-names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Amazon', 'E-shop']
+names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Amazon', 'E-Shop']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
-for name in names_NRP:
-    order = ['cost', 'revenue']
+names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
+order_NRP = ['cost', 'revenue']
+
+for name in names_FSP:
+    order = names_FSP
     result_folder = 'so-sa-{}'.format(name)
 
     problem = Problem(name)
