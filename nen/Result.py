@@ -209,6 +209,7 @@ class MethodResult:
         self.method_result = Result(self.problem)
         # add each solution and count up the elapsed time
         self.method_result.total_num_anneals = 0
+        self.method_result.iterations = 0
         for result in self.results:
             self.method_result.elapsed += result.elapsed
             self.method_result.iterations += result.iterations
@@ -549,17 +550,18 @@ class ProblemResult:
             w.append(v)
         method1_objective = method1_result.get_wso_objective(w)
         method2_objective = method2_result.get_wso_objective(w)
+        iterations = method2_result.method_result.iterations
         # N/A indicates ‘‘not applicable’’ which means that the corresponding
         # algorithm could not statistically compare with itself in the rank-sum test
         # N/A means itself for Wilcoxon’s ranksums p_value
-        statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative="less")
+        statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative="greater")
         statistics = {method1: statistic, method2: statistic}
         pvalues = {method1: pvalue, method2: pvalue}
         mean = {method1: np.mean(method1_objective), method2: np.mean(method2_objective)}
         std = {method1: np.std(method1_objective), method2: np.std(method2_objective)}
         max_num = {method1: np.max(method1_objective), method2: np.max(method2_objective)}
         min_num = {method1: np.min(method1_objective), method2: np.min(method2_objective)}
-        elapsed = {method1: method1_result.method_result.elapsed, method2: method2_result.method_result.elapsed}
+        elapsed = {method1: method1_result.method_result.elapsed / iterations, method2: method2_result.method_result.elapsed / iterations}
         return statistics, pvalues, mean, std, max_num, min_num, elapsed
 
     def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:

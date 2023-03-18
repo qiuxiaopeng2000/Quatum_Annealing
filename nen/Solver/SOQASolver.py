@@ -29,7 +29,7 @@ class SOQA:
         sample_times: int
             loop execution SOQA times
         """
-        print("start SOQA to solve single-problem!!!")
+        print("{} start SOQA to solve single-problem!!!".format(problem.name))
         result = Result(problem)
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
         # calculate the penalty and add constraints to objective with penalty
@@ -51,7 +51,8 @@ class SOQA:
         result.info['weights'] = weights
         result.info['penalty'] = penalty
         result.info['num_reads'] = num_reads
-        print("SOQA end!!!")
+        result.iterations = sample_times
+        print("{} SOQA end!!!".format(problem.name))
         return result
 
     @staticmethod
