@@ -91,7 +91,7 @@ class SOQA:
                 else:
                     result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
         best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
-        result.add(best_solution)
+        result.wso_add(best_solution)
         return result
 
     @staticmethod

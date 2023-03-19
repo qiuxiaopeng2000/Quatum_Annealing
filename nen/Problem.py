@@ -153,7 +153,7 @@ class Problem:
         with the sum of objectives list with variables values.
         """
         sum_obj = 0.0
-        res: List[float] = [0.0]
+        res: List[float] = []
         obj_values: List[float] = [0.0] * len(self.objectives_index)
         for obj_name, obj_index in self.objectives_index.items():
             for var, coef in self.objectives[obj_name].items():

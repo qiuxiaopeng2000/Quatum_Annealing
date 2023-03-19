@@ -83,10 +83,10 @@ class FSAQPSolver:
         fitness, variables = FSAQPSolver.quadratic_to_fitness(H)
         start = SolverUtil.time()
         x0 = SASolver.randomSolution(problem).variables
-        if len(x0) < len(variables):
+        if len(x0[0]) < len(variables):
             # Slack Variables
-            x0.extend([False for _ in range(len(variables) - len(x0))])
-        assert len(x0) == len(variables)
+            x0[0].extend([False for _ in range(len(variables) - len(x0[0]))])
+        assert len(x0[0]) == len(variables)
         sampler = SA(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0, num_reads=num_reads)
         best_x, _ = sampler.run()
         end = SolverUtil.time()
@@ -98,7 +98,10 @@ class FSAQPSolver:
         for ind, val in enumerate(best_x):
             values[variables[ind]] = bool(val)
         result = Result(problem)
-        result.add(problem.wso_evaluate(values, weights))
+        result.objectives_num = 1
+        problem.objectives_num = 1
+        o = problem.wso_evaluate(values, weights).objectives
+        result.wso_add(problem.wso_evaluate(values, weights))
         result.elapsed = (end - start) / L
         return result
 
