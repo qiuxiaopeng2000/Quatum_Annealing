@@ -83,6 +83,10 @@ class FSAQPSolver:
         fitness, variables = FSAQPSolver.quadratic_to_fitness(H)
         start = SolverUtil.time()
         x0 = SASolver.randomSolution(problem).variables
+        if len(x0) < len(variables):
+            # Slack Variables
+            x0.extend([False for _ in range(len(variables) - len(x0))])
+        assert len(x0) == len(variables)
         sampler = SA(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0, num_reads=num_reads)
         best_x, _ = sampler.run()
         end = SolverUtil.time()

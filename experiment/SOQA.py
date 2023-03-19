@@ -25,6 +25,7 @@ weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
               {'cost': 4 / 5, 'revenue': 1 / 5}]
 
 for name in names_FSP:
+    flag = 0
     for weight in weight_FSP:
         order = order_FSP
         result_folder = 'so-sa-{}'.format(name)
@@ -59,9 +60,11 @@ for name in names_FSP:
             name, ['sa', 'soqp'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
             scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}
         )
-        Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))
+        Visualizer.tabluate(table, 'so-sa-compare-{}-{}.csv'.format(name, flag))
+        flag += 1
 
 for name in names_NRP:
+    flag = 0
     for weight in weight_NRP:
         order = order_NRP
         result_folder = 'so-sa-{}'.format(name)
@@ -96,4 +99,5 @@ for name in names_NRP:
             name, ['sa', 'soqp'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
             scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}
         )
-        Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))
+        Visualizer.tabluate(table, 'so-sa-compare-{}-{}.csv'.format(name, flag))
+        flag += 1
