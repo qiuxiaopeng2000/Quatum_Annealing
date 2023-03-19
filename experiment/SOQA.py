@@ -25,7 +25,7 @@ for name in names_FSP:
     # prepare the problem result folder before solving
     problem_result = ProblemResult(name, problem, result_folder)
     qp = QP(name, order)
-    weights = {'cost': 1 / 2, 'revenue': 1 / 2}
+    weights = {'COST': 1/4, 'USED_BEFORE': 1/4, 'DEFECTS': 1/4, 'DESELECTED': 1/4}
 
     # solve with Genetic Algorithm
     result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=1,
