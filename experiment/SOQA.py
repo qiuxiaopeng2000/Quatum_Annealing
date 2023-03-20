@@ -45,7 +45,7 @@ for name in names_FSP:
         sa_result.add(result1)
 
         # solve with cplex
-        result = SOQA.solve(problem=qp, weights=weights, sample_times=5, step_count=100, num_reads=100)
+        result = SOQA.solve(problem=qp, weights=weights, sample_times=5, step_count=1, num_reads=100)
         so_result = MethodResult('soqp', problem_result.path, qp)
         so_result.add(result)
 

@@ -45,7 +45,7 @@ class MOQASolver:
             qubo = Constraint.quadratic_to_qubo_dict(objective)
             # Solve in QA
             sampler = EmbeddingSampler()
-            # read num_reads from once sample, but not all meet the criteria
+            # read num_reads from once sample, but some answer is duplicate,
             # so the number return less than num_reads
             sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
             samplesets.append(sampleset)

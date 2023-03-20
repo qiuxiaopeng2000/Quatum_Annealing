@@ -241,7 +241,7 @@ class MethodResult:
 
     def load_result(self, index: int, evaluate: bool) -> None:
         """load_result [summary] load the result with archive (objectives and variables) from files (.obj and .var).
-        It would involve problem infomation, thus need a problem.
+        It would involve problem information, thus need a problem.
 
         If evaluate is True, solutions would be loaded from variables via problem.evaluate.
         It would check if a solution is feasible and it still loads objectives but just for checking.
@@ -550,7 +550,6 @@ class ProblemResult:
             w.append(v)
         method1_objective = method1_result.get_wso_objective(w)
         method2_objective = method2_result.get_wso_objective(w)
-        iterations = method2_result.method_result.iterations
         # N/A indicates ‘‘not applicable’’ which means that the corresponding
         # algorithm could not statistically compare with itself in the rank-sum test
         # N/A means itself for Wilcoxon’s ranksums p_value
