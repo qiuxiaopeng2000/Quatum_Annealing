@@ -101,7 +101,11 @@ class FSAQPSolver:
         # result.objectives_num = 1
         # problem.objectives_num = 1
         # o = problem.wso_evaluate(values, weights).objectives
-        result.wso_add(problem.evaluate(values))
+        have_solution_flag = result.wso_add(problem.evaluate(values))
+        if not have_solution_flag:
+            result.info['have_solution_flag'] = False
+        else:
+            result.info['have_solution_flag'] = True
         result.elapsed = (end - start) / L
         return result
 

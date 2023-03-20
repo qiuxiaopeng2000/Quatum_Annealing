@@ -91,7 +91,11 @@ class SOQA:
                 else:
                     result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
         best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
-        result.wso_add(best_solution)
+        have_solution_flag = result.wso_add(best_solution)
+        if not have_solution_flag:
+            result.info['have_solution_flag'] = False
+        else:
+            result.info['have_solution_flag'] = True
         return result
 
     @staticmethod
@@ -101,10 +105,11 @@ class SOQA:
         """
         best_value: float = float('inf')
         best_solution: Union[None, BinarySolution] = None
+        # best_solution: BinarySolution = solution_list[0]
         w = [weights[s] for s in problem.objectives_order]
         for solution in solution_list:
             v = sum([solution.objectives[i] * w[i] for i in range(problem.objectives_num)])
-            if best_value > v:
+            if best_value > v and sum(solution.constraints) == 0:
                 best_value = v
                 best_solution = solution
         return best_solution
