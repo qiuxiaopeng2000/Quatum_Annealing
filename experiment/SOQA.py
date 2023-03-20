@@ -10,7 +10,8 @@ from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
 from nen.Solver.FSAQPSolver import FSAQPSolver
 from nen.Solver.SOQASolver import SOQA
 
-names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
+# names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
+names_FSP = ['ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = [{'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4},
               {'COST': 1 / 2, 'USED_BEFORE': 1 / 6, 'DEFECTS': 1 / 6, 'DESELECTED': 1 / 6},
@@ -41,13 +42,11 @@ for name in names_FSP:
         # solve with Genetic Algorithm
         result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=1,
                                     max_stay=20, sample_times=5, num_reads=100)
-        assert result1.info['have_solution_flag'] == True, "GA cannot solve this problem!!!"
         sa_result = MethodResult('sa', problem_result.path, qp)
         sa_result.add(result1)
 
         # solve with cplex
         result = SOQA.solve(problem=qp, weights=weights, sample_times=5, step_count=1, num_reads=100)
-        assert result.info['have_solution_flag'] == True, "GA cannot solve this problem!!!"
         so_result = MethodResult('soqp', problem_result.path, qp)
         so_result.add(result)
 

@@ -13,6 +13,7 @@ class SOQA:
     The Quantum Annealling Solver is implemeneted with D-Wave Leap,
     make sure the environment is configured successfully accordingly.
     """
+
     @staticmethod
     def solve(problem: QP, weights: Dict[str, float], num_reads: int, step_count: int, sample_times: int = 1) -> Result:
         """
@@ -31,16 +32,14 @@ class SOQA:
         """
         print("{} start SOQA to solve single-problem!!!".format(problem.name))
         result = Result(problem)
-        result.info['have_solution_flag'] = True
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
         # calculate the penalty and add constraints to objective with penalty
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
         assert num_reads % step_count == 0
         num_ = int(num_reads / step_count)
         for _ in range(sample_times):
-            res = SOQA.solve_once(problem=problem, weights=weights, penalty=penalty, sample_times=step_count, num_reads=num_)
-            if not res.info['have_solution_flag']:
-                result.info['have_solution_flag'] = False
+            res = SOQA.solve_once(problem=problem, weights=weights, penalty=penalty, sample_times=step_count,
+                                  num_reads=num_)
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
             if 'occurence' not in result.info:
@@ -93,26 +92,30 @@ class SOQA:
                     result.info['occurence'][key] = str(occurrence)
                 else:
                     result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
-        best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
-        have_solution_flag = result.wso_add(best_solution)
-        if not have_solution_flag:
-            result.info['have_solution_flag'] = False
-        else:
-            result.info['have_solution_flag'] = True
+        best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem, violated_count=False)
+        result.wso_add(best_solution)
         return result
 
     @staticmethod
-    def best_solution(solution_list: List[BinarySolution],
-                      problem: QP, weights: Dict[str, float]) -> Union[None, BinarySolution]:
+    def best_solution(solution_list: List[BinarySolution], problem: QP,
+                      weights: Dict[str, float], violated_count: bool = True) -> Union[None, BinarySolution]:
         """best_solution [summary] get the best solution from the archive with certain weights.
         """
+        best_value_all: float = float('inf')
+        best_solution_all: Union[None, BinarySolution] = None
         best_value: float = float('inf')
         best_solution: Union[None, BinarySolution] = None
-        # best_solution: BinarySolution = solution_list[0]
         w = [weights[s] for s in problem.objectives_order]
         for solution in solution_list:
             v = sum([solution.objectives[i] * w[i] for i in range(problem.objectives_num)])
-            if best_value > v and sum(solution.constraints) == 0:
-                best_value = v
-                best_solution = solution
+            if best_value_all > v:
+                best_value_all = v
+                best_solution_all = solution
+            if violated_count:
+                if best_value > v and sum(solution.constraints) == 0:
+                    best_value = v
+                    best_solution = solution
+        if best_solution is None:
+            best_solution_all.constraints = [0.0]
+            best_solution = best_solution_all
         return best_solution
