@@ -21,8 +21,11 @@ class FSAQPSolver:
               L: int = 300, max_stay: int = 150, sample_times: int = 1, num_reads: int = 1e30) -> Result:
         print("{} start Simulated Annealing to solve single-problem!!!".format(problem.name))
         result = Result(problem)
+        result.info['have_solution_flag'] = True
         for _ in range(sample_times):
             res = FSAQPSolver.solve_once(problem, weights, t_max, t_min, L, max_stay, num_reads)
+            if not res.info['have_solution_flag']:
+                result.info['have_solution_flag'] = False
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
         result.iterations = sample_times

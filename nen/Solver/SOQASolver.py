@@ -31,6 +31,7 @@ class SOQA:
         """
         print("{} start SOQA to solve single-problem!!!".format(problem.name))
         result = Result(problem)
+        result.info['have_solution_flag'] = True
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
         # calculate the penalty and add constraints to objective with penalty
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
@@ -38,6 +39,8 @@ class SOQA:
         num_ = int(num_reads / step_count)
         for _ in range(sample_times):
             res = SOQA.solve_once(problem=problem, weights=weights, penalty=penalty, sample_times=step_count, num_reads=num_)
+            if not res.info['have_solution_flag']:
+                result.info['have_solution_flag'] = False
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
             if 'occurence' not in result.info:
