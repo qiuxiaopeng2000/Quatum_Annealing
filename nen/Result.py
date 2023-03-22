@@ -51,7 +51,8 @@ class NDArchive:
         """add [summary] add a solution in a single problem into nd archive.
         """
         # check wether solution is feasible
-        if sum(solution.constraints) > 0: return False
+        # if sum(solution.constraints) > 0: return False
+
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
         assert len(solution.objectives) == self.objectives_num
@@ -530,10 +531,19 @@ class ProblemResult:
             result[key] /= iteration
         return result
 
-    def statistical_analysis(self, method1: str, method2: str, weights: Dict[str, float]):
+    def statistical_analysis(self, method1: str, method2: str, weights: Dict[str, float], alternative: str):
         """
         p_value [summary] return statistical analysis of two solutions with two different methods indicated by
         [statistic: float, p_value: float, mean: float, std: float, max: float: min: float].
+
+        alternative: str
+        -------
+        * 'two-sided': one of the distributions (underlying `x` or `y`) is
+          stochastically greater than the other.
+        * 'less': the distribution underlying `x` is stochastically less
+          than the distribution underlying `y`.
+        * 'greater': the distribution underlying `x` is stochastically greater
+          than the distribution underlying `y`.
         """
         assert method1 in self.methods_results
         assert method2 in self.methods_results
@@ -553,7 +563,7 @@ class ProblemResult:
         # N/A indicates ‘‘not applicable’’ which means that the corresponding
         # algorithm could not statistically compare with itself in the rank-sum test
         # N/A means itself for Wilcoxon’s ranksums p_value
-        statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative="greater")
+        statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative=alternative)
         statistics = {method1: statistic, method2: statistic}
         pvalues = {method1: pvalue, method2: pvalue}
         mean = {method1: np.mean(method1_objective), method2: np.mean(method2_objective)}
@@ -585,9 +595,9 @@ class ProblemResult:
         average_elapsed = sum(average_method_result.get_elapseds())
         average_results = average_method_result.results
         # compare
-        elapsed = {union_method: union_result.elapsed, average_method: average_elapsed}
-        found = {union_method: len(union_result),
-                 average_method: (sum([len(r) for r in average_results]))}
+        elapsed = {union_method: union_result.elapsed / iteration1, average_method: average_elapsed / iteration2}
+        found = {union_method: len(union_result) / iteration1,
+                 average_method: (sum([len(r) for r in average_results])) / iteration2}
         front_all: List[Dict[str, float]] = []
         igd_all: List[Dict[str, float]] = []
         hv_all: List[Dict[str, float]] = []

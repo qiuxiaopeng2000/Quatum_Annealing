@@ -10,20 +10,27 @@ from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
 from nen.Solver.FSAQPSolver import FSAQPSolver
 from nen.Solver.SOQASolver import SOQA
 
-# names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
-names_FSP = ['ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
+names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
+# names_FSP = ['WebPortal', 'Drupal', 'E-Shop']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
+alternative_FSP = ['less', 'less', 'less']
+# weight_FSP = [{'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4},
+#               {'COST': 1 / 2, 'USED_BEFORE': 1 / 6, 'DEFECTS': 1 / 6, 'DESELECTED': 1 / 6},
+#               {'COST': 1 / 6, 'USED_BEFORE': 1 / 2, 'DEFECTS': 1 / 6, 'DESELECTED': 1 / 6},
+#               {'COST': 1 / 6, 'USED_BEFORE': 1 / 6, 'DEFECTS': 1 / 2, 'DESELECTED': 1 / 6},
+#               {'COST': 1 / 6, 'USED_BEFORE': 1 / 6, 'DEFECTS': 1 / 6, 'DESELECTED': 1 / 2}]
 weight_FSP = [{'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4},
-              {'COST': 1 / 2, 'USED_BEFORE': 1 / 6, 'DEFECTS': 1 / 6, 'DESELECTED': 1 / 6},
-              {'COST': 1 / 6, 'USED_BEFORE': 1 / 2, 'DEFECTS': 1 / 6, 'DESELECTED': 1 / 6},
-              {'COST': 1 / 6, 'USED_BEFORE': 1 / 6, 'DEFECTS': 1 / 2, 'DESELECTED': 1 / 6},
-              {'COST': 1 / 6, 'USED_BEFORE': 1 / 6, 'DEFECTS': 1 / 6, 'DESELECTED': 1 / 2}]
+              ]
 
-names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
+# names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
+names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'classic-3', 'classic-4', 'classic-5']
+alternative_NRP = ['greater', 'greater', 'greater']
 order_NRP = ['cost', 'revenue']
+# weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
+#               {'cost': 1 / 5, 'revenue': 4 / 5},
+#               {'cost': 4 / 5, 'revenue': 1 / 5}]
 weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
-              {'cost': 1 / 5, 'revenue': 4 / 5},
-              {'cost': 4 / 5, 'revenue': 1 / 5}]
+              ]
 
 for name in names_FSP:
     flag = 0
@@ -40,13 +47,13 @@ for name in names_FSP:
         weights = weight
 
         # solve with Genetic Algorithm
-        result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=1,
-                                    max_stay=20, sample_times=5, num_reads=100)
+        result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=100,
+                                    max_stay=20, sample_times=5, num_reads=1000)
         sa_result = MethodResult('sa', problem_result.path, qp)
         sa_result.add(result1)
 
         # solve with cplex
-        result = SOQA.solve(problem=qp, weights=weights, sample_times=5, step_count=1, num_reads=100)
+        result = SOQA.solve(problem=qp, weights=weights, sample_times=5, step_count=1, num_reads=1000)
         so_result = MethodResult('soqp', problem_result.path, qp)
         so_result.add(result)
 
@@ -56,7 +63,7 @@ for name in names_FSP:
         problem_result.dump()
 
         # compare
-        scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights)
+        scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights, alternative='greater')
         table = Visualizer.tabulate_single_problem(
             name, ['sa', 'soqp'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
             scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}

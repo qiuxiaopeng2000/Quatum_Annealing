@@ -47,9 +47,8 @@ class HybridSolver:
                 hybrid.Race(
                     hybrid.SimulatedAnnealingProblemSampler(num_reads=num_reads),
                     hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='pfs')
-                    | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=num_reads)
-                    | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3)
-
+                    | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=num_reads, solver='Advantage_system4.1')
+                    | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3, max_iter=1000)
             # Solve in Hybrid-QA
             sampler = hybrid.HybridSampler(workflow)
             start = SolverUtil.time()
@@ -147,7 +146,7 @@ class HybridSolver:
         assert len(samplesets) == sample_times
         for sampleset in samplesets:
             iteration += 1
-            print(iteration, '++++++++++')
+            # print(iteration, '++++++++++')
             for values, occurrence in EmbeddingSampler.get_values_and_occurrence(sampleset, problem.variables):
                 solution = problem.wso_evaluate(values, weights)
                 solution_list.append(solution)

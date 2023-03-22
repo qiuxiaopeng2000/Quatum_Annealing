@@ -27,14 +27,14 @@ for name in names_FSP:
     lp = LP(name, order)
 
     # solve with NSGA-II
-    result1 = GASolver.solve(iterations=5, populationSize=100, maxEvaluations=50000, crossoverProbability=0.8,
+    result1 = GASolver.solve(iterations=10, populationSize=100, maxEvaluations=50000, crossoverProbability=0.8,
                              mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
     assert result1.iterations != 0
     ga_result = MethodResult('ga', problem_result.path, lp)
     ga_result.add(result1)
 
     # solve with cplex
-    result = MOQASolver.solve(qp, sample_times=5, num_reads=100)
+    result = MOQASolver.solve(qp, sample_times=10, num_reads=100)
     assert result.iterations != 0
     qp_result = MethodResult('moqa', problem_result.path, qp)
     qp_result.add(result)

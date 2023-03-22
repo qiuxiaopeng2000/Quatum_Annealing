@@ -31,7 +31,7 @@ class SimulatedAnnealingBase(SkoBase):
     See https://github.com/guofei9987/scikit-opt/blob/master/examples/demo_sa.py
     """
 
-    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, num_reads=1e30, **kwargs):
+    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, num_reads=1000, alpha: float = 0.7, **kwargs):
         assert T_max > T_min > 0, 'T_max > T_min > 0'
 
         self.num_reads = num_reads
@@ -39,7 +39,7 @@ class SimulatedAnnealingBase(SkoBase):
         self.T_max = T_max  # initial temperature
         self.T_min = T_min  # end temperature
         self.L = int(L)  # num of iteration under every temperature（also called Long of Chain）
-        # stop if best_y stay unchanged over max_stay_counter times (also called cooldown time)
+        # stop if best_y stay unchanged over max_stay_counter times (also c alled cooldown time)
         self.max_stay_counter = max_stay_counter
 
         self.n_dim = len(x0)
@@ -47,6 +47,7 @@ class SimulatedAnnealingBase(SkoBase):
         self.best_x = np.array(x0)  # initial solution
         self.best_y = self.func(self.best_x)
         self.T = self.T_max
+        self.alpha = alpha
         self.iter_cycle = 0
         self.generation_best_X, self.generation_best_Y = [self.best_x], [self.best_y]
         # history reasons, will be deprecated
@@ -58,7 +59,7 @@ class SimulatedAnnealingBase(SkoBase):
         return x_new
 
     def cool_down(self):
-        self.T = self.T * 0.7
+        self.T = self.T * self.alpha
 
     def isclose(self, a, b, rel_tol=1e-09, abs_tol=1e-30):
         return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
@@ -110,7 +111,7 @@ class SimulatedAnnealingValue(SimulatedAnnealingBase):
     SA on real value function
     """
 
-    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, num_reads=1e30, **kwargs):
+    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, num_reads: int = 1000, **kwargs):
         super().__init__(func, x0, T_max, T_min, L, max_stay_counter, num_reads, **kwargs)
         lb, ub = kwargs.get('lb', None), kwargs.get('ub', None)
 
@@ -140,7 +141,7 @@ class SAFast(SimulatedAnnealingValue):
     T_new = T0 * exp(-c * k**quench)
     """
 
-    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, num_reads=1e30, **kwargs):
+    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, num_reads=1000, **kwargs):
         super().__init__(func, x0, T_max, T_min, L, max_stay_counter, num_reads, **kwargs)
         self.m, self.n, self.quench = kwargs.get('m', 1), kwargs.get('n', 1), kwargs.get('quench', 1)
         self.c = self.m * np.exp(-self.n * self.quench)

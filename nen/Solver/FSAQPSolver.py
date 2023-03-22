@@ -1,3 +1,4 @@
+import random
 from typing import Dict, List
 
 import numpy as np
@@ -8,7 +9,7 @@ from nen.Solver.EmbeddingSampler import EmbeddingSampler
 from nen.Term import Quadratic, Constraint
 from nen.Solver.MetaSolver import SolverUtil
 # from sko.SA import SA
-from nen.Solver.SA import SA
+from nen.Solver.SA import SAFast
 from nen.Solver.SASolver import SASolver
 
 
@@ -18,11 +19,12 @@ class FSAQPSolver:
 
     @staticmethod
     def solve(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
-              L: int = 300, max_stay: int = 150, sample_times: int = 1, num_reads: int = 1e30) -> Result:
+              L: int = 300, max_stay: int = 150, sample_times: int = 1, num_reads: int = 1000) -> Result:
         print("{} start Simulated Annealing to solve single-problem!!!".format(problem.name))
         result = Result(problem)
         for _ in range(sample_times):
-            res = FSAQPSolver.solve_once(problem, weights, t_max, t_min, L, max_stay, num_reads)
+            res = FSAQPSolver.solve_once(problem=problem, weights=weights, t_max=t_max, t_min=t_min,
+                                         L=L, max_stay=max_stay, num_reads=num_reads)
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
         result.iterations = sample_times
@@ -66,7 +68,7 @@ class FSAQPSolver:
 
     @staticmethod
     def solve_once(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
-                   L: int = 300, max_stay: int = 150, num_reads: int = 1e30) -> Result:
+                   L: int = 300, max_stay: int = 150, num_reads: int = 1000) -> Result:
         """
         t_max: initial temperature
         t_min: end temperature
@@ -81,18 +83,22 @@ class FSAQPSolver:
         H = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
         # sample with sko.SA (default = FSA)
         fitness, variables = FSAQPSolver.quadratic_to_fitness(H)
-        start = SolverUtil.time()
-        x0 = SASolver.randomSolution(problem).variables
+
+        # too slow
+        # x0 = SASolver.randomSolution(problem).variables
         # Add Slack Variables
-        if len(x0[0]) < len(variables):
-            x0[0].extend([False for _ in range(len(variables) - len(x0[0]))])
-        assert len(x0[0]) == len(variables)
-        sampler = SA(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0, num_reads=num_reads)
+        # if len(x0[0]) < len(variables):
+        #     x0[0].extend([False for _ in range(len(variables) - len(x0[0]))])
+        # assert len(x0[0]) == len(variables)
+        x0 = []
+        for _ in range(len(variables)):
+            x0.append(bool(random.randint(0, 1)))
+
+        start = SolverUtil.time()
+        sampler = SAFast(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0, num_reads=num_reads)
         best_x, _ = sampler.run()
         end = SolverUtil.time()
         # restore the result
-        # shape = best_x.shape
-        # print(shape)
         best_x = np.array(best_x).flatten().tolist()
         values: Dict[str, bool] = {}
         for ind, val in enumerate(best_x):
@@ -100,8 +106,6 @@ class FSAQPSolver:
         result = Result(problem)
         # result.objectives_num = 1
         # problem.objectives_num = 1
-        # o = problem.wso_evaluate(values, weights).objectives
         result.wso_add(problem.evaluate(values))
         result.elapsed = (end - start) / L
         return result
-

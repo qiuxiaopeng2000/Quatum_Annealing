@@ -15,7 +15,7 @@ class SOQA:
     """
 
     @staticmethod
-    def solve(problem: QP, weights: Dict[str, float], num_reads: int, step_count: int, sample_times: int = 1) -> Result:
+    def solve(problem: QP, weights: Dict[str, float], num_reads: int, step_count: int = 1, sample_times: int = 1) -> Result:
         """
         Parameters
         -------------
@@ -118,4 +118,5 @@ class SOQA:
         if best_solution is None:
             best_solution_all.constraints = [0.0]
             best_solution = best_solution_all
+            best_solution.constraints = [0.0]
         return best_solution

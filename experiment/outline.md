@@ -1,7 +1,7 @@
 # Exp. Outline
 
 data: 
-NRP: 'Baan'-100, 'ms'-50, 'rp'-25, 'classic-1'-240, 'classic-2'-1120, 'realistic-e1'-4038, 'realistic-g1'-3135,'realistic-m1'-4828
+NRP: 'rp'-25, 'ms'-50, 'Baan'-100, 'classic-1'-240, 'classic-2'-1120, 'classic-3'-2000, 'classic-4'-4000, 'classic-5'-2500
 > 在MOQA上运行到classic-2时，量子计算机就会无法求解
 ```
 Traceback (most recent call last):
@@ -16,7 +16,7 @@ Traceback (most recent call last):
 ValueError: no embedding found
 ```
 
-FSP: ''BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, Amazon'-79, 'E-shop'-290
+FSP: 'BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, 'Amazon'-79, 'E-shop'-290
 
 将数据从变量规模从小到大排列
      
@@ -45,3 +45,10 @@ FSP: ''BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, Amazon'-79, 'E-sho
 * Comparison: TTS ,hv, igd, sp
 * MOQA: num_reads = 100, sample_times = 10
 * NSGA-II: large-scale maxvalue = 10000, small-scale maxvalue = 10000
+
+
+problem:
+1. 用多目标的数据集跑单目标问题有点奇怪
+2. 数据集的选定，不知道选哪些，选多了量子计算机时间不够用
+3. 什么是大规模数据集（解决方法：用不同规模的数据分别跑代码），大规模FSP数据不够
+4. dubug SA的iter_cycle，查看为什么SA这么慢
