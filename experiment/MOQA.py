@@ -27,7 +27,7 @@ for name in names_FSP:
     lp = LP(name, order)
 
     # solve with NSGA-II
-    result1 = GASolver.solve(iterations=10, populationSize=100, maxEvaluations=50000, crossoverProbability=0.8,
+    result1 = GASolver.solve(iterations=10, populationSize=100, maxEvaluations=20000, crossoverProbability=0.8,
                              mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
     assert result1.iterations != 0
     ga_result = MethodResult('ga', problem_result.path, lp)
@@ -65,7 +65,7 @@ for name in names_NRP:
     lp = LP(name, order)
 
     # solve with NSGA-II
-    result1 = GASolver.solve(iterations=5, populationSize=100, maxEvaluations=50000, crossoverProbability=0.8,
+    result1 = GASolver.solve(iterations=5, populationSize=100, maxEvaluations=10000, crossoverProbability=0.8,
                              mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
     ga_result = MethodResult('ga', problem_result.path, lp)
     ga_result.add(result1)
