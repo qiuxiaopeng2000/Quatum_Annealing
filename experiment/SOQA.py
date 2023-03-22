@@ -48,12 +48,12 @@ for name in names_FSP:
 
         # solve with Genetic Algorithm
         result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=100,
-                                    max_stay=20, sample_times=5, num_reads=1000)
+                                    max_stay=20, sample_times=20, num_reads=1000)
         sa_result = MethodResult('sa', problem_result.path, qp)
         sa_result.add(result1)
 
         # solve with cplex
-        result = SOQA.solve(problem=qp, weights=weights, sample_times=5, step_count=1, num_reads=1000)
+        result = SOQA.solve(problem=qp, weights=weights, sample_times=20, step_count=1, num_reads=100)
         so_result = MethodResult('soqp', problem_result.path, qp)
         so_result.add(result)
 
@@ -86,7 +86,7 @@ for name in names_NRP:
         weights = {'cost': 1 / 2, 'revenue': 1 / 2}
 
         # solve with Genetic Algorithm
-        result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=300,
+        result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=100,
                                     max_stay=50, sample_times=20, num_reads=1000)
         sa_result = MethodResult('sa', problem_result.path, qp)
         sa_result.add(result1)
