@@ -102,7 +102,7 @@ for name in names_NRP:
         problem_result.dump()
 
         # compare
-        scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights)
+        scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights, alternative='greater')
         table = Visualizer.tabulate_single_problem(
             name, ['sa', 'soqp'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
             scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}
