@@ -83,7 +83,8 @@ class HybridSolver:
         return result
 
     @staticmethod
-    def single_solve(problem: QP, weights: Dict[str, float], num_reads: int, sample_times: int, step_count: int) -> Result:
+    def single_solve(problem: QP, weights: Dict[str, float], num_reads: int,
+                     sample_times: int, step_count: int = 1, num_sweeps: int = 1000) -> Result:
         print("start Hybrid Solver to solve single-problem!!!")
         result = Result(problem)
         # prepare wso objective
@@ -101,7 +102,7 @@ class HybridSolver:
         # define the workflow
         workflow = hybrid.Loop(
             hybrid.Race(
-                hybrid.SimulatedAnnealingProblemSampler(num_reads=num_),
+                hybrid.SimulatedAnnealingProblemSampler(num_reads=num_, num_sweeps=num_sweeps),
                 hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='pfs')
                 | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=num_)
                 | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3)
@@ -131,8 +132,8 @@ class HybridSolver:
         for _ in range(sample_times):
             start = SolverUtil.time()
             sampleset = sampler.sample(bqm)
-            while len(sampleset.record) == 0:
-                sampleset = sampler.sample(bqm)
+            # while len(sampleset.record) == 0:
+            #     sampleset = sampler.sample(bqm)
             end = SolverUtil.time()
             if sampleset.info.get('timing'):
                 elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
@@ -148,10 +149,10 @@ class HybridSolver:
             iteration += 1
             # print(iteration, '++++++++++')
             for values, occurrence in EmbeddingSampler.get_values_and_occurrence(sampleset, problem.variables):
-                solution = problem.wso_evaluate(values, weights)
+                solution = problem.evaluate(values)
                 solution_list.append(solution)
         best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem)
-        result.add(best_solution)
+        result.wso_add(best_solution)
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads
         return result
