@@ -23,7 +23,7 @@ weight_FSP = [{'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTE
               ]
 
 # names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
-names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'classic-3', 'classic-4', 'classic-5']
+names_NRP = ['ms', 'Baan', 'classic-1', 'classic-2', 'classic-3', 'classic-4', 'classic-5']
 alternative_NRP = ['greater', 'greater', 'greater']
 order_NRP = ['cost', 'revenue']
 # weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
@@ -32,44 +32,44 @@ order_NRP = ['cost', 'revenue']
 weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
               ]
 
-for name in names_FSP:
-    flag = 0
-    for weight in weight_FSP:
-        order = order_FSP
-        result_folder = 'so-sa-{}'.format(name)
-
-        problem = Problem(name)
-        problem.vectorize(order)
-
-        # prepare the problem result folder before solving
-        problem_result = ProblemResult(name, problem, result_folder)
-        qp = QP(name, order)
-        weights = weight
-
-        # solve with Genetic Algorithm
-        result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=100,
-                                    max_stay=20, sample_times=20, num_reads=1000)
-        sa_result = MethodResult('sa', problem_result.path, qp)
-        sa_result.add(result1)
-
-        # solve with cplex
-        result = SOQA.solve(problem=qp, weights=weights, sample_times=20, step_count=1, num_reads=100)
-        so_result = MethodResult('soqp', problem_result.path, qp)
-        so_result.add(result)
-
-        # dump the results
-        problem_result.add(sa_result)
-        problem_result.add(so_result)
-        problem_result.dump()
-
-        # compare
-        scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights, alternative='greater')
-        table = Visualizer.tabulate_single_problem(
-            name, ['sa', 'soqp'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
-            scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}
-        )
-        Visualizer.tabluate(table, 'so-sa-compare-{}-{}.csv'.format(name, flag))
-        flag += 1
+# for name in names_FSP:
+#     flag = 0
+#     for weight in weight_FSP:
+#         order = order_FSP
+#         result_folder = 'so-sa-{}'.format(name)
+#
+#         problem = Problem(name)
+#         problem.vectorize(order)
+#
+#         # prepare the problem result folder before solving
+#         problem_result = ProblemResult(name, problem, result_folder)
+#         qp = QP(name, order)
+#         weights = weight
+#
+#         # solve with Genetic Algorithm
+#         result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=100,
+#                                     max_stay=20, sample_times=20, num_reads=1000)
+#         sa_result = MethodResult('sa', problem_result.path, qp)
+#         sa_result.add(result1)
+#
+#         # solve with cplex
+#         result = SOQA.solve(problem=qp, weights=weights, sample_times=20, step_count=1, num_reads=100)
+#         so_result = MethodResult('soqp', problem_result.path, qp)
+#         so_result.add(result)
+#
+#         # dump the results
+#         problem_result.add(sa_result)
+#         problem_result.add(so_result)
+#         problem_result.dump()
+#
+#         # compare
+#         scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights, alternative='greater')
+#         table = Visualizer.tabulate_single_problem(
+#             name, ['sa', 'soqp'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
+#             scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}
+#         )
+#         Visualizer.tabluate(table, 'so-sa-compare-{}-{}.csv'.format(name, flag))
+#         flag += 1
 
 for name in names_NRP:
     flag = 0
