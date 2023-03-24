@@ -35,12 +35,12 @@ for name in names_FSP:
         weights = weight
 
         # solve with SOQA Algorithm
-        result1 = SOQA.solve(problem=qp, weights=weights, sample_times=10, num_reads=1000)
+        result1 = SOQA.solve(problem=qp, weights=weights, sample_times=5, num_reads=100)
         sa_result = MethodResult('soqa', problem_result.path, qp)
         sa_result.add(result1)
 
         # solve with cplex
-        result = HybridSolver.single_solve(problem=qp, weights=weights, sample_times=10, num_reads=1000)
+        result = HybridSolver.single_solve(problem=qp, weights=weights, sample_times=5, num_reads=100)
         so_result = MethodResult('hybrid', problem_result.path, qp)
         so_result.add(result)
 
