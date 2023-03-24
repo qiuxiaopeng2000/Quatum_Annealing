@@ -1,14 +1,13 @@
 import sys
 import os
 
-from nen.Solver.GASolver import GASolver
-
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
 from nen.Solver.HybridSolver import HybridSolver
+from nen.Solver.GASolver import GASolver
 
 # names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
 names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
