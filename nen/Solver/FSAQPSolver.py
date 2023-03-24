@@ -107,5 +107,5 @@ class FSAQPSolver:
         # result.objectives_num = 1
         # problem.objectives_num = 1
         result.wso_add(problem.evaluate(values))
-        result.elapsed = (end - start) / L
+        result.elapsed = (end - start)
         return result

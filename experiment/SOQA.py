@@ -33,7 +33,7 @@ weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
               ]
 
 # for name in names_FSP:
-#     flag = 0
+#
 #     for weight in weight_FSP:
 #         order = order_FSP
 #         result_folder = 'so-sa-{}'.format(name)
@@ -46,7 +46,7 @@ weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
 #         qp = QP(name, order)
 #         weights = weight
 #
-#         # solve with Genetic Algorithm
+#         # solve with SA Algorithm
 #         result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=100,
 #                                     max_stay=20, sample_times=20, num_reads=1000)
 #         sa_result = MethodResult('sa', problem_result.path, qp)
@@ -68,11 +68,10 @@ weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
 #             name, ['sa', 'soqp'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
 #             scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}
 #         )
-#         Visualizer.tabluate(table, 'so-sa-compare-{}-{}.csv'.format(name, flag))
-#         flag += 1
+#         Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))
+
 
 for name in names_NRP:
-    flag = 0
     for weight in weight_NRP:
         order = order_NRP
         result_folder = 'so-sa-{}'.format(name)
@@ -83,16 +82,16 @@ for name in names_NRP:
         # prepare the problem result folder before solving
         problem_result = ProblemResult(name, problem, result_folder)
         qp = QP(name, order)
-        weights = {'cost': 1 / 2, 'revenue': 1 / 2}
+        weights = weight
 
-        # solve with Genetic Algorithm
-        result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=100,
-                                    max_stay=50, sample_times=20, num_reads=1000)
+        # solve with SA Algorithm
+        result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=300,
+                                    max_stay=50, sample_times=10, num_reads=1000)
         sa_result = MethodResult('sa', problem_result.path, qp)
         sa_result.add(result1)
 
         # solve with cplex
-        result = SOQA.solve(problem=qp, weights=weights, sample_times=20, step_count=100, num_reads=100)
+        result = SOQA.solve(problem=qp, weights=weights, sample_times=10, num_reads=1000)
         so_result = MethodResult('soqp', problem_result.path, qp)
         so_result.add(result)
 
@@ -104,8 +103,7 @@ for name in names_NRP:
         # compare
         scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights, alternative='greater')
         table = Visualizer.tabulate_single_problem(
-            name, ['sa', 'soqp'], ['statistic', 'p_value', 'mean', 'std', 'max', 'min', 'time'],
-            scores, {'statistic': 8, 'p_value': 8, 'mean': 8, 'std': 8, 'max': 8, 'min': 8, 'time': 8}
+            name, ['soqp', 'sa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+            scores, {'time': 6, 'statistic': 8, 'p_value': 8, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
         )
-        Visualizer.tabluate(table, 'so-sa-compare-{}-{}.csv'.format(name, flag))
-        flag += 1
+        Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))

@@ -1,13 +1,14 @@
-# Put this file at Nen/ (Project Root Path)
 import sys
 import os
+
+from nen.Solver.GASolver import GASolver
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
-from nen.Solver.MOQASolver import MOQASolver
-from nen.Solver.GASolver import GASolver
+from nen.Solver.HybridSolver import HybridSolver
 
 # names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
 names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
@@ -35,7 +36,7 @@ for name in names_FSP:
     ga_result.add(result1)
 
     # solve with cplex
-    result = MOQASolver.solve(qp, sample_times=3, num_reads=1000)
+    result = HybridSolver.solve(problem=qp, sample_times=3, num_reads=1000, num_sweeps=1000)
     assert result.iterations != 0
     qp_result = MethodResult('moqa', problem_result.path, qp)
     qp_result.add(result)
@@ -72,7 +73,7 @@ for name in names_NRP:
     ga_result.add(result1)
 
     # solve with cplex
-    result = MOQASolver.solve(qp, sample_times=3, num_reads=1000)
+    result = HybridSolver.solve(problem=qp, sample_times=3, num_reads=1000, num_sweeps=1000)
     qp_result = MethodResult('moqa', problem_result.path, qp)
     qp_result.add(result)
 

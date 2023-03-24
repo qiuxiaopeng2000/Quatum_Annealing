@@ -158,3 +158,4 @@ class ProblemTest(unittest.TestCase):
         for problem_name in problem_names:
             LP(problem_name)
             QP(problem_name)
+

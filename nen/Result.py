@@ -555,6 +555,7 @@ class ProblemResult:
             method2_result.make_method_result(single_flag=True)
         assert len(method1_result.method_result.solution_list) == len(method2_result.method_result.solution_list)
         # 'alternative' is Alternative Hypothesis
+        iteration = method2_result.method_result.iterations
         w = []
         for k, v in weights.items():
             w.append(v)
@@ -570,8 +571,8 @@ class ProblemResult:
         std = {method1: np.std(method1_objective), method2: np.std(method2_objective)}
         max_num = {method1: np.max(method1_objective), method2: np.max(method2_objective)}
         min_num = {method1: np.min(method1_objective), method2: np.min(method2_objective)}
-        elapsed = {method1: method1_result.method_result.elapsed, method2: method2_result.method_result.elapsed}
-        return statistics, pvalues, mean, std, max_num, min_num, elapsed
+        elapsed = {method1: method1_result.method_result.elapsed / iteration, method2: method2_result.method_result.elapsed / iteration}
+        return  elapsed, statistics, pvalues, mean, std, max_num, min_num
 
     def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
         """union_average_compare [summary] return union method compared with average method with scores indicated by
@@ -608,7 +609,7 @@ class ProblemResult:
             average_result = average_results[i]
             problem_archive = \
                 ProblemArchive(self.problem, {union_method: union_result, average_method: average_result})
-            front_all.append({k: float(v) for k, v in problem_archive.on_pareto_count().items()})
+            front_all.append({k: float(v) / iteration1 for k, v in problem_archive.on_pareto_count().items()})
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())
             sp_all.append(problem_archive.compute_sp())

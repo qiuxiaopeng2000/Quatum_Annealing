@@ -2,12 +2,13 @@ from typing import Dict, List
 
 import hybrid
 from dimod import BinaryQuadraticModel
-# from dwave.system import LeapHybridSampler
+from dwave.system import LeapHybridSampler
+# from dwave.system import DWaveSampler
 
 from nen.Solver import MOQASolver, SOQA
 from nen.Term import Constraint, Quadratic
 from nen.Problem import QP
-from nen.Result import Result, NDArchive
+from nen.Result import Result
 from nen.Solver.MetaSolver import SolverUtil
 from nen.Solver.EmbeddingSampler import EmbeddingSampler, SampleSet
 
@@ -22,7 +23,7 @@ class HybridSolver:
     """
 
     @staticmethod
-    def solve(problem: QP, sample_times: int, num_reads: int) -> Result:
+    def solve(problem: QP, sample_times: int, num_reads: int, num_sweeps: int = 1000) -> Result:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
         print("start Hybrid Solver to solve multi-objective problem!!!")
@@ -32,37 +33,38 @@ class HybridSolver:
         samplesets: List[SampleSet] = []
         elapseds: List[float] = []
         for _ in range(sample_times):
-            # generate random weights and calculate weighted sum obejctive
-            weights = MOQASolver.random_normalized_weights(basic_weights)
-            wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
-            # calculate the penalty and add constraints to objective with penalty
-            penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
-            objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
-            qubo = Constraint.quadratic_to_qubo_dict(objective)
-            # convert qubo to bqm
-            bqm = BinaryQuadraticModel.from_qubo(qubo)
+            for _ in range(num_reads):
+                # generate random weights and calculate weighted sum obejctive
+                weights = MOQASolver.random_normalized_weights(basic_weights)
+                wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
+                # calculate the penalty and add constraints to objective with penalty
+                penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
+                objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
+                qubo = Constraint.quadratic_to_qubo_dict(objective)
+                # convert qubo to bqm
+                bqm = BinaryQuadraticModel.from_qubo(qubo)
 
-            # define the workflow
-            workflow = hybrid.Loop(
-                hybrid.Race(
-                    hybrid.SimulatedAnnealingProblemSampler(num_reads=num_reads),
-                    hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='pfs')
-                    | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=num_reads, solver='Advantage_system4.1')
-                    | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3, max_iter=1000)
-            # Solve in Hybrid-QA
-            sampler = hybrid.HybridSampler(workflow)
-            start = SolverUtil.time()
-            sampleset = sampler.sample(bqm)
-            end = SolverUtil.time()
-            while len(sampleset.record) == 0:
+                # define the workflow
+                workflow = hybrid.Loop(
+                    hybrid.Race(
+                        hybrid.SimulatedAnnealingProblemSampler(num_reads=1, num_sweeps=num_sweeps),
+                        hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='pfs')
+                        | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=1)
+                        | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3, max_iter=1000)
+                # Solve in Hybrid-QA
+                sampler = hybrid.HybridSampler(workflow)
+                start = SolverUtil.time()
                 sampleset = sampler.sample(bqm)
-            if sampleset.info.get('timing'):
-                elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
-            else:
-                elapsed = end - start
+                end = SolverUtil.time()
+                # while len(sampleset.record) == 0:
+                #     sampleset = sampler.sample(bqm)
+                if sampleset.info.get('timing'):
+                    elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
+                else:
+                    elapsed = end - start
 
-            samplesets.append(sampleset)
-            elapseds.append(elapsed)
+                samplesets.append(sampleset)
+                elapseds.append(elapsed)
         # put samples into result
         result = Result(problem)
         for sampleset in samplesets:
@@ -79,6 +81,7 @@ class HybridSolver:
         # storage parameters
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads
+        result.iterations = sample_times
         print("Hybrid Solver end!!!")
         return result
 
@@ -105,7 +108,7 @@ class HybridSolver:
                 hybrid.SimulatedAnnealingProblemSampler(num_reads=num_, num_sweeps=num_sweeps),
                 hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='pfs')
                 | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=num_)
-                | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3)
+                | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3, max_iter=1000)
 
         for _ in range(sample_times):
             res = HybridSolver.solve_once(problem=problem, weights=weights, bqm=bqm, sample_times=step_count,
@@ -115,6 +118,7 @@ class HybridSolver:
         result.info['weights'] = weights
         result.info['penalty'] = penalty
         result.info['num_reads'] = num_reads
+        result.iterations = sample_times
         print("Hybrid Solver end!!!")
         return result
 
@@ -155,4 +159,5 @@ class HybridSolver:
         result.wso_add(best_solution)
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads
+        result.iterations = sample_times
         return result
