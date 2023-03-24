@@ -108,7 +108,7 @@ class LeapHybridSolver:
         result = Result(problem)
         samplesets = []
         # Solve in QA
-        sampler = LeapHybridSampler()
+        sampler = LeapHybridSampler(solver='hybrid_binary_quadratic_model_version2')
         sampleset = sampler.sample(bqm, time_limit=1)
         # while len(sampleset.record) == 0:
         #     sampleset = sampler.sample(bqm)
