@@ -17,7 +17,7 @@ order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 
 for name in names_FSP:
     order = order_FSP
-    result_folder = 'QA-GA-{}'.format(name)
+    result_folder = 'HY-GA-{}'.format(name)
 
     problem = Problem(name)
     problem.vectorize(order)
@@ -37,7 +37,7 @@ for name in names_FSP:
     # solve with cplex
     result = HybridSolver.solve(problem=qp, sample_times=3, num_reads=1000, num_sweeps=1000)
     assert result.iterations != 0
-    qp_result = MethodResult('moqa', problem_result.path, qp)
+    qp_result = MethodResult('hybrid', problem_result.path, qp)
     qp_result.add(result)
 
     # dump the results
@@ -46,16 +46,16 @@ for name in names_FSP:
     problem_result.dump()
 
     # compare
-    scores = problem_result.union_average_compare(union_method='moqa', average_method='ga')
+    scores = problem_result.union_average_compare(union_method='hybrid', average_method='ga')
     table = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+        name, ['hybrid', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
         scores, {'elapsed time': 4, 'found': 2, 'front': 2, 'igd': 2, 'hv': 2, 'spacing': 2, 'tts': 6}
     )
-    Visualizer.tabluate(table, 'qa-ga-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table, 'hy-ga-compare-{}.csv'.format(name))
 
 for name in names_NRP:
     order = order_NRP
-    result_folder = 'QA-GA-{}'.format(name)
+    result_folder = 'HY-GA-{}'.format(name)
 
     problem = Problem(name)
     problem.vectorize(order)
@@ -73,7 +73,7 @@ for name in names_NRP:
 
     # solve with cplex
     result = HybridSolver.solve(problem=qp, sample_times=3, num_reads=1000, num_sweeps=1000)
-    qp_result = MethodResult('moqa', problem_result.path, qp)
+    qp_result = MethodResult('hybrid', problem_result.path, qp)
     qp_result.add(result)
 
     # dump the results
@@ -82,9 +82,9 @@ for name in names_NRP:
     problem_result.dump()
 
     # compare
-    scores = problem_result.union_average_compare(union_method='moqa', average_method='ga')
+    scores = problem_result.union_average_compare(union_method='hybrid', average_method='ga')
     table = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+        name, ['hybrid', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
         scores, {'elapsed time': 4, 'found': 2, 'front': 2, 'igd': 2, 'hv': 2, 'spacing': 2, 'tts': 6}
     )
-    Visualizer.tabluate(table, 'qa-ga-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table, 'hy-ga-compare-{}.csv'.format(name))

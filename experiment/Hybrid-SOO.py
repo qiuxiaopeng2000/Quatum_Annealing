@@ -10,7 +10,8 @@ from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
 from nen.Solver.HybridSolver import HybridSolver
 from nen.Solver.SOQASolver import SOQA
 
-names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
+# names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
+names_FSP = ['ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 alternative_FSP = ['less', 'less', 'less']
 weight_FSP = [{'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}]
