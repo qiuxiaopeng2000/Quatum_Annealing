@@ -44,7 +44,7 @@ class LeapHybridSolver:
                 # convert qubo to bqm
                 bqm = BinaryQuadraticModel.from_qubo(qubo)
 
-                sampleset = sample.sample(bqm, time_limit=1)
+                sampleset = sample.sample(bqm)
 
                 elapsed = sampleset.info['qpu_access_time']
                 samplesets.append(sampleset)
@@ -109,7 +109,7 @@ class LeapHybridSolver:
         samplesets = []
         # Solve in QA
         sampler = LeapHybridSampler(solver='hybrid_binary_quadratic_model_version2')
-        sampleset = sampler.sample(bqm, time_limit=1)
+        sampleset = sampler.sample(bqm)
         # while len(sampleset.record) == 0:
         #     sampleset = sampler.sample(bqm)
         elapsed = sampleset.info['qpu_sampling_time'] / 1000_000
