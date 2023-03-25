@@ -6,7 +6,7 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
-from nen.Solver.HybridSolver import HybridSolver
+from nen.Solver.DwaveHybridSolver import HybridSolver
 from nen.Solver.GASolver import GASolver
 
 

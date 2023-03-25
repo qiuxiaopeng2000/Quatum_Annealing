@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+import hybrid
 from dimod import BinaryQuadraticModel
 from dwave.system import LeapHybridSampler
 # from dwave.system import DWaveSampler
@@ -12,7 +13,7 @@ from nen.Solver.MetaSolver import SolverUtil
 from nen.Solver.EmbeddingSampler import EmbeddingSampler, SampleSet
 
 
-class LeapHybridSolver:
+class DwaveHybridSolver:
     """ [summary] HybridSolver, stands for Multi-Objective Quantum Annealling with HybridSolver,
     hybrid—quantum-classical hybrid; typically one or more classical algorithms run on the problem
     while outsourcing to a quantum processing unit (QPU) parts of the problem where it benefits most.
@@ -22,13 +23,12 @@ class LeapHybridSolver:
     """
 
     @staticmethod
-    def solve(problem: QP, sample_times: int, num_reads: int) -> Result:
+    def solve(problem: QP, sample_times: int, num_reads: int, num_sweeps: int = 1000) -> Result:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
         print("start Hybrid Solver to solve multi-objective problem!!!")
         # scale objectives and get the basic
         basic_weights = SolverUtil.scaled_weights(problem.objectives)
-        sample = LeapHybridSampler(solver='hybrid_binary_quadratic_model_version2')
         # sample for sample_times times
         samplesets: List[SampleSet] = []
         elapseds: List[float] = []
@@ -44,9 +44,25 @@ class LeapHybridSolver:
                 # convert qubo to bqm
                 bqm = BinaryQuadraticModel.from_qubo(qubo)
 
-                sampleset = sample.sample(bqm)
+                # define the workflow
+                workflow = hybrid.Loop(
+                    hybrid.Race(
+                        hybrid.SimulatedAnnealingProblemSampler(num_reads=1, num_sweeps=num_sweeps),
+                        hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='pfs')
+                        | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=1)
+                        | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3, max_iter=1000)
+                # Solve in Hybrid-QA
+                sampler = hybrid.HybridSampler(workflow)
+                start = SolverUtil.time()
+                sampleset = sampler.sample(bqm)
+                end = SolverUtil.time()
+                # while len(sampleset.record) == 0:
+                #     sampleset = sampler.sample(bqm)
+                if sampleset.info.get('timing'):
+                    elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
+                else:
+                    elapsed = end - start
 
-                elapsed = sampleset.info['qpu_access_time']
                 samplesets.append(sampleset)
                 elapseds.append(elapsed)
         # put samples into result
@@ -86,9 +102,17 @@ class LeapHybridSolver:
         assert num_reads % step_count == 0
         num_ = int(num_reads / step_count)
 
+        # define the workflow
+        workflow = hybrid.Loop(
+            hybrid.Race(
+                hybrid.SimulatedAnnealingProblemSampler(num_reads=num_, num_sweeps=num_sweeps),
+                hybrid.EnergyImpactDecomposer(size=50, rolling=True, traversal='pfs')
+                | hybrid.QPUSubproblemAutoEmbeddingSampler(num_reads=num_)
+                | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3, max_iter=1000)
+
         for _ in range(sample_times):
-            res = LeapHybridSolver.solve_once(problem=problem, weights=weights, bqm=bqm, sample_times=step_count,
-                                              num_reads=num_)
+            res = HybridSolver.solve_once(problem=problem, weights=weights, bqm=bqm, sample_times=step_count,
+                                          num_reads=num_, workflow=workflow)
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
         result.info['weights'] = weights
@@ -100,7 +124,7 @@ class LeapHybridSolver:
 
     @staticmethod
     def solve_once(problem: QP, weights: Dict[str, float], num_reads: int,
-                   sample_times: int, bqm) -> Result:
+                   sample_times: int, bqm, workflow) -> Result:
         """solve [summary] solve single objective qp (applied wso technique), return Result.
         the result return from hybrid.HybridSampler is an object of 'concurrent.futures.Future',
         not an object of 'dimod.SampleSet', so we need to convert the result to  'dimod.SampleSet' by 'from_future'
@@ -108,12 +132,19 @@ class LeapHybridSolver:
         result = Result(problem)
         samplesets = []
         # Solve in QA
-        sampler = LeapHybridSampler(solver='hybrid_binary_quadratic_model_version2')
-        sampleset = sampler.sample(bqm)
-        elapsed = sampleset.info['qpu_sampling_time'] / 1000_000
-        result.elapsed = elapsed
-        samplesets.append(sampleset)
-
+        sampler = hybrid.HybridSampler(workflow)
+        for _ in range(sample_times):
+            start = SolverUtil.time()
+            sampleset = sampler.sample(bqm)
+            # while len(sampleset.record) == 0:
+            #     sampleset = sampler.sample(bqm)
+            end = SolverUtil.time()
+            if sampleset.info.get('timing'):
+                elapsed = sampleset.info['timing']['qpu_sampling_time'] / 1000_000
+            else:
+                elapsed = end - start
+            result.elapsed += elapsed
+            samplesets.append(sampleset)
         # get results
         solution_list = []
         iteration = 0

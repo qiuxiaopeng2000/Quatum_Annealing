@@ -46,7 +46,7 @@ class GASolver:
         print("{} start Genetic Algorithm to solve multi-objective problem!!!".format(problem.name))
         result = Result(problem)
         termination = DefaultMultiObjectiveTermination(
-            n_max_gen=iterations,
+            n_max_gen=maxEvaluations / populationSize,
             n_max_evals=maxEvaluations
         )
         pro = PymooProblem(problem)

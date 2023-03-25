@@ -8,7 +8,7 @@ sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
 from nen.Solver.FSAQPSolver import FSAQPSolver
-from nen.Solver.HybridSolver import HybridSolver
+from nen.Solver.DwaveHybridSolver import HybridSolver
 
 name = 'ms'
 order = ['cost', 'revenue']
