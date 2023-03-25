@@ -10,7 +10,6 @@ from nen.Term import Quadratic, Constraint
 from nen.Solver.MetaSolver import SolverUtil
 # from sko.SA import SA
 from nen.Solver.SA import SAFast
-from nen.Solver.SASolver import SASolver
 
 
 class FSAQPSolver:

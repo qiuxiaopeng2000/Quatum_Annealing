@@ -24,7 +24,7 @@ qp = QP(name, order)
 weights = {'cost': 1/2, 'revenue': 1/2}
 
 # solve with Genetic Algorithm
-result = HybridSolver.solve(problem=qp, sample_times=1, num_reads=5, seed=1, sub_size=10)
+result = HybridSolver.solve(problem=qp, sample_times=1, num_reads=5, seed=1, sub_size=10, maxEvaluations=100)
 sa_result = MethodResult('sa', problem_result.path, qp)
 sa_result.add(result)
 
