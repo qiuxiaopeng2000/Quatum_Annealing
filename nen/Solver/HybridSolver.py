@@ -46,6 +46,7 @@ class HybridSolver:
         elapseds: List[float] = []
         solution_list: List[BinarySolution] = []
         for _ in range(sample_times):
+            solution_: List[BinarySolution] = []
             # generate random weights and calculate weighted sum obejctive
             weights = MOQASolver.random_normalized_weights(basic_weights)
             wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
@@ -58,19 +59,21 @@ class HybridSolver:
 
             start = SolverUtil.time()
             '''Decomposer'''
-            states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=problem.variables_num)
+            states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
             '''Sampler'''
-            subsamplesets = HybridSolver.Sampler(states=states, num_reads=num_reads, elapseds=elapseds)
+            subsamplesets = HybridSolver.Sampler(states=states, num_reads=num_reads)
             '''Composer'''
-            HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads, solution_list=solution_list)
+            HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads,
+                                  solution_list=solution_)
             end = SolverUtil.time()
             '''NSGA-II'''
             t = end - start
+            elapseds.append(t)
             HybridSolver.NSGAII(populationSize=num_reads, maxEvaluations=maxEvaluations, problem=problem, seed=seed,
-                                time=t, elapseds=elapseds, solution_list=solution_list)
+                                time=t, solution_list=solution_)
             '''Selection'''
-            solution_list.sort(key=lambda x: x.objectives[0])
-            solution_list = solution_list[:num_reads]
+            solution_.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
+            solution_list += solution_[:num_reads]
 
         # put samples into result
         result = Result(problem)
@@ -113,7 +116,7 @@ class HybridSolver:
             '''Decomposer'''
             states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=problem.variables_num)
             '''Sampler'''
-            subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads, elapseds=elapseds)
+            subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
             '''Composer'''
             HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads,
                                   solution_list=solution_)
@@ -121,8 +124,9 @@ class HybridSolver:
             '''SA'''
             H = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
             t = end1 - start1
+            elapseds.append(t)
             HybridSolver.SA(H=H, t_max=t_max, t_min=t_min, L=L, max_stay=max_stay, num_reads=num_reads,
-                            time=t, problem=problem, elapseds=elapseds, solution_list=solution_)
+                            time=t, problem=problem, solution_list=solution_)
             '''Selection'''
             solution_.sort(key=lambda x: x.objectives[0])
             solution_list.append(solution_[0])
@@ -161,7 +165,7 @@ class HybridSolver:
         return states
 
     @staticmethod
-    def Sampler(states: List[State], num_reads: int, elapseds: List[float]) -> List[SampleSet]:
+    def Sampler(states: List[State], num_reads: int) -> List[SampleSet]:
         subsamplesets = []
         for state in states:
             pro_bqm = state.subproblem
@@ -169,7 +173,6 @@ class HybridSolver:
             sampler = EmbeddingSampler()
             sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw')
             subsamplesets.append(sampleset)
-            elapseds.append(elapsed)
         return subsamplesets
 
     @staticmethod
@@ -180,9 +183,14 @@ class HybridSolver:
         for subsampleset in subsamplesets:
             var_index: Dict[str, int] = {}
             for var in subsampleset.variables:
+                if var not in problem.variables:
+                    continue
                 var_index[var] = subsampleset.variables.index(var)
+            assert len(subsampleset.record) == num_reads
             for subsample in subsampleset.record:
                 for var in subsampleset.variables:
+                    if var not in problem.variables:
+                        continue
                     values_array[var].append(subsample[0][var_index[var]])
         if len(values_array) != problem.variables_num:
             return False
@@ -196,7 +204,7 @@ class HybridSolver:
 
     @staticmethod
     def NSGAII(populationSize: int, maxEvaluations: int, problem: QP, seed: float,
-               time: float, elapseds: List[float], solution_list: List[BinarySolution]):
+               time: float, solution_list: List[BinarySolution]):
         t = 0
         termination = DefaultMultiObjectiveTermination(
             n_max_gen=maxEvaluations / populationSize,
@@ -220,11 +228,10 @@ class HybridSolver:
                 solution = problem.evaluate(values)
                 solution_list.append(solution)
             t += res.exec_time
-            elapseds.append(res.exec_time)
 
     @staticmethod
     def SA(H: Quadratic, t_max: float, t_min: float, L: int, max_stay: int, num_reads: int,
-           time: float, problem: QP, elapseds: List[float], solution_list: List[BinarySolution]):
+           time: float, problem: QP, solution_list: List[BinarySolution]):
         fitness, variables = FSAQPSolver.quadratic_to_fitness(H)
         x0 = []
         for _ in range(len(variables)):
@@ -244,4 +251,3 @@ class HybridSolver:
             sol = problem.evaluate(values)
             solution_list.append(sol)
             t += (end2 - start2)
-            elapseds.append(end2 - start2)
