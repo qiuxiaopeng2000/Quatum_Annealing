@@ -10,7 +10,7 @@ from nen.Solver.MOQASolver import MOQASolver
 from nen.Solver.GASolver import GASolver
 
 # names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
-names_NRP = ['rp', 'ms']
+names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
 order_NRP = ['cost', 'revenue']
 names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
@@ -30,7 +30,7 @@ for name in names_FSP:
     # solve with NSGA-II
     ga_result = MethodResult('ga', problem_result.path, lp)
     for _ in range(3):
-        result1 = GASolver.solve(populationSize=1000, maxEvaluations=50000, crossoverProbability=0.8,
+        result1 = GASolver.solve(populationSize=100, maxEvaluations=5000, crossoverProbability=0.8, iterations=10,
                                  mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
         ga_result.add(result1)
 

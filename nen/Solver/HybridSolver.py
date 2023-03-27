@@ -76,8 +76,8 @@ class HybridSolver:
             HybridSolver.NSGAII(populationSize=num_reads, maxEvaluations=maxEvaluations, problem=problem, seed=seed,
                                 time=t, solution_list=solution_)
             '''Selection'''
-            # solution_.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
-            solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
+            solution_.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
+            # solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
             solution_list += solution_[:num_reads]
 
         # put samples into result

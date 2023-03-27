@@ -46,6 +46,7 @@ class GASolver:
         print("{} start Genetic Algorithm to solve multi-objective problem!!!".format(problem.name))
         result = Result(problem)
         termination = DefaultMultiObjectiveTermination(
+            n_max_gen=iterations,
             n_max_evals=maxEvaluations
         )
         pro = PymooProblem(problem)
@@ -59,7 +60,7 @@ class GASolver:
                     eliminate_duplicates=True)
 
         for _ in range(iterations):
-            res = minimize(pro, alg, termination, seed=seed, verbose=verbose)
+            res = minimize(pro, alg, termination, seed=seed, verbose=verbose, return_least_infeasible=True)
             # return_least_infeasible=True
 
             result.elapsed += res.exec_time

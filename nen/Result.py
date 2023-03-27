@@ -601,7 +601,6 @@ class ProblemResult:
         if average_method_result.method_result is None:
             average_method_result.make_method_result(single_flag=False)
 
-        average_elapsed = sum(average_method_result.get_elapseds())
         average_results = average_method_result.method_result
         # compare
         elapsed: List[Dict[str, float]] = []
@@ -616,10 +615,10 @@ class ProblemResult:
         iteration = average_method_result.iteration
         for i in range(iteration):
             problem_archive = \
-                ProblemArchive(self.problem, {union_method: union_result, average_method: average_results})
-            elapsed.append({union_method: union_result.elapsed, average_method: average_elapsed})
-            found.append({union_method: len(union_result.solution_list),
-                          average_method: len(average_results.solution_list)})
+                ProblemArchive(self.problem, {union_method: union_method_result.results[i], average_method: average_method_result.results[i]})
+            elapsed.append({union_method: union_method_result.results[i].elapsed, average_method: average_method_result.results[i].elapsed})
+            found.append({union_method: len(union_method_result.results[i].solution_list),
+                          average_method: len(average_method_result.results[i].solution_list)})
             front_all.append({k: float(v) for k, v in problem_archive.on_pareto_count().items()})
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())
