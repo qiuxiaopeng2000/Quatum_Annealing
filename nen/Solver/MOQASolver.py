@@ -22,7 +22,7 @@ class MOQASolver:
     """
 
     @staticmethod
-    def solve(problem: QP, sample_times: int, num_reads: int) -> Result:
+    def solve(problem: QP, num_reads: int, sample_times: int = 1) -> Result:
         """solve [summary] solve qp, results are recorded in result.
         num_reads:
             read the num of solution from the solver result, not all the solution on the pareto.

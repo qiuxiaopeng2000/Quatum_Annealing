@@ -35,7 +35,7 @@ class HybridSolver:
     """
 
     @staticmethod
-    def solve(problem: QP, sample_times: int, num_reads: int, seed: float, sub_size: int, maxEvaluations: int) -> Result:
+    def solve(problem: QP, num_reads: int, seed: float, sub_size: int, maxEvaluations: int, sample_times: int = 1) -> Result:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
         print("{} start Hybrid Solver to solve multi-objective problem!!!".format(problem.name))
@@ -59,20 +59,25 @@ class HybridSolver:
 
             start = SolverUtil.time()
             '''Decomposer'''
+            s1 = SolverUtil.time()
             states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
+            e1 = SolverUtil.time()
             '''Sampler'''
-            subsamplesets = HybridSolver.Sampler(states=states, num_reads=num_reads)
+            subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
             '''Composer'''
+            s2 = SolverUtil.time()
             HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads,
                                   solution_list=solution_)
+            e2 = SolverUtil.time()
             end = SolverUtil.time()
             '''NSGA-II'''
             t = end - start
-            elapseds.append(t)
+            elapseds.append(e1 - s1 + e2 - s2 + runtime)
             HybridSolver.NSGAII(populationSize=num_reads, maxEvaluations=maxEvaluations, problem=problem, seed=seed,
                                 time=t, solution_list=solution_)
             '''Selection'''
-            solution_.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
+            # solution_.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
+            solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
             solution_list += solution_[:num_reads]
 
         # put samples into result
@@ -90,6 +95,7 @@ class HybridSolver:
         result.info['sample_times'] = sample_times
         result.info['num_reads'] = num_reads
         result.iterations = sample_times
+        result.total_num_anneals = num_reads * sample_times
         print("{} Hybrid Solver end!!!".format(problem.name))
         return result
 
@@ -114,17 +120,20 @@ class HybridSolver:
 
             start1 = SolverUtil.time()
             '''Decomposer'''
+            s1 = SolverUtil.time()
             states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=problem.variables_num)
+            e1 = SolverUtil.time()
             '''Sampler'''
             subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
             '''Composer'''
-            HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads,
-                                  solution_list=solution_)
+            s2 = SolverUtil.time()
+            HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads, solution_list=solution_)
+            e2 = SolverUtil.time()
             end1 = SolverUtil.time()
             '''SA'''
             H = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
             t = end1 - start1
-            elapseds.append(t)
+            elapseds.append(e1 - s1 + e2 - s2 + runtime)
             HybridSolver.SA(H=H, t_max=t_max, t_min=t_min, L=L, max_stay=max_stay, num_reads=num_reads,
                             time=t, problem=problem, solution_list=solution_)
             '''Selection'''
@@ -165,7 +174,8 @@ class HybridSolver:
         return states
 
     @staticmethod
-    def Sampler(states: List[State], num_reads: int) -> List[SampleSet]:
+    def Sampler(states: List[State], num_reads: int) -> Tuple[List[SampleSet], float]:
+        elapseds = 0.0
         subsamplesets = []
         for state in states:
             pro_bqm = state.subproblem
@@ -173,7 +183,8 @@ class HybridSolver:
             sampler = EmbeddingSampler()
             sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw')
             subsamplesets.append(sampleset)
-        return subsamplesets
+            elapseds += elapsed
+        return subsamplesets, elapseds
 
     @staticmethod
     def Composer(problem: QP, subsamplesets: List[SampleSet], num_reads: int, solution_list: List[BinarySolution]) -> bool:
@@ -207,7 +218,6 @@ class HybridSolver:
                time: float, solution_list: List[BinarySolution]):
         t = 0
         termination = DefaultMultiObjectiveTermination(
-            n_max_gen=maxEvaluations / populationSize,
             n_max_evals=maxEvaluations
         )
         pro = PymooProblem(problem)
@@ -217,8 +227,7 @@ class HybridSolver:
                     # crossover=SBX(prob=crossoverProbability, eta=15),
                     crossover=TwoPointCrossover(),
                     # mutation=PolynomialMutation(eta=20, prob=mutationProbability),
-                    mutation=BitflipMutation(),
-                    eliminate_duplicates=True)
+                    mutation=BitflipMutation())
         while t < time:
             res = minimize(pro, alg, termination, seed=seed, verbose=False,
                            return_least_infeasible=True)

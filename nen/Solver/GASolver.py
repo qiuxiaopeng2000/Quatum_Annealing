@@ -5,7 +5,7 @@ from pymoo.operators.sampling.rnd import BinaryRandomSampling
 from pymoo.optimize import minimize
 from pymoo.termination.default import DefaultMultiObjectiveTermination
 
-from nen.Problem import PymooProblem
+from nen.Problem import PymooProblem, QP
 from nen.Problem import Problem
 from nen.Result import Result
 
@@ -18,9 +18,9 @@ class GASolver:
         make sure the environment is configured successfully accordingly.
         """
     @staticmethod
-    def solve(problem: Problem, populationSize: int, maxEvaluations: int, iterations: int,
+    def solve(problem: Problem, populationSize: int, maxEvaluations: int,
               seed: int, crossoverProbability: float, mutationProbability: int,
-              verbose: bool = False) -> Result:
+              verbose: bool = False, iterations: int = 1) -> Result:
         """
         seed : integer
             The random seed to be used.
@@ -46,7 +46,6 @@ class GASolver:
         print("{} start Genetic Algorithm to solve multi-objective problem!!!".format(problem.name))
         result = Result(problem)
         termination = DefaultMultiObjectiveTermination(
-            n_max_gen=maxEvaluations / populationSize,
             n_max_evals=maxEvaluations
         )
         pro = PymooProblem(problem)
@@ -58,9 +57,10 @@ class GASolver:
                     # mutation=PolynomialMutation(eta=20, prob=mutationProbability),
                     mutation=BitflipMutation(),
                     eliminate_duplicates=True)
+
         for _ in range(iterations):
-            res = minimize(pro, alg, termination, seed=seed, verbose=verbose,
-                           return_least_infeasible=True)
+            res = minimize(pro, alg, termination, seed=seed, verbose=verbose)
+            # return_least_infeasible=True
 
             result.elapsed += res.exec_time
             for sol in res.pop:
@@ -69,6 +69,7 @@ class GASolver:
                 solution = problem.evaluate(values)
                 result.add(solution)
         result.iterations = iterations
+        result.total_num_anneals = populationSize * iterations
         print("Genetic Algorithm end!!!")
         return result
 

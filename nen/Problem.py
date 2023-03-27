@@ -308,8 +308,8 @@ class PymooProblem(Pro):
 
     def _evaluate(self, x, out, *args, **kwargs):
         """
-        Assuming the Algorithm has variability size N, the input variable x is a one-dimensional
-        matrix with the length N.
+        Assuming the Algorithm has variability size N, the input variable x is a
+        matrix with the [populationSize, N].
         """
         # objective
         objs = []

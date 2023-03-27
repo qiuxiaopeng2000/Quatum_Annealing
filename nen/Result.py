@@ -37,15 +37,14 @@ class NDArchive:
     def add(self, solution: BinarySolution) -> bool:
         """add [summary] add a non-dominant solution into nd archive.
         """
-        # check wether solution is feasible
-        if sum(solution.constraints) > 0:
+        # check whether solution is feasible
+        if sum(solution.constraints) > 1:
             return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
         assert len(solution.objectives) == self.objectives_num
         # round objectives with NDArchive.ROUND_PRECISION
         solution.objectives = [round(x, NDArchive.ROUND_PRECISION) for x in solution.objectives]
-        self.total_num_anneals += 1
         self.all_solution_list.append(solution)
         return self.archive.add(solution)
         # self.solution_list.append(solution)
@@ -429,7 +428,7 @@ class ProblemArchive:
         """
         # pareto_count = self.on_pareto_count()
         # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
-        return {k: len(v.all_solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
+        return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
@@ -602,18 +601,14 @@ class ProblemResult:
         if average_method_result.method_result is None:
             average_method_result.make_method_result(single_flag=False)
 
-        iteration1 = sum(r.iterations for r in union_method_result.results)
-        iteration2 = sum(r.iterations for r in average_method_result.results)
-        assert iteration1 == iteration2
-
         average_elapsed = sum(average_method_result.get_elapseds())
         average_results = average_method_result.method_result
         # compare
-        elapsed = {union_method: union_result.elapsed / iteration1, average_method: average_elapsed / iteration2}
-        found = {union_method: len(union_result.all_solution_list) / iteration1,
-                 average_method: len(average_results.all_solution_list) / iteration2}
-        front_all = {union_method: len(union_result.solution_list) / iteration1,
-                     average_method: len(average_results.solution_list) / iteration2}
+        elapsed: List[Dict[str, float]] = []
+        found: List[Dict[str, float]] = []
+        # front_all = {union_method: len(union_result.solution_list) / iteration1,
+        #              average_method: len(average_results.solution_list) / iteration2}
+        front_all: List[Dict[str, float]] = []
         igd_all: List[Dict[str, float]] = []
         hv_all: List[Dict[str, float]] = []
         sp_all: List[Dict[str, float]] = []
@@ -622,13 +617,18 @@ class ProblemResult:
         for i in range(iteration):
             problem_archive = \
                 ProblemArchive(self.problem, {union_method: union_result, average_method: average_results})
-            # front_all.append({k: float(v) / iteration1 for k, v in problem_archive.on_pareto_count().items()})
+            elapsed.append({union_method: union_result.elapsed, average_method: average_elapsed})
+            found.append({union_method: len(union_result.solution_list),
+                          average_method: len(average_results.solution_list)})
+            front_all.append({k: float(v) for k, v in problem_archive.on_pareto_count().items()})
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())
             sp_all.append(problem_archive.compute_sp())
             tts_all.append(problem_archive.compute_tts())
         # collect scores
-        scores = [elapsed, found, front_all,
+        scores = [ProblemResult.average_of_dicts(elapsed),
+                  ProblemResult.average_of_dicts(found),
+                  ProblemResult.average_of_dicts(front_all),
                   ProblemResult.average_of_dicts(igd_all),
                   ProblemResult.average_of_dicts(hv_all),
                   ProblemResult.average_of_dicts(sp_all),
