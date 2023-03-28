@@ -9,7 +9,7 @@ from nen.Solver.EmbeddingSampler import EmbeddingSampler
 from nen.Term import Quadratic, Constraint
 from nen.Solver.MetaSolver import SolverUtil
 # from sko.SA import SA
-from nen.Solver.SA import SAFast
+from nen.Solver.SA import SAFast as sa
 
 
 class FSAQPSolver:
@@ -94,7 +94,7 @@ class FSAQPSolver:
             x0.append(bool(random.randint(0, 1)))
 
         start = SolverUtil.time()
-        sampler = SAFast(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0, num_reads=num_reads)
+        sampler = sa(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0, num_reads=num_reads)
         best_x, _ = sampler.run()
         end = SolverUtil.time()
         # restore the result
