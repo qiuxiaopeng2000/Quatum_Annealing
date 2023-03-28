@@ -32,7 +32,7 @@ for name in names_FSP:
     # solve with NSGA-II
     ga_result = MethodResult('ga', problem_result.path, lp)
     for _ in range(3):
-        result1 = GASolver.solve(populationSize=1000, maxEvaluations=50000, crossoverProbability=0.8,
+        result1 = GASolver.solve(populationSize=100, maxEvaluations=5000, crossoverProbability=0.8, iterations=10,
                                  mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
         ga_result.add(result1)
 
@@ -71,14 +71,14 @@ for name in names_NRP:
     # solve with NSGA-II
     ga_result = MethodResult('ga', problem_result.path, lp)
     for _ in range(3):
-        result1 = GASolver.solve(populationSize=1000, maxEvaluations=20000, crossoverProbability=0.8,
+        result1 = GASolver.solve(populationSize=100, maxEvaluations=20000, crossoverProbability=0.8, iterations=10,
                                  mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
         ga_result.add(result1)
 
     # solve with cplex
     qp_result = MethodResult('hybrid', problem_result.path, qp)
     for _ in range(3):
-        result = HybridSolver.solve(problem=qp, sample_times=10, num_reads=100, maxEvaluations=2000, seed=1, sub_size=100)
+        result = HybridSolver.solve(problem=qp, sample_times=10, num_reads=100, maxEvaluations=20000, seed=1, sub_size=100)
         qp_result.add(result)
 
     # dump the results

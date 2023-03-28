@@ -78,7 +78,7 @@ class HybridSolver:
             '''Selection'''
             solution_.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
             # solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
-            solution_list += solution_[:num_reads]
+            solution_list += solution_
 
         # put samples into result
         result = Result(problem)
