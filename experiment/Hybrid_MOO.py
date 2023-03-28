@@ -13,7 +13,7 @@ from nen.Solver.GASolver import GASolver
 names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
 order_NRP = ['cost', 'revenue']
 # names_FSP = ['BerkeleyDB']
-names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
+names_FSP = ['E-Shop']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 
 
