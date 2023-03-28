@@ -163,9 +163,12 @@ class HybridSolver:
         State is a dict subclass and usually contains at least three keys:
         samples: SampleSet, problem: BinaryQuadraticModel and subproblem: BinaryQuadraticModel.
         """
+        length = variables_num
+        if length < sub_size:
+            sub_size = 20
         decomposer = EnergyImpactDecomposer(size=sub_size, rolling=True, rolling_history=1.0, traversal='pfs')
         state0 = State.from_sample(min_sample(bqm), bqm)
-        length = variables_num
+
         states = []
         while length > 0:
             state0 = decomposer.run(state0).result()

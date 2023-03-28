@@ -472,7 +472,7 @@ class ProblemArchive:
             elif p_solve[name] == 1:
                 scores[name] = 0
             else:
-                scores[name] = (math.log(1 - 0.99) / math.log(1 - p_solve[name])) * (res.elapsed / res.iterations)
+                scores[name] = (math.log(1 - 0.99) / math.log(1 - p_solve[name])) * res.elapsed
 
         return scores
 
