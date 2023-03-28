@@ -16,8 +16,7 @@ from pymoo.optimize import minimize
 from pymoo.termination.default import DefaultMultiObjectiveTermination
 
 from nen.Solver import MOQASolver, SOQA
-from nen.Solver.FSAQPSolver import FSAQPSolver
-from nen.Solver.SA import SAFast as sa
+from nen.Solver.FSAQPSolver import FSAQPSolver, sa
 from nen.Term import Constraint, Quadratic
 from nen.Problem import QP, PymooProblem
 from nen.Result import Result
