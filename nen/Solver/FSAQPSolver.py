@@ -9,7 +9,7 @@ from nen.Solver.EmbeddingSampler import EmbeddingSampler
 from nen.Term import Quadratic, Constraint
 from nen.Solver.MetaSolver import SolverUtil
 # from sko.SA import SA
-from nen.Solver.SA import SAFast as sa
+from nen.Solver.SA import SAFasts as sa
 
 
 class FSAQPSolver:
