@@ -116,7 +116,5 @@ class SOQA:
                     best_value = v
                     best_solution = solution
         if best_solution is None:
-            best_solution_all.constraints = [0.0]
             best_solution = best_solution_all
-            best_solution.constraints = [0.0]
         return best_solution

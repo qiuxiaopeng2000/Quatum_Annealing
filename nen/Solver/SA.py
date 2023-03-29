@@ -129,7 +129,7 @@ class SimulatedAnnealingValue(SimulatedAnnealingBase):
         self.hop = self.hop * np.ones(self.n_dim)
 
 
-class SAFasts(SimulatedAnnealingValue):
+class SAFast(SimulatedAnnealingValue):
     """
     u ~ Uniform(0, 1, size = d)
     y = sgn(u - 0.5) * T * ((1 + 1/T)**abs(2*u - 1) - 1.0)
@@ -210,7 +210,7 @@ class SACauchy(SimulatedAnnealingValue):
 
 
 # SA_fast is the default
-SA = SAFasts
+SA = SAFast
 
 
 class SA_TSP(SimulatedAnnealingBase):
