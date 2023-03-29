@@ -42,8 +42,7 @@ class SOQASolver:
         for _ in range(sample_times):
             res = SOQASolver.solve_once(problem=problem, weights=weights, penalty=penalty, sample_times=step_count,
                                         num_reads=num_)
-            for sol in res.solution_list:
-                result.solution_list.append(sol)
+            result.solution_list.append(res.single)
             result.elapsed += res.elapsed
             if 'occurence' not in result.info:
                 result.info['occurence'] = {}
