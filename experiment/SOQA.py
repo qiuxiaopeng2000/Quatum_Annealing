@@ -32,42 +32,42 @@ order_NRP = ['cost', 'revenue']
 weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
               ]
 
-for name in names_FSP:
-    for weight in weight_FSP:
-        order = order_FSP
-        result_folder = 'so-sa-{}'.format(name)
-
-        problem = Problem(name)
-        problem.vectorize(order)
-
-        # prepare the problem result folder before solving
-        problem_result = ProblemResult(name, problem, result_folder)
-        qp = QP(name, order)
-        weights = weight
-
-        # solve with SA Algorithm
-        result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=300,
-                                    max_stay=150, sample_times=30, num_reads=1000)
-        sa_result = MethodResult('sa', problem_result.path, qp)
-        sa_result.add(result1)
-
-        # solve with cplex
-        result = SOQASolver.solve(problem=qp, weights=weights, sample_times=30, num_reads=1000, step_count=10)
-        so_result = MethodResult('soqp', problem_result.path, qp)
-        so_result.add(result)
-
-        # dump the results
-        problem_result.add(sa_result)
-        problem_result.add(so_result)
-        problem_result.dump()
-
-        # compare
-        scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights, alternative='greater')
-        table = Visualizer.tabulate_single_problem(
-            name, ['soqp', 'sa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-            scores, {'time': 4, 'statistic': 12, 'p_value': 12, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
-        )
-        Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))
+# for name in names_FSP:
+#     for weight in weight_FSP:
+#         order = order_FSP
+#         result_folder = 'so-sa-{}'.format(name)
+#
+#         problem = Problem(name)
+#         problem.vectorize(order)
+#
+#         # prepare the problem result folder before solving
+#         problem_result = ProblemResult(name, problem, result_folder)
+#         qp = QP(name, order)
+#         weights = weight
+#
+#         # solve with SA Algorithm
+#         result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=300,
+#                                     max_stay=150, sample_times=30, num_reads=1000)
+#         sa_result = MethodResult('sa', problem_result.path, qp)
+#         sa_result.add(result1)
+#
+#         # solve with cplex
+#         result = SOQASolver.solve(problem=qp, weights=weights, sample_times=30, num_reads=1000, step_count=10)
+#         so_result = MethodResult('soqp', problem_result.path, qp)
+#         so_result.add(result)
+#
+#         # dump the results
+#         problem_result.add(sa_result)
+#         problem_result.add(so_result)
+#         problem_result.dump()
+#
+#         # compare
+#         scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights, alternative='greater')
+#         table = Visualizer.tabulate_single_problem(
+#             name, ['soqp', 'sa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+#             scores, {'time': 4, 'statistic': 12, 'p_value': 12, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+#         )
+#         Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))
 
 
 for name in names_NRP:

@@ -3,9 +3,8 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 from dimod import BinaryQuadraticModel
-from dwave.system import LeapHybridSampler
 # from dwave.system import DWaveSampler
-from hybrid import State, min_sample, EnergyImpactDecomposer, SplatComposer
+from hybrid import State, min_sample, EnergyImpactDecomposer
 from jmetal.core.solution import BinarySolution
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
@@ -15,7 +14,7 @@ from pymoo.operators.sampling.rnd import BinaryRandomSampling
 from pymoo.optimize import minimize
 from pymoo.termination.default import DefaultMultiObjectiveTermination
 
-from nen.Solver import MOQASolver, SOQA
+from nen.Solver import MOQASolver
 from nen.Solver.FSAQPSolver import FSAQPSolver, SAFast
 from nen.Term import Constraint, Quadratic
 from nen.Problem import QP, PymooProblem
@@ -120,7 +119,7 @@ class HybridSolver:
             start1 = SolverUtil.time()
             '''Decomposer'''
             s1 = SolverUtil.time()
-            states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=problem.variables_num)
+            states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
             e1 = SolverUtil.time()
             '''Sampler'''
             subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
@@ -137,7 +136,7 @@ class HybridSolver:
                             time=t, problem=problem, solution_list=solution_)
             '''Selection'''
             solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
-            solution_list += solution_[0]
+            solution_list.append(solution_[0])
 
         # put samples into result
         result = Result(problem)

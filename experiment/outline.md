@@ -47,8 +47,3 @@ FSP: 'BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, 'Amazon'-79, 'E-sho
 * NSGA-II: large-scale maxvalue = 10000, small-scale maxvalue = 10000
 
 
-problem:
-1. 用多目标的数据集跑单目标问题有点奇怪
-2. 数据集的选定，不知道选哪些，选多了量子计算机时间不够用
-3. 什么是大规模数据集（解决方法：用不同规模的数据分别跑代码），大规模FSP数据不够
-4. dubug SA的iter_cycle，查看为什么SA这么慢
