@@ -85,7 +85,7 @@ class FSAQPSolver:
         fitness, variables = FSAQPSolver.quadratic_to_fitness(H)
 
         # too slow
-        x0 = SASolver.randomSolution(problem).variables
+        # x0 = SASolver.randomSolution(problem).variables
         # Add Slack Variables
         # if len(x0[0]) < len(variables):
         #     x0[0].extend([False for _ in range(len(variables) - len(x0[0]))])

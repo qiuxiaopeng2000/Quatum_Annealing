@@ -8,7 +8,7 @@ sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
 from nen.Solver.FSAQPSolver import FSAQPSolver
-from nen.Solver.SOQASolver import SOQA
+from nen.Solver.SOQASolver import SOQASolver
 
 names_FSP = ['BerkeleyDB', 'ERS', 'WebPortal', 'Drupal', 'Amazon', 'E-Shop']
 # names_FSP = ['WebPortal', 'Drupal', 'E-Shop']
@@ -33,7 +33,6 @@ weight_NRP = [{'cost': 1 / 2, 'revenue': 1 / 2},
               ]
 
 for name in names_FSP:
-
     for weight in weight_FSP:
         order = order_FSP
         result_folder = 'so-sa-{}'.format(name)
@@ -48,12 +47,12 @@ for name in names_FSP:
 
         # solve with SA Algorithm
         result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=300,
-                                    max_stay=20, sample_times=10, num_reads=1000)
+                                    max_stay=150, sample_times=30, num_reads=1000)
         sa_result = MethodResult('sa', problem_result.path, qp)
         sa_result.add(result1)
 
         # solve with cplex
-        result = SOQA.solve(problem=qp, weights=weights, sample_times=10, num_reads=1000, step_count=10)
+        result = SOQASolver.solve(problem=qp, weights=weights, sample_times=30, num_reads=1000, step_count=10)
         so_result = MethodResult('soqp', problem_result.path, qp)
         so_result.add(result)
 
@@ -66,7 +65,7 @@ for name in names_FSP:
         scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights, alternative='greater')
         table = Visualizer.tabulate_single_problem(
             name, ['soqp', 'sa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-            scores, {'time': 4, 'statistic': 8, 'p_value': 8, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+            scores, {'time': 4, 'statistic': 12, 'p_value': 12, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
         )
         Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))
 
@@ -86,12 +85,12 @@ for name in names_NRP:
 
         # solve with SA Algorithm
         result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=300,
-                                    max_stay=150, sample_times=10, num_reads=1000)
+                                    max_stay=150, sample_times=30, num_reads=1000)
         sa_result = MethodResult('sa', problem_result.path, qp)
         sa_result.add(result1)
 
         # solve with cplex
-        result = SOQA.solve(problem=qp, weights=weights, sample_times=10, num_reads=1000, step_count=10)
+        result = SOQASolver.solve(problem=qp, weights=weights, sample_times=30, num_reads=1000, step_count=10)
         so_result = MethodResult('soqp', problem_result.path, qp)
         so_result.add(result)
 
@@ -104,7 +103,6 @@ for name in names_NRP:
         scores = problem_result.statistical_analysis(method1="sa", method2="soqp", weights=weights, alternative='greater')
         table = Visualizer.tabulate_single_problem(
             name, ['soqp', 'sa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-            scores, {'time': 6, 'statistic': 8, 'p_value': 8, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+            scores, {'time': 6, 'statistic': 12, 'p_value': 12, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
         )
         Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))
-    flag = 1

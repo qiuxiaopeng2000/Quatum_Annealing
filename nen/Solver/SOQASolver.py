@@ -1,4 +1,6 @@
 from typing import Dict, List, Union
+
+import numpy as np
 from jmetal.core.solution import BinarySolution
 from nen.Term import Constraint, Quadratic
 from nen.Problem import QP
@@ -7,7 +9,7 @@ from nen.Solver.MetaSolver import SolverUtil
 from nen.Solver.EmbeddingSampler import EmbeddingSampler
 
 
-class SOQA:
+class SOQASolver:
     """ [summary] SOQA, stands for Quantum Annealling Weighted Sum Objective Solver as Single Objective Problem.
 
     The Quantum Annealling Solver is implemeneted with D-Wave Leap,
@@ -38,9 +40,10 @@ class SOQA:
         assert num_reads % step_count == 0
         num_ = int(num_reads / step_count)
         for _ in range(sample_times):
-            res = SOQA.solve_once(problem=problem, weights=weights, penalty=penalty, sample_times=step_count,
-                                  num_reads=num_)
-            result.solution_list.append(res.single)
+            res = SOQASolver.solve_once(problem=problem, weights=weights, penalty=penalty, sample_times=step_count,
+                                        num_reads=num_)
+            for sol in res.solution_list:
+                result.solution_list.append(sol)
             result.elapsed += res.elapsed
             if 'occurence' not in result.info:
                 result.info['occurence'] = {}
@@ -92,7 +95,8 @@ class SOQA:
                     result.info['occurence'][key] = str(occurrence)
                 else:
                     result.info['occurence'][key] = str(int(result.info['occurence'][key]) + occurrence)
-        best_solution = SOQA.best_solution(solution_list=solution_list, weights=weights, problem=problem, violated_count=False)
+        solution_list.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
+        best_solution = SOQASolver.best_solution(solution_list=solution_list, weights=weights, problem=problem, violated_count=False)
         result.wso_add(best_solution)
         return result
 

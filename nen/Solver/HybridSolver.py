@@ -16,7 +16,7 @@ from pymoo.optimize import minimize
 from pymoo.termination.default import DefaultMultiObjectiveTermination
 
 from nen.Solver import MOQASolver, SOQA
-from nen.Solver.FSAQPSolver import FSAQPSolver, sa
+from nen.Solver.FSAQPSolver import FSAQPSolver, SAFast
 from nen.Term import Constraint, Quadratic
 from nen.Problem import QP, PymooProblem
 from nen.Result import Result
@@ -136,8 +136,8 @@ class HybridSolver:
             HybridSolver.SA(H=H, t_max=t_max, t_min=t_min, L=L, max_stay=max_stay, num_reads=num_reads,
                             time=t, problem=problem, solution_list=solution_)
             '''Selection'''
-            solution_.sort(key=lambda x: x.objectives[0])
-            solution_list.append(solution_[0])
+            solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
+            solution_list += solution_[0]
 
         # put samples into result
         result = Result(problem)
@@ -247,7 +247,7 @@ class HybridSolver:
         x0 = []
         for _ in range(len(variables)):
             x0.append(bool(random.randint(0, 1)))
-        sampler = sa(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0,
+        sampler = SAFast(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0,
                          num_reads=num_reads)
         t = 0
         while t < time:
