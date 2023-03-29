@@ -35,12 +35,12 @@ for name in names_FSP:
         weights = weight
 
         # solve with SOQA Algorithm
-        result1 = SOQASolver.solve(problem=qp, weights=weights, sample_times=10, num_reads=1000, step_count=10)
+        result1 = SOQASolver.solve(problem=qp, weights=weights, sample_times=30, num_reads=100)
         sa_result = MethodResult('soqa', problem_result.path, qp)
         sa_result.add(result1)
 
         # solve with cplex
-        result = HybridSolver.single_solve(problem=qp, weights=weights, sample_times=10, num_reads=1000, t_max=100, t_min=0.0001,
+        result = HybridSolver.single_solve(problem=qp, weights=weights, sample_times=30, num_reads=100, t_max=100, t_min=0.0001,
                                            L=300, max_stay=150, sub_size=100)
         so_result = MethodResult('hybrid', problem_result.path, qp)
         so_result.add(result)
@@ -72,12 +72,12 @@ for name in names_NRP:
         weights = weight
 
         # solve with SOQA Algorithm
-        result1 = SOQASolver.solve(problem=qp, weights=weights, sample_times=30, num_reads=1000, step_count=10)
+        result1 = SOQASolver.solve(problem=qp, weights=weights, sample_times=30, num_reads=100)
         sa_result = MethodResult('soqa', problem_result.path, qp)
         sa_result.add(result1)
 
         # solve with cplex
-        result = HybridSolver.single_solve(problem=qp, weights=weights, sample_times=30, num_reads=1000, t_max=100,
+        result = HybridSolver.single_solve(problem=qp, weights=weights, sample_times=30, num_reads=100, t_max=100,
                                            t_min=0.0001, L=300, max_stay=150, sub_size=100)
         so_result = MethodResult('hybrid', problem_result.path, qp)
         so_result.add(result)
