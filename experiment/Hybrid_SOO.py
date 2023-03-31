@@ -2,12 +2,11 @@
 import sys
 import os
 
-from nen.Solver.FSAQPSolver import FSAQPSolver
-
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
+from nen.Solver.FSAQPSolver import FSAQPSolver
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP
 from nen.Solver.HybridSolver import HybridSolver
 from nen.Solver.SOQASolver import SOQASolver
