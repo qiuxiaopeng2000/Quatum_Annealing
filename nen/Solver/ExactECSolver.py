@@ -14,4 +14,5 @@ class ExactECSolver:
         result = Result(problem)
         result.set_solution_list(archive.solution_list)
         result.elapsed = elapsed
+        result.total_num_anneals = len(result.solution_list)
         return result
