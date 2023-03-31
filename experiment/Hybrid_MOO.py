@@ -10,7 +10,7 @@ from nen.Solver.HybridSolver import HybridSolver
 from nen.Solver.GASolver import GASolver
 
 # names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'realistic-e1', 'realistic-g1', 'realistic-m1']
-names_NRP = ['classic-1', 'classic-2', 'classic-3']
+names_NRP = ['classic-2', 'classic-3']
 order_NRP = ['cost', 'revenue']
 # names_FSP = ['BerkeleyDB']
 names_FSP = ['Amazon']

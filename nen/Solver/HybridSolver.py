@@ -55,7 +55,6 @@ class HybridSolver:
             # convert qubo to bqm
             bqm = BinaryQuadraticModel.from_qubo(qubo)
 
-            start = SolverUtil.time()
             '''Decomposer'''
             s1 = SolverUtil.time()
             states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
@@ -67,9 +66,8 @@ class HybridSolver:
             HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads,
                                   solution_list=solution_)
             e2 = SolverUtil.time()
-            end = SolverUtil.time()
             '''NSGA-II'''
-            t = end - start
+            t = e1 - s1 + e2 - s2 + runtime
             elapseds.append(e1 - s1 + e2 - s2 + runtime)
             HybridSolver.NSGAII(populationSize=num_reads, maxEvaluations=maxEvaluations, problem=problem, seed=seed,
                                 time=t, solution_list=solution_)
@@ -116,7 +114,6 @@ class HybridSolver:
             # convert qubo to bqm
             bqm = BinaryQuadraticModel.from_qubo(qubo)
 
-            start1 = SolverUtil.time()
             '''Decomposer'''
             s1 = SolverUtil.time()
             states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
@@ -127,10 +124,9 @@ class HybridSolver:
             s2 = SolverUtil.time()
             HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads, solution_list=solution_)
             e2 = SolverUtil.time()
-            end1 = SolverUtil.time()
             '''SA'''
             H = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
-            t = end1 - start1
+            t = e1 - s1 + e2 - s2 + runtime
             elapseds.append(e1 - s1 + e2 - s2 + runtime)
             HybridSolver.SA(H=H, t_max=t_max, t_min=t_min, L=L, max_stay=max_stay, num_reads=num_reads,
                             time=t, problem=problem, solution_list=solution_)
@@ -246,10 +242,11 @@ class HybridSolver:
         x0 = []
         for _ in range(len(variables)):
             x0.append(bool(random.randint(0, 1)))
-        sampler = SAFast(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0,
-                         num_reads=num_reads)
+
         t = 0
         while t < time:
+            sampler = SAFast(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0,
+                             num_reads=num_reads)
             start2 = SolverUtil.time()
             best_x, _ = sampler.run()
             end2 = SolverUtil.time()

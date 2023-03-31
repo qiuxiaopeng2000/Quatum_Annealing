@@ -541,7 +541,7 @@ class ProblemResult:
             result[key] /= iteration
         return result
 
-    def statistical_analysis(self, method1: str, method2: str, weights: Dict[str, float], alternative: str):
+    def statistical_analysis(self, method1: str, method2: str, weights: Dict[str, float], alternative: str = "two-sided"):
         """
         p_value [summary] return statistical analysis of two solutions with two different methods indicated by
         [statistic: float, p_value: float, mean: float, std: float, max: float: min: float].
@@ -582,7 +582,7 @@ class ProblemResult:
         max_num = {method1: np.max(method1_objective), method2: np.max(method2_objective)}
         min_num = {method1: np.min(method1_objective), method2: np.min(method2_objective)}
         elapsed = {method1: method1_result.method_result.elapsed / iteration, method2: method2_result.method_result.elapsed / iteration}
-        return  elapsed, statistics, pvalues, mean, std, max_num, min_num
+        return elapsed, statistics, pvalues, mean, std, max_num, min_num
 
     def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
         """union_average_compare [summary] return union method compared with average method with scores indicated by
