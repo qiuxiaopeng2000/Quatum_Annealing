@@ -205,7 +205,7 @@ class MethodResult:
         """
         return [result.elapsed for result in self.results]
 
-    def make_method_result(self, single_flag: bool) -> None:
+    def make_method_result(self, single_flag: bool = False) -> None:
         """make_method_result [summary] make the method result with all solutions of every archives.
         single_flag: a flag to whether judgment is a sign of a single-objective problem
         """
@@ -429,7 +429,7 @@ class ProblemArchive:
         # pareto_count = self.on_pareto_count()
         # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
         # return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
-        return {k: 1 for k, v in self.method_archives.items()}
+        return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
@@ -585,7 +585,7 @@ class ProblemResult:
         elapsed = {method1: method1_result.method_result.elapsed / iteration, method2: method2_result.method_result.elapsed / iteration}
         return elapsed, statistics, pvalues, mean, std, max_num, min_num
 
-    def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
+    def average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
         """union_average_compare [summary] return union method compared with average method with scores indicated by
         [elapsed time, found, front, igd, hv, spacing].
         """
@@ -602,7 +602,6 @@ class ProblemResult:
         if average_method_result.method_result is None:
             average_method_result.make_method_result(single_flag=False)
 
-        average_results = average_method_result.method_result
         # compare
         elapsed: List[Dict[str, float]] = []
         found: List[Dict[str, float]] = []
@@ -633,6 +632,46 @@ class ProblemResult:
                   ProblemResult.average_of_dicts(hv_all),
                   ProblemResult.average_of_dicts(sp_all),
                   ProblemResult.average_of_dicts(tts_all)]
+        return scores
+
+    def union_average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
+        """union_average_compare [summary] return union method compared with average method with scores indicated by
+        [elapsed time, found, front, igd, hv, spacing].
+        """
+        assert union_method in self.methods_results
+        assert average_method in self.methods_results
+        # prepare union result
+        union_method_result = self.methods_results[union_method]
+        if union_method_result.method_result is None:
+            union_method_result.make_method_result(single_flag=False)
+        union_result = union_method_result.method_result
+        assert union_result is not None
+        # prepare average results
+        average_method_result = self.methods_results[average_method]
+        iteration = average_method_result.iteration
+        average_elapsed = sum(average_method_result.get_elapseds()) / iteration
+        average_results = average_method_result.results
+        # compare
+        elapsed = {union_method: union_result.elapsed, average_method: average_elapsed}
+        found = {union_method: len(union_result),
+                 average_method: (sum([len(r) for r in average_results]) / iteration)}
+        front_all: List[Dict[str, float]] = []
+        igd_all: List[Dict[str, float]] = []
+        hv_all: List[Dict[str, float]] = []
+        sp_all: List[Dict[str, float]] = []
+        for i in range(iteration):
+            average_result = average_results[i]
+            problem_archive = \
+                ProblemArchive(self.problem, {union_method: union_result, average_method: average_result})
+            front_all.append({k: float(v) for k, v in problem_archive.on_pareto_count().items()})
+            igd_all.append(problem_archive.compute_igd())
+            hv_all.append(problem_archive.compute_hv())
+            sp_all.append(problem_archive.compute_sp())
+        # collect scores
+        scores = [elapsed, found, ProblemResult.average_of_dicts(front_all),
+                  ProblemResult.average_of_dicts(igd_all),
+                  ProblemResult.average_of_dicts(hv_all),
+                  ProblemResult.average_of_dicts(sp_all)]
         return scores
 
     @staticmethod

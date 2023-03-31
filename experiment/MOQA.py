@@ -47,7 +47,7 @@ for name in names_FSP:
     problem_result.dump()
 
     # compare
-    scores = problem_result.union_average_compare(union_method='moqa', average_method='ga')
+    scores = problem_result.average_compare(union_method='moqa', average_method='ga')
     table = Visualizer.tabulate_single_problem(
         name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
         scores, {'elapsed time': 4, 'found': 3, 'front': 3, 'igd': 2, 'hv': 2, 'spacing': 2, 'tts': 6}
@@ -85,7 +85,7 @@ for name in names_FSP:
 #     problem_result.dump()
 #
 #     # compare
-#     scores = problem_result.union_average_compare(union_method='moqa', average_method='ga')
+#     scores = problem_result.average_compare(union_method='moqa', average_method='ga')
 #     table = Visualizer.tabulate_single_problem(
 #         name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
 #         scores, {'elapsed time': 4, 'found': 3, 'front': 3, 'igd': 2, 'hv': 2, 'spacing': 2, 'tts': 6}
