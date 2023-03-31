@@ -276,4 +276,4 @@ class ExactSolver:
         for values in values_list:
             archive.add(problem.evaluate(values))
         # return
-        return (archive, end - start)
+        return archive, end - start
