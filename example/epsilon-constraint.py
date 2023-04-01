@@ -34,7 +34,9 @@ for name in names_NRP:
     lp = LP(name, order)
 
     # solve with epsilon
+    print("start solve {} problem".format(name))
     ea_result = MethodResult('ea', problem_result.path, lp)
+    print("end solve {} problem".format(name))
     result = ExactECSolver.solve(lp)
     ea_result.add(result)
 
@@ -54,7 +56,9 @@ for name in names_FSP:
     lp = LP(name, order)
 
     # solve with epsilon
+    print("start solve {} problem".format(name))
     ea_result = MethodResult('ea', problem_result.path, lp)
+    print("end solve {} problem".format(name))
     result = ExactECSolver.solve(lp)
     ea_result.add(result)
 
