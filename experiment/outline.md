@@ -46,4 +46,7 @@ FSP: 'BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, 'Amazon'-79, 'E-sho
 * MOQA: num_reads = 100, sample_times = 10
 * NSGA-II: large-scale maxvalue = 10000, small-scale maxvalue = 10000
 
-
+1. 将NRP和FSP问题分开讨论，将MOQA、Hybrid从一个表中分解成四个表
+2. 跑完NRP问题的失效的数据，从老师的以前论文中找
+3. 重点描述清楚decomposer的结构内容
+4. 增加一个RQ，探究decomposer分解成多组子问题的，初步计算：100规模数据分解成10 * 10 的数据，探究其与只选用前5个数据相比效果差异

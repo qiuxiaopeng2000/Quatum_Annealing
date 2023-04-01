@@ -659,7 +659,7 @@ class ProblemResult:
         igd_all: List[Dict[str, float]] = []
         hv_all: List[Dict[str, float]] = []
         sp_all: List[Dict[str, float]] = []
-        tts_all: List[Dict[str, float]] = []
+        # tts_all: List[Dict[str, float]] = []
         for i in range(iteration):
             average_result = average_results[i]
             problem_archive = \
@@ -668,13 +668,14 @@ class ProblemResult:
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())
             sp_all.append(problem_archive.compute_sp())
-            tts_all.append(problem_archive.compute_tts())
+            # tts_all.append(problem_archive.compute_tts())
         # collect scores
         scores = [elapsed, found, ProblemResult.average_of_dicts(front_all),
                   ProblemResult.average_of_dicts(igd_all),
                   ProblemResult.average_of_dicts(hv_all),
                   ProblemResult.average_of_dicts(sp_all),
-                  ProblemResult.average_of_dicts(tts_all)]
+                  # ProblemResult.average_of_dicts(tts_all)
+                  ]
         return scores
 
     @staticmethod

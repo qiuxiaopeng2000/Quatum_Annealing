@@ -31,7 +31,7 @@ for name in names_FSP:
     # solve with NSGA-II
     ga_result = MethodResult('ga', problem_result.path, lp)
     for _ in range(3):
-        result1 = GASolver.solve(populationSize=100, maxEvaluations=50000, crossoverProbability=0.8, iterations=10,
+        result1 = GASolver.solve(populationSize=1000, maxEvaluations=50000, crossoverProbability=0.8, iterations=10,
                                  mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
         ga_result.add(result1)
 

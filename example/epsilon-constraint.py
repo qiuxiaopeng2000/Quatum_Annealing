@@ -12,7 +12,7 @@ from project_path import PROJECT_PATH
 import sys
 sys.path.append(PROJECT_PATH)
 
-from nen import LP, ProblemResult, MethodResult, Problem, QP, Visualizer
+from nen import LP, ProblemResult, MethodResult, Problem
 from nen.Solver import ExactECSolver
 
 
@@ -38,25 +38,9 @@ for name in names_NRP:
     result = ExactECSolver.solve(lp)
     ea_result.add(result)
 
-    # solve with NSGA-II
-    ga_result = MethodResult('ga', problem_result.path, lp)
-    result1 = GASolver.solve(populationSize=100, maxEvaluations=50000, crossoverProbability=0.8, iterations=10,
-                             mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
-    ga_result.add(result1)
-
     # dump the results
     problem_result.add(ea_result)
-    problem_result.add(ga_result)
     problem_result.dump()
-
-    # compare
-    scores = problem_result.union_average_compare(union_method='ea', average_method='ga')
-    table = Visualizer.tabulate_single_problem(
-        name, ['ea', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
-        scores, {'elapsed time': 4, 'found': 3, 'front': 3, 'igd': 2, 'hv': 2, 'spacing': 2, 'tts': 6}
-    )
-    Visualizer.tabluate(table, 'ea-ga-compare-{}.csv'.format(name))
-
 
 for name in names_FSP:
     order = order_FSP
@@ -74,23 +58,9 @@ for name in names_FSP:
     result = ExactECSolver.solve(lp)
     ea_result.add(result)
 
-    # solve with NSGA-II
-    ga_result = MethodResult('ga', problem_result.path, lp)
-    result1 = GASolver.solve(populationSize=100, maxEvaluations=50000, crossoverProbability=0.8, iterations=10,
-                             mutationProbability=(1 / problem.variables_num), seed=1, problem=problem)
-    ga_result.add(result1)
-
     # dump the results
     problem_result.add(ea_result)
-    problem_result.add(ga_result)
     problem_result.dump()
 
-    # compare
-    scores = problem_result.union_average_compare(union_method='ea', average_method='ga')
-    table = Visualizer.tabulate_single_problem(
-        name, ['ea', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
-        scores, {'elapsed time': 4, 'found': 3, 'front': 3, 'igd': 2, 'hv': 2, 'spacing': 2, 'tts': 6}
-    )
-    Visualizer.tabluate(table, 'ea-ga-compare-{}.csv'.format(name))
 
 
