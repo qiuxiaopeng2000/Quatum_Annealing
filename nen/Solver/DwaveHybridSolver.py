@@ -111,7 +111,7 @@ class DwaveHybridSolver:
                 | hybrid.SplatComposer()) | hybrid.ArgMin(), convergence=3, max_iter=1000)
 
         for _ in range(sample_times):
-            res = HybridSolver.solve_once(problem=problem, weights=weights, bqm=bqm, sample_times=step_count,
+            res = DwaveHybridSolver.solve_once(problem=problem, weights=weights, bqm=bqm, sample_times=step_count,
                                           num_reads=num_, workflow=workflow)
             result.solution_list.append(res.single)
             result.elapsed += res.elapsed
