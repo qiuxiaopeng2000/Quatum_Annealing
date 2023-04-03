@@ -26,6 +26,11 @@ class JarSolver:
 
     @staticmethod
     def dump_config(name: str, **args) -> None:
+        """
+        exec_time:
+        limit the NSGA-II running time,
+        if <= 0, means no limit.
+        """
         file_name = path.join(DUMP_DIR, name + '.json')
         Path(DUMP_DIR).mkdir(parents=False, exist_ok=True)
         content = {}

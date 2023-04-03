@@ -176,7 +176,7 @@ def load_fsp_new(name):
                         # exclude
                         inequations.append([feature_name[-parts[0]], '><', feature_name[-parts[1]]])
                     elif parts[0] > 0 and parts[1] < 0:
-                        inequations.append([feature_name[parts[1]], '=>', feature_name[-parts[0]]])
+                        inequations.append([feature_name[-parts[1]], '=>', feature_name[parts[0]]])
                     elif parts[0] < 0 and parts[1] > 0:
                         inequations.append([feature_name[-parts[0]], '=>', feature_name[parts[1]]])
                 else:
@@ -441,29 +441,29 @@ def load_Baan():
 
 if __name__ == '__main__':
     # FSP
-    fsp_problems = ['WebPortal', 'E-Shop', 'Drupal']
+    fsp_problems = ['Freebsd', 'Fiasco']
     for fsp_name in fsp_problems:
         problem = load_fsp_new(fsp_name)
         problem.dump(fsp_name)
-    # NRP: rp
-    rp_problems = ['ms', 'rp']
-    for rp_name in rp_problems:
-        problem = load_rp(rp_name)
-        problem.dump(rp_name)
-    # TSM
-    tsm_problems = ['make']
-    for tsm_name in tsm_problems:
-        problem = load_tsm(tsm_name)
-        problem.dump(tsm_name)
-    # NRP: Xuan
-    xuan = ['classic-1', 'classic-2', 'classic-3', 'classic-4', 'classic-5',
-            'realistic-e1', 'realistic-e2', 'realistic-e3', 'realistic-e4',
-            'realistic-g1', 'realistic-g2', 'realistic-g3', 'realistic-g4',
-            'realistic-m1', 'realistic-m2', 'realistic-m3', 'realistic-m4'
-            ]
-    for xuan_name in xuan:
-        problem = load_xuan(xuan_name)
-        problem.dump(xuan_name)
-    # NRP: Baan
-    problem = load_Baan()
-    problem.dump('Baan')
+    # # NRP: rp
+    # rp_problems = ['ms', 'rp']
+    # for rp_name in rp_problems:
+    #     problem = load_rp(rp_name)
+    #     problem.dump(rp_name)
+    # # TSM
+    # tsm_problems = ['make']
+    # for tsm_name in tsm_problems:
+    #     problem = load_tsm(tsm_name)
+    #     problem.dump(tsm_name)
+    # # NRP: Xuan
+    # xuan = ['classic-1', 'classic-2', 'classic-3', 'classic-4', 'classic-5',
+    #         'realistic-e1', 'realistic-e2', 'realistic-e3', 'realistic-e4',
+    #         'realistic-g1', 'realistic-g2', 'realistic-g3', 'realistic-g4',
+    #         'realistic-m1', 'realistic-m2', 'realistic-m3', 'realistic-m4'
+    #         ]
+    # for xuan_name in xuan:
+    #     problem = load_xuan(xuan_name)
+    #     problem.dump(xuan_name)
+    # # NRP: Baan
+    # problem = load_Baan()
+    # problem.dump('Baan')

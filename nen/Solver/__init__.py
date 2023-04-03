@@ -14,10 +14,12 @@ from nen.Solver.EmbeddingSampler import EmbeddingSampler
 from nen.Solver.SAQPSolver import SAQPSolver
 from nen.Solver.SASolver import SASolver
 from nen.Solver.TabuQPSolver import TabuQPSolver
+from nen.Solver.QAWSOSolver import QAWSOSolver
+from nen.Solver.HybridSolver import HybridSolver
 
 
 __all__ = ['SolutionGenerator', 'SolverUtil', 'RandomSolver', 'JarSolver',
-           'EmbeddingSampler',
+           'EmbeddingSampler', 'QAWSOSolver', 'HybridSolver',
            'ExactWSOSolver', 'ExactWSOQPSolver',
            'ExactECSolver', 'ExactIECSolver', 'ExactECQPSolver', 'SolRep3DSolver',
            'SOQASolver', 'RQAWSOSolver', 'MOQASolver',

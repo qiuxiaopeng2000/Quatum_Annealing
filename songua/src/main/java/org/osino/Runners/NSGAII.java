@@ -19,13 +19,14 @@ import org.osino.ConfigLoader;
 public class NSGAII {
     public Results solve(
         Problem problem, int iterations, int populationSize, int maxEvaluations,
-        double crossoverProbability, double mutationProbability
+        double crossoverProbability, double mutationProbability, double exec_time
         ) {
         Results results = new Results();
+        long s = System.nanoTime();
         for (int i = 0; i < iterations; ++ i) {
             Algorithm<List<BinarySolution>> algorithm = new NSGAIIBuilder<BinarySolution>(
                 problem,
-                new SinglePointCrossover(crossoverProbability), 
+                new SinglePointCrossover(crossoverProbability),
                 new BitFlipMutation(mutationProbability),
                 populationSize
                 )
@@ -37,6 +38,8 @@ public class NSGAII {
             long end = System.nanoTime();
             double elapsedTime = (end - start) / 1e9;
             results.put(new Result(elapsedTime, algorithm.getResult()));
+            if (exec_time > 0)
+                if (System.nanoTime() - s > exec_time) break;
         }
         return results;
     }
@@ -63,7 +66,8 @@ public class NSGAII {
         Results results =
             algorithm.solve(problem, config.getInteger("iterations"),
                             config.getInteger("populationSize"), config.getInteger("maxEvaluations"),
-                            config.getDouble("crossoverProbability"), config.getDouble("mutationProbability")
+                            config.getDouble("crossoverProbability"), config.getDouble("mutationProbability"),
+                            config.getDouble("exec_time")
                             );
         Path folder = Paths.get(Paths.get(System.getProperty("user.dir")).toString(), "result");
         folder = Paths.get(folder.toString(), config.get("resultFolder"), config.get("problem"));

@@ -250,7 +250,7 @@ class MethodResult:
                 for solution in solutions:
                     var_file.write(NDArchive.bool_list_to_str(solution.variables[0]) + '\n')
 
-    def load_result(self, index: int, evaluate: bool) -> None:
+    def load_result(self, index: int, evaluate: bool, single_flag: bool = False) -> None:
         """load_result [summary] load the result with archive (objectives and variables) from files (.obj and .var).
         It would involve problem information, thus need a problem.
 
@@ -305,8 +305,12 @@ class MethodResult:
         # append to archives
         result = Result(self.problem)
         # archive.set_solution_list(solution_list)
-        for solution in solution_list:
-            result.add(solution)
+        if single_flag:
+            for solution in solution_list:
+                result.wso_add(solution)
+        else:
+            for solution in solution_list:
+                result.add(solution)
         self.results.append(result)
 
     def dump_info(self) -> None:
@@ -315,6 +319,7 @@ class MethodResult:
         # write elapeds into info
         self.info['iteration'] = len(self.results)
         self.info['elapseds'] = [result.elapsed for result in self.results]
+        self.info['total_num_anneals'] = [result.total_num_anneals for result in self.results]
         # dump into file
         with open(self.info_file_name(), 'w+') as info_out:
             json.dump(self.info, info_out)
@@ -339,7 +344,7 @@ class MethodResult:
         for index in range(self.info['iteration']):
             self.dump_result(index)
 
-    def load(self, evaluate: bool = True) -> None:
+    def load(self, evaluate: bool = True, single_flag: bool = False) -> None:
         """load [summary] load the MethodResult from files, indicated by info file.
         Evaluate is True as we want to load solutions from variables via evaluation.
         """
@@ -351,8 +356,9 @@ class MethodResult:
         assert len(elapseds) == self.iteration
         # load results
         for index in range(self.iteration):
-            self.load_result(index, evaluate)
+            self.load_result(index, evaluate, single_flag)
             self.results[index].elapsed = elapseds[index]
+            self.results[index].total_num_anneals = 1000
         assert len(self.results) == self.iteration
 
 
@@ -566,7 +572,7 @@ class ProblemResult:
             method2_result.make_method_result(single_flag=True)
         assert len(method1_result.method_result.solution_list) == len(method2_result.method_result.solution_list)
         # 'alternative' is Alternative Hypothesis
-        iteration = method2_result.method_result.iterations
+        iteration = method2_result.iteration
         w = []
         for k, v in weights.items():
             w.append(v)
@@ -605,8 +611,6 @@ class ProblemResult:
         # compare
         elapsed: List[Dict[str, float]] = []
         found: List[Dict[str, float]] = []
-        # front_all = {union_method: len(union_result.solution_list) / iteration1,
-        #              average_method: len(average_results.solution_list) / iteration2}
         front_all: List[Dict[str, float]] = []
         igd_all: List[Dict[str, float]] = []
         hv_all: List[Dict[str, float]] = []

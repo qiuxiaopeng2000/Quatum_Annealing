@@ -40,7 +40,7 @@ class SASampler(EmbeddingSampler):
         return result
 
     def sample_hamiltonian(self, H: Quadratic, variables: List[str], num_reads: int,
-                           t_max: float, t_min: float, alpha: float
+                           t_max: float, t_min: float, alpha: float, exec_time: float
                            ) -> Tuple[List[Dict[Any, bool]], float]:
         """sample_hamiltonian [summary] sample qubo or hamiltionian without any embedding.
         """
@@ -61,6 +61,8 @@ class SASampler(EmbeddingSampler):
                     b = s
                 t *= alpha
             values_list.append(b)
+            if (SolverUtil.time() - start) > exec_time:
+                break
         elapsed = SolverUtil.time() - start
         return values_list, elapsed
 
@@ -120,14 +122,14 @@ class SASampler(EmbeddingSampler):
         return values_list, elapsed
 
     def sa_sample(self, H: Quadratic, variables: List[str],
-                  if_embed: bool, num_reads: int,
+                  if_embed: bool, num_reads: int, exec_time: float,
                   t_max: float, t_min: float, alpha: float
                   ) -> Tuple[List[Dict[str, bool]], float]:
         random.seed(datetime.now())
         if if_embed:
             return self.embed_sample(H, variables, num_reads, t_max, t_min, alpha)
         else:
-            return self.sample_hamiltonian(H, variables, num_reads, t_max, t_min, alpha)
+            return self.sample_hamiltonian(H, variables, num_reads, t_max, t_min, alpha, exec_time)
 
 
 class SAQPSolver:
@@ -135,7 +137,7 @@ class SAQPSolver:
     """
     @staticmethod
     def solve(problem: QP, weights: Dict[str, float], if_embed: bool,
-              num_reads: int, t_max: float, t_min: float, alpha: float) -> Result:
+              num_reads: int, t_max: float, t_min: float, alpha: float, exec_time: float = 1e6) -> Result:
         # check arguments
         assert t_min < t_max
         assert 0 <= alpha <= 1
@@ -146,10 +148,10 @@ class SAQPSolver:
         # sample
         sampler = SASampler()
         values_list, elapsed = \
-            sampler.sa_sample(H, problem.variables, if_embed, num_reads, t_max, t_min, alpha)
+            sampler.sa_sample(H, problem.variables, if_embed, num_reads, t_max, t_min, alpha, exec_time)
         # add into result
         result = Result(problem)
         for values in values_list:
-            result.add(problem.evaluate(values))
+            result.wso_add(problem.evaluate(values))
         result.elapsed = elapsed
         return result

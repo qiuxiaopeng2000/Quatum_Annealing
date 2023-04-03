@@ -7,18 +7,12 @@ from dimod import BinaryQuadraticModel
 from hybrid import State, min_sample, EnergyImpactDecomposer
 from jmetal.core.solution import BinarySolution
 
-from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.operators.crossover.pntx import TwoPointCrossover
-from pymoo.operators.mutation.bitflip import BitflipMutation
-from pymoo.operators.sampling.rnd import BinaryRandomSampling
-from pymoo.optimize import minimize
-from pymoo.termination.default import DefaultMultiObjectiveTermination
 
-from nen.Solver import MOQASolver
-from nen.Solver.FSAQPSolver import FSAQPSolver, SAFast
+from nen.Solver import MOQASolver, JarSolver
+from nen.Solver.SAQPSolver import SAQPSolver
 from nen.Term import Constraint, Quadratic
-from nen.Problem import QP, PymooProblem
-from nen.Result import Result
+from nen.Problem import QP
+from nen.Result import Result, MethodResult, ProblemResult
 from nen.Solver.MetaSolver import SolverUtil
 from nen.Solver.EmbeddingSampler import EmbeddingSampler, SampleSet
 
@@ -33,7 +27,8 @@ class HybridSolver:
     """
 
     @staticmethod
-    def solve(problem: QP, num_reads: int, seed: float, sub_size: int, maxEvaluations: int, sample_times: int = 1) -> Result:
+    def solve(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int, order: List[str],
+              problem_result: ProblemResult, result_folder: str, sample_times: int = 1, rate: float = 1.0) -> Result:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
         print("{} start Hybrid Solver to solve multi-objective problem!!!".format(problem.name))
@@ -43,8 +38,8 @@ class HybridSolver:
         samplesets: List[SampleSet] = []
         elapseds: List[float] = []
         solution_list: List[BinarySolution] = []
+        t = 0
         for _ in range(sample_times):
-            solution_: List[BinarySolution] = []
             # generate random weights and calculate weighted sum obejctive
             weights = MOQASolver.random_normalized_weights(basic_weights)
             wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
@@ -58,23 +53,26 @@ class HybridSolver:
             '''Decomposer'''
             s1 = SolverUtil.time()
             states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
+            length = len(states)
+            states = states[:int(length * rate)]
             e1 = SolverUtil.time()
             '''Sampler'''
             subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
             '''Composer'''
             s2 = SolverUtil.time()
             HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads,
-                                  solution_list=solution_)
+                                  solution_list=solution_list)
             e2 = SolverUtil.time()
-            '''NSGA-II'''
-            t = e1 - s1 + e2 - s2 + runtime
-            elapseds.append(e1 - s1 + e2 - s2 + runtime)
-            HybridSolver.NSGAII(populationSize=num_reads, maxEvaluations=maxEvaluations, problem=problem, seed=seed,
-                                time=t, solution_list=solution_)
-            '''Selection'''
-            # solution_.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
-            solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
-            solution_list += solution_
+            t += e1 - s1 + e2 - s2 + runtime
+            elapseds.append(t)
+        '''NSGA-II'''
+        HybridSolver.NSGAII(populationSize=num_reads * sample_times, maxEvaluations=maxEvaluations, problem=problem,
+                            time=t, solution_list=solution_list, order=order, problem_result=problem_result, result_folder=result_folder)
+        '''Selection'''
+        # solution_list.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
+        solution_list.sort(key=lambda x: (x.constraints[0], x.objectives))
+        # solution_list.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
+        solution_list = solution_list[:sample_times * num_reads]
 
         # put samples into result
         result = Result(problem)
@@ -97,57 +95,52 @@ class HybridSolver:
 
     @staticmethod
     def single_solve(problem: QP, weights: Dict[str, float], num_reads: int, sub_size: int, t_max: float,
-                     t_min: float, L: int, max_stay: int, sample_times: int) -> Result:
+                     t_min: float, alpha: float, rate: float = 1.0) -> Result:
         print("{} start Hybrid Solver to solve single-objective problem!!!".format(problem.name))
         # sample for sample_times times
         samplesets: List[SampleSet] = []
-        elapseds: List[float] = []
         solution_list: List[BinarySolution] = []
-        for _ in range(sample_times):
-            solution_: List[BinarySolution] = []
-            # generate random weights and calculate weighted sum obejctive
-            wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
-            # calculate the penalty and add constraints to objective with penalty
-            penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
-            objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
-            qubo = Constraint.quadratic_to_qubo_dict(objective)
-            # convert qubo to bqm
-            bqm = BinaryQuadraticModel.from_qubo(qubo)
 
-            '''Decomposer'''
-            s1 = SolverUtil.time()
-            states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
-            e1 = SolverUtil.time()
-            '''Sampler'''
-            subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
-            '''Composer'''
-            s2 = SolverUtil.time()
-            HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads, solution_list=solution_)
-            e2 = SolverUtil.time()
-            '''SA'''
-            H = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
-            t = e1 - s1 + e2 - s2 + runtime
-            elapseds.append(e1 - s1 + e2 - s2 + runtime)
-            HybridSolver.SA(H=H, t_max=t_max, t_min=t_min, L=L, max_stay=max_stay, num_reads=num_reads,
-                            time=t, problem=problem, solution_list=solution_)
-            '''Selection'''
-            solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
-            solution_list.append(solution_[0])
+        # generate random weights and calculate weighted sum obejctive
+        wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
+        # calculate the penalty and add constraints to objective with penalty
+        penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
+        objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
+        qubo = Constraint.quadratic_to_qubo_dict(objective)
+        # convert qubo to bqm
+        bqm = BinaryQuadraticModel.from_qubo(qubo)
+
+        '''Decomposer'''
+        s1 = SolverUtil.time()
+        states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
+        e1 = SolverUtil.time()
+        '''Sampler'''
+        states = states[:int(len(states) * rate)]
+        subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
+        '''Composer'''
+        s2 = SolverUtil.time()
+        HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads, solution_list=solution_list)
+        e2 = SolverUtil.time()
+        '''SA'''
+        t = e1 - s1 + e2 - s2 + runtime
+        HybridSolver.SA(t_max=t_max, t_min=t_min, num_reads=num_reads, weight=weights,
+                        time=t, problem=problem, solution_list=solution_list, alpha=alpha)
+        '''Selection'''
+        solution_list.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
+        solution_list = solution_list[:num_reads]
 
         # put samples into result
         result = Result(problem)
         for solution in solution_list:
             result.wso_add(solution)
         # add into method result
-        result.elapsed = sum(elapseds)
+        result.elapsed = t
         for sampleset in samplesets:
             if 'solving info' not in result.info:
                 result.info['solving info'] = [sampleset.info]
             else:
                 result.info['solving info'].append(sampleset.info)
         # storage parameters
-        result.info['sample_times'] = sample_times
-        result.iterations = sample_times
         print("{} Hybrid Solver end!!!".format(problem.name))
         return result
 
@@ -211,50 +204,24 @@ class HybridSolver:
         return True
 
     @staticmethod
-    def NSGAII(populationSize: int, maxEvaluations: int, problem: QP, seed: float,
-               time: float, solution_list: List[BinarySolution]):
-        t = 0
-        termination = DefaultMultiObjectiveTermination(
-            n_max_evals=maxEvaluations
+    def NSGAII(populationSize: int, maxEvaluations: int, problem: QP, result_folder: str, problem_result: ProblemResult,
+               time: float, solution_list: List[BinarySolution], order: List[str]):
+        JarSolver.solve(
+            solver_name='NSGAII', config_name='tmp_config',
+            problem=problem.name, objectiveOrder=order, iterations=30,
+            populationSize=populationSize, maxEvaluations=maxEvaluations,
+            crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
+            resultFolder=result_folder, methodName='temp', exec_time=time
         )
-        pro = PymooProblem(problem)
-        alg = NSGA2(pop_size=populationSize,
-                    # n_offsprings=10,
-                    sampling=BinaryRandomSampling(),
-                    # crossover=SBX(prob=crossoverProbability, eta=15),
-                    crossover=TwoPointCrossover(),
-                    # mutation=PolynomialMutation(eta=20, prob=mutationProbability),
-                    mutation=BitflipMutation())
-        while t < time:
-            res = minimize(pro, alg, termination, seed=seed, verbose=False,
-                           return_least_infeasible=True)
-            for sol in res.pop:
-                val = list(sol.X.flatten())
-                values = problem.convert_to_BinarySolution(val)
-                solution = problem.evaluate(values)
-                solution_list.append(solution)
-            t += res.exec_time
+        ea_result = MethodResult('nsgaii', problem_result.path, problem)
+        ea_result.load()
+        for result in ea_result.results:
+            solution_list += result.solution_list
 
     @staticmethod
-    def SA(H: Quadratic, t_max: float, t_min: float, L: int, max_stay: int, num_reads: int,
-           time: float, problem: QP, solution_list: List[BinarySolution]):
-        fitness, variables = FSAQPSolver.quadratic_to_fitness(H)
-        x0 = []
-        for _ in range(len(variables)):
-            x0.append(bool(random.randint(0, 1)))
+    def SA(t_max: float, t_min: float, num_reads: int, alpha: float,
+           time: float, problem: QP, solution_list: List[BinarySolution], weight: Dict[str, float]):
+        result = SAQPSolver.solve(problem=problem, num_reads=num_reads, weights=weight, if_embed=False,
+                                  t_max=t_max, t_min=t_min, alpha=alpha, exec_time=time)
+        solution_list += result.solution_list
 
-        t = 0
-        while t < time:
-            sampler = SAFast(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0,
-                             num_reads=num_reads)
-            start2 = SolverUtil.time()
-            best_x, _ = sampler.run()
-            end2 = SolverUtil.time()
-            # restore the result
-            best_x = np.array(best_x).flatten().tolist()
-            values: Dict[str, bool] = {}
-            for ind, val in enumerate(best_x):
-                values[variables[ind]] = bool(val)
-            sol = problem.evaluate(values)
-            solution_list.append(sol)
-            t += (end2 - start2)
