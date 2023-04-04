@@ -7,11 +7,11 @@ sys.path.append(rootPath)
 from nen import QP, ProblemResult, MethodResult
 from nen.Solver import SAQPSolver
 
-names_FSP = ['E-shop', 'eCos', 'uClinux']
+names_FSP = ['ERS', 'WebPortal', 'Amazon', 'E-shop', 'eCos', 'uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['classic-1', 'classic-2', 'classic-3']
+names_NRP = ['classic-1', 'classic-2', 'classic-3', 'classic-1', 'classic-2', 'classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
@@ -21,9 +21,9 @@ for name in names_FSP:
     problem = QP(name, order_FSP)
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('sa', problem_result.path, problem)
-    for _ in range(30):
+    for _ in range(6):
         result = SAQPSolver.solve(problem=problem, num_reads=1000, weights=weight_FSP, if_embed=False,
-                                  t_max=100, t_min=1e-6, alpha=0.9)
+                                  t_max=100, t_min=1e-4, alpha=0.9)
         moqa_method_result.add(result)
 
     # add result to method result, problem result
@@ -37,7 +37,7 @@ for name in names_NRP:
     problem = QP(name, order_NRP)
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('sa', problem_result.path, problem)
-    for _ in range(30):
+    for _ in range(6):
         result = SAQPSolver.solve(problem=problem, num_reads=1000, weights=weight_NRP, if_embed=False, t_max=100, t_min=1e-6, alpha=0.9)
         moqa_method_result.add(result)
 
