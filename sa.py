@@ -7,11 +7,11 @@ sys.path.append(rootPath)
 from nen import QP, ProblemResult, MethodResult
 from nen.Solver import SAQPSolver
 
-names_FSP = ['ERS', 'WebPortal', 'Amazon', 'E-shop', 'eCos', 'uClinux']
+names_FSP = ['E-Shop', 'eCos', 'uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['classic-1', 'classic-2', 'classic-3', 'classic-1', 'classic-2', 'classic-3']
+names_NRP = ['classic-1', 'classic-2', 'classic-3', 'rp', 'ms', 'Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
