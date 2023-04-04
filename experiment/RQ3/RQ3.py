@@ -14,6 +14,7 @@ names_NRP = ['classic-1', 'classic-2', 'classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
+result_folder = 'hymoo'
 
 # compare CQHA with NSGA-II
 for name in names_NRP:
@@ -21,7 +22,7 @@ for name in names_NRP:
     problem.vectorize(order_NRP)
 
     # prepare the problem result folder before solving
-    result_folder = 'QA-GA-{}'.format(name)
+
     problem_result = ProblemResult(name, problem, result_folder)
 
     hy_result_folder = 'HY-GA-{}'.format(name)

@@ -16,7 +16,7 @@ Traceback (most recent call last):
 ValueError: no embedding found
 ```
 
-FSP: 'BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, 'Amazon'-79, 'E-shop'-290, 'eCos'-1244, 'Freebsd'-1396, 
+FSP: 'BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, 'Amazon'-79, 'E-shop'-290, 'eCos'-1244, 'Freebsd'-1396(MemoryError), 
      'Fiasco'-1638, 'uClinux'-1850, 'LinuxX86'-6888
 
 将数据从变量规模从小到大排列

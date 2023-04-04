@@ -25,8 +25,9 @@ for name in names_FSP:
     problem_result = ProblemResult(name, problem, result_folder)
 
     ga_result = MethodResult('ga', problem_result.path, problem)
-    ga_result.load()
+    ga_result.load(evaluate=False)
     qa_result = MethodResult('moqa', problem_result.path, problem)
+    qa_result.load(evaluate=False)
 
     problem_result.add(ga_result)
     problem_result.add(qa_result)
@@ -34,8 +35,8 @@ for name in names_FSP:
     # compare
     scores_ga = problem_result.average_compare(union_method='moqa', average_method='ga')
     table_ga = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'ga'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-        scores_ga, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+        name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+        scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
     )
     Visualizer.tabluate(table_ga, 'moqa-ga-compare-{}.csv'.format(name))
 
@@ -49,16 +50,17 @@ for name in names_NRP:
     problem_result = ProblemResult(name, problem, result_folder)
 
     ga_result = MethodResult('ga', problem_result.path, problem)
-    ga_result.load()
+    ga_result.load(evaluate=False)
     qa_result = MethodResult('moqa', problem_result.path, problem)
-    qa_result.load()
+    qa_result.load(evaluate=False)
 
     problem_result.add(ga_result)
+    problem_result.add(qa_result)
 
     # compare
     scores_ga = problem_result.average_compare(union_method='moqa', average_method='ga')
     table_ga = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'ga'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-        scores_ga, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+        name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+        scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
     )
     Visualizer.tabluate(table_ga, 'moqa-ga-compare-{}.csv'.format(name))

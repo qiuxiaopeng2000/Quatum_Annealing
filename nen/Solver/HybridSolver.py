@@ -7,7 +7,6 @@ from dimod import BinaryQuadraticModel
 from hybrid import State, min_sample, EnergyImpactDecomposer
 from jmetal.core.solution import BinarySolution
 
-
 from nen.Solver import MOQASolver, JarSolver
 from nen.Solver.SAQPSolver import SAQPSolver
 from nen.Term import Constraint, Quadratic
@@ -77,7 +76,7 @@ class HybridSolver:
         # put samples into result
         result = Result(problem)
         for solution in solution_list:
-            result.add(solution)
+            result.wso_add(solution)
         # add into method result
         result.elapsed = sum(elapseds)
         for sampleset in samplesets:
@@ -115,7 +114,8 @@ class HybridSolver:
         states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
         e1 = SolverUtil.time()
         '''Sampler'''
-        states = states[:int(len(states) * rate)]
+        length = int(len(states) * rate)
+        states = states[:length]
         subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
         '''Composer'''
         s2 = SolverUtil.time()
@@ -213,8 +213,8 @@ class HybridSolver:
             crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
             resultFolder=result_folder, methodName='temp', exec_time=time
         )
-        ea_result = MethodResult('nsgaii', problem_result.path, problem)
-        ea_result.load()
+        ea_result = MethodResult('temp', problem_result.path, problem)
+        ea_result.load(evaluate=False)
         for result in ea_result.results:
             solution_list += result.solution_list
 

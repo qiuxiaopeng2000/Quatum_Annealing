@@ -23,7 +23,7 @@ class SASolver:
         solution.variables = [variables]
         # evaluate solution
         solution = problem.evaluate_solution(solution)
-        while solution.constraints[0] > 10:  # For problems which are not easy to solve, this operator will be very time-consuming.
+        while solution.constraints[0] > 0:  # For problems which are not easy to solve, this operator will be very time-consuming.
             # random variables
             variables = []
             for _ in range(problem.variables_num):

@@ -56,7 +56,7 @@ class MOQASolver:
         for sampleset in samplesets:
             for values in EmbeddingSampler.get_values(sampleset, problem.variables):
                 solution = problem.evaluate(values)
-                result.add(solution)
+                result.wso_add(solution)
         # add into method result
         result.elapsed = sum(elapseds)
         for sampleset in samplesets:

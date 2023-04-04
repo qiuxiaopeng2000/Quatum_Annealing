@@ -34,9 +34,11 @@ class SASampler(EmbeddingSampler):
         """
         result = H.constant
         for k, v in H.linear.items():
-            if values[k]: result += v
+            if k in values:
+                if values[k]: result += v
         for (k1, k2), v in H.quadratic.items():
-            if values[k1] and values[k2]: result += v
+            if k1 in values and k2 in values:
+                if values[k1] and values[k2]: result += v
         return result
 
     def sample_hamiltonian(self, H: Quadratic, variables: List[str], num_reads: int,
@@ -122,8 +124,8 @@ class SASampler(EmbeddingSampler):
         return values_list, elapsed
 
     def sa_sample(self, H: Quadratic, variables: List[str],
-                  if_embed: bool, num_reads: int, exec_time: float,
-                  t_max: float, t_min: float, alpha: float
+                  if_embed: bool, num_reads: int,
+                  t_max: float, t_min: float, alpha: float, exec_time: float
                   ) -> Tuple[List[Dict[str, bool]], float]:
         random.seed(datetime.now())
         if if_embed:
@@ -141,6 +143,7 @@ class SAQPSolver:
         # check arguments
         assert t_min < t_max
         assert 0 <= alpha <= 1
+        print("start SA to solve {}".format(problem.name))
         # modelling
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
@@ -154,4 +157,5 @@ class SAQPSolver:
         for values in values_list:
             result.wso_add(problem.evaluate(values))
         result.elapsed = elapsed
+        print("end SA to solve")
         return result

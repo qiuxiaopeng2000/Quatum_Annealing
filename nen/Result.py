@@ -30,7 +30,7 @@ class NDArchive:
         self.objectives_num: int = objectives_num
         # the archive
         self.archive = NonDominatedSolutionsArchive()
-        self.all_solution_list: List[BinarySolution] = []
+        self.all_solution_num: float = 0.0
         self.total_num_anneals = 0
         self.iterations = 0
 
@@ -45,7 +45,7 @@ class NDArchive:
         assert len(solution.objectives) == self.objectives_num
         # round objectives with NDArchive.ROUND_PRECISION
         solution.objectives = [round(x, NDArchive.ROUND_PRECISION) for x in solution.objectives]
-        self.all_solution_list.append(solution)
+        self.all_solution_num += 1
         return self.archive.add(solution)
         # self.solution_list.append(solution)
         # return True
@@ -224,6 +224,7 @@ class MethodResult:
             else:
                 for solution in result.solution_list:
                     self.method_result.add(solution)
+                    self.method_result.all_solution_num += 1
 
     def dump_result(self, index: int) -> None:
         """dump_result [summary] dump the result archive into .obj and .var files
@@ -311,6 +312,7 @@ class MethodResult:
         else:
             for solution in solution_list:
                 result.add(solution)
+                result.all_solution_num += 1
         self.results.append(result)
 
     def dump_info(self) -> None:
@@ -435,7 +437,7 @@ class ProblemArchive:
         # pareto_count = self.on_pareto_count()
         # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
         # return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
-        return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
+        return {k: v.all_solution_num / v.total_num_anneals for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
@@ -535,7 +537,7 @@ class ProblemResult:
         for method in methods:
             self.methods_results[method] = MethodResult(method, self.path, self.problem)
             self.methods_results[method].load(evaluate)
-            self.methods_results[method].make_method_result(single_flag=False)
+            # self.methods_results[method].make_method_result(single_flag=True)
 
     @staticmethod
     def average_of_dicts(scores: List[Dict[str, float]]) -> Dict[str, float]:
@@ -572,7 +574,7 @@ class ProblemResult:
             method2_result.make_method_result(single_flag=True)
         assert len(method1_result.method_result.solution_list) == len(method2_result.method_result.solution_list)
         # 'alternative' is Alternative Hypothesis
-        iteration = method2_result.iteration
+        iteration = method2_result.method_result.iterations
         w = []
         for k, v in weights.items():
             w.append(v)
@@ -621,8 +623,8 @@ class ProblemResult:
             problem_archive = \
                 ProblemArchive(self.problem, {union_method: union_method_result.results[i], average_method: average_method_result.results[i]})
             elapsed.append({union_method: union_method_result.results[i].elapsed, average_method: average_method_result.results[i].elapsed})
-            found.append({union_method: len(union_method_result.results[i].solution_list),
-                          average_method: len(average_method_result.results[i].solution_list)})
+            found.append({union_method: union_method_result.results[i].all_solution_num,
+                          average_method: average_method_result.results[i].all_solution_num})
             front_all.append({k: float(v) for k, v in problem_archive.on_pareto_count().items()})
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())

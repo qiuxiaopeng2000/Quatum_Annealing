@@ -6,9 +6,7 @@ from nen.Solver import JarSolver
 
 name = 'ms'
 order = ['cost', 'revenue']
-print('++++++++++++')
 result_folder = 'ms-ea-example'
-print('----------------')
 
 problem = Problem(name)
 problem.vectorize(order)
@@ -27,7 +25,7 @@ JarSolver.solve(
 
 # load results
 ea_result = MethodResult('ea', problem_result.path, problem)
-ea_result.load()
+ea_result.load(evaluate=False, single_flag=False)
 
 problem_result.add(ea_result)
 problem_result.dump()

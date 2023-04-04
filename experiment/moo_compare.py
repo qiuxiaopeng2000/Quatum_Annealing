@@ -95,18 +95,18 @@ for name in names_NRP:
     # compare
     scores_ga = problem_result.union_average_compare(union_method='ea', average_method='ga')
     table_ga = Visualizer.tabulate_single_problem(
-        name, ['ea', 'ga'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-        scores_ga, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+        name, ['ea', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing'],
+        scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4}
     )
     scores_moqp = problem_result.union_average_compare(union_method='ea', average_method='moqp')
     table_moqp = Visualizer.tabulate_single_problem(
-        name, ['ea', 'moqp'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-        scores_moqp, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+        name, ['ea', 'moqa'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing'],
+        scores_moqp, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4}
     )
     scores_hy = problem_result.union_average_compare(union_method='ea', average_method='hybrid')
     table_hy = Visualizer.tabulate_single_problem(
-        name, ['ea', 'hybrid'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-        scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+        name, ['ea', 'hybeid'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing'],
+        scores_hy, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4}
     )
     Visualizer.tabluate(table_ga, 'ea-ga-compare-{}.csv'.format(name))
     Visualizer.tabluate(table_moqp, 'ea-moqa-compare-{}.csv'.format(name))
