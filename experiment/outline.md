@@ -77,8 +77,7 @@ FSP：'eCos'-1244, 'uClinux'-1396, 'Fiasco'-1638
 RQ5: large scale problems, solve bound
 1. 探寻dwave的求解能力，则hybrid的子问题规模大小不能超过这个值
 2. 数据规模多大时，hybrid的求解能力下降
-
-sub-size: [100, 500, 1000]
+sub-size: [100, 300, 500, 700]
 NRP：'classic-4'-4000
 FSP：'LinuxX86'-6888
 

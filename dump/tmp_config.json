@@ -1,0 +1,15 @@
+{
+  "problem": "classic-3",
+  "objectiveOrder": [
+    "cost",
+    "revenue"
+  ],
+  "iterations": 30,
+  "populationSize": 1000,
+  "maxEvaluations": 20000,
+  "crossoverProbability": 0.8,
+  "mutationProbability": 0.0005,
+  "resultFolder": "nsgaii",
+  "methodName": "nsgaii",
+  "exec_time": -1
+}
