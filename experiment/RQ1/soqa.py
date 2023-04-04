@@ -14,9 +14,10 @@ names_NRP = ['rp', 'ms', 'Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
+result_folder = 'soqa'
 
 for name in names_FSP:
-    result_folder = 'soqa-{}'.format(name)
+
     problem = QP(name, order_FSP)
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('soqa', problem_result.path, problem)
@@ -33,7 +34,7 @@ for name in names_FSP:
     problem_result.dump()
 
 for name in names_NRP:
-    result_folder = 'soqa-{}'.format(name)
+    # result_folder = 'soqa-{}'.format(name)
     problem = QP(name, order_NRP)
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('soqa', problem_result.path, problem)

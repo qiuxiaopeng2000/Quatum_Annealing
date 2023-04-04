@@ -12,8 +12,10 @@ names_NRP = ['rp', 'ms', 'Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
+result_folder = 'nsgaii'
+
 for name in names_NRP:
-    result_folder = 'nsgaii-{}'.format(name)
+
     problem = Problem(name)
     problem.vectorize(order_NRP)
 
@@ -26,7 +28,7 @@ for name in names_NRP:
         problem=name, objectiveOrder=order_NRP, iterations=30,
         populationSize=1000, maxEvaluations=20000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
-        resultFolder=result_folder, methodName='nsgaii'
+        resultFolder=result_folder, methodName='nsgaii', exec_time=-1
     )
 
     # load results
@@ -37,7 +39,7 @@ for name in names_NRP:
     problem_result.dump()
 
 for name in names_FSP:
-    result_folder = 'nsgaii-{}'.format(name)
+    # result_folder = 'nsgaii-{}'.format(name)
     problem = Problem(name)
     problem.vectorize(order_FSP)
 
@@ -50,7 +52,7 @@ for name in names_FSP:
         problem=name, objectiveOrder=order_FSP, iterations=30,
         populationSize=1000, maxEvaluations=50000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
-        resultFolder=result_folder, methodName='nsgaii'
+        resultFolder=result_folder, methodName='nsgaii', exec_time=-1
     )
 
     # load results

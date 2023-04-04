@@ -6,7 +6,7 @@
 from nen import QP, ProblemResult, MethodResult
 from nen.Solver import HybridSolver
 
-names_FSP = ['E-shop', 'eCos', 'Freebsd']
+names_FSP = ['E-shop', 'eCos', 'uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 

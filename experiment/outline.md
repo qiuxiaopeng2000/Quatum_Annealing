@@ -71,12 +71,14 @@ NRP：'classic-1'-240, 'classic-2'-1120, 'classic-3'-2000
 FSP：'E-shop'-290, 'eCos'-1244, 'uClinux'-1850
 
 RQ4: medium-large scale problems, decomposer: [0.3, 0.5, 0.7]
-NRP：'classic-1'-240, 'classic-2'-1120, 'classic-3'-2000
-FSP：'eCos'-1244, 'Freebsd'-1396, 'Fiasco'-1638
+NRP：'classic-2'-1120, 'classic-3'-2000
+FSP：'eCos'-1244, 'uClinux'-1396, 'Fiasco'-1638
 
 RQ5: large scale problems, solve bound
 1. 探寻dwave的求解能力，则hybrid的子问题规模大小不能超过这个值
 2. 数据规模多大时，hybrid的求解能力下降
-NRP：'classic-5'-2500, 'classic-4'-4000
-FSP：'uClinux'-1850, 'LinuxX86'-6888
+
+sub-size: [100, 500, 1000]
+NRP：'classic-4'-4000
+FSP：'LinuxX86'-6888
 

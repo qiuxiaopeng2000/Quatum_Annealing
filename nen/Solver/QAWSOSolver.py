@@ -17,6 +17,7 @@ class QAWSOSolver:
     def solve(problem: QP, weights: Dict[str, float], penalty: float, num_reads: int) -> Result:
         """solve [summary] solve single objective qp (applied wso technique), return Result.
         """
+        print("start SOQA to solve {}".format(problem.name))
         # prepare wso objective
         wso = SolverUtil.weighted_sum_objective(problem.objectives, weights)
         # add constraints to objective with penalty
@@ -24,7 +25,7 @@ class QAWSOSolver:
         qubo = Constraint.quadratic_to_qubo_dict(objective)
         # Solve in QA
         sampler = EmbeddingSampler()
-        sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
+        sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw')
         # get results
         result = Result(problem)
         if 'occurence' not in result.info:
@@ -46,6 +47,7 @@ class QAWSOSolver:
         result.info['weights'] = weights
         result.info['penalty'] = penalty
         result.info['num_reads'] = num_reads
+        print("end SOQA to solve")
         return result
 
     @staticmethod

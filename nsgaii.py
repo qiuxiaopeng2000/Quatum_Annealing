@@ -1,31 +1,62 @@
 # Put this file at Nen/ (Project Root Path)
 from nen import Problem
-
-from nen import ProblemResult, MethodResult
 from nen.Solver import JarSolver
 
-name = 'ms'
-order = ['cost', 'revenue']
-result_folder = 'ms-ea-example'
+from nen import ProblemResult, MethodResult
 
-problem = Problem(name)
-problem.vectorize(order)
+names_FSP = ['E-shop', 'eCos', 'uClinux']
+order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
+weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-# prepare the problem result folder before solving
-problem_result = ProblemResult(name, problem, result_folder)
+names_NRP = ['classic-1', 'classic-2', 'classic-3']
+order_NRP = ['cost', 'revenue']
+weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-# solve with NSGA-II
-JarSolver.solve(
-    solver_name='NSGAII', config_name='tmp_config',
-    problem=name, objectiveOrder=order, iterations=1,
-    populationSize=500, maxEvaluations=100000,
-    crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
-    resultFolder=result_folder, methodName='ea', exec_time=-1
-)
+result_folder = 'nsgaii'
 
-# load results
-ea_result = MethodResult('ea', problem_result.path, problem)
-ea_result.load(evaluate=False, single_flag=False)
+for name in names_NRP:
+    problem = Problem(name)
+    problem.vectorize(order_NRP)
 
-problem_result.add(ea_result)
-problem_result.dump()
+    # prepare the problem result folder before solving
+    problem_result = ProblemResult(name, problem, result_folder)
+
+    # solve with NSGA-II
+    JarSolver.solve(
+        solver_name='NSGAII', config_name='tmp_config',
+        problem=name, objectiveOrder=order_NRP, iterations=30,
+        populationSize=1000, maxEvaluations=20000,
+        crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
+        resultFolder=result_folder, methodName='nsgaii', exec_time=-1
+    )
+
+    # load results
+    ea_result = MethodResult('nsgaii', problem_result.path, problem)
+    ea_result.load()
+
+    problem_result.add(ea_result)
+    problem_result.dump()
+
+for name in names_FSP:
+    # result_folder = 'nsgaii-{}'.format(name)
+    problem = Problem(name)
+    problem.vectorize(order_FSP)
+
+    # prepare the problem result folder before solving
+    problem_result = ProblemResult(name, problem, result_folder)
+
+    # solve with NSGA-II
+    JarSolver.solve(
+        solver_name='NSGAII', config_name='tmp_config',
+        problem=name, objectiveOrder=order_FSP, iterations=30,
+        populationSize=1000, maxEvaluations=50000,
+        crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
+        resultFolder=result_folder, methodName='nsgaii', exec_time=-1
+    )
+
+    # load results
+    ea_result = MethodResult('nsgaii', problem_result.path, problem)
+    ea_result.load()
+
+    problem_result.add(ea_result)
+    problem_result.dump()
