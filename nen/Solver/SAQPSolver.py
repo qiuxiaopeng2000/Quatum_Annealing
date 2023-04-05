@@ -48,11 +48,14 @@ class SASampler(EmbeddingSampler):
         """
         values_list: List[Dict[Any, bool]] = []
         start = SolverUtil.time()
+        s = SASampler.random_values(variables)
+        b: Dict[Any, bool] = {}
         # loop num_reads time
         for _ in range(num_reads):
             t = t_max
-            s = SASampler.random_values(variables)
-            b: Dict[Any, bool] = {}
+            # s = SASampler.random_values(variables)
+            if len(b) != 0:
+                s = b
             # start annealing
             while t > t_min:
                 sn = SASampler.random_neighbour(s)
