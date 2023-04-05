@@ -4,7 +4,7 @@ from nen.Solver import JarSolver
 
 from nen import ProblemResult, MethodResult
 
-names_FSP = ['ERS', 'WebPortal', 'Amazon']
+names_FSP = ['ERS', 'WebPortal', 'Drupal']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
@@ -25,7 +25,7 @@ for name in names_NRP:
     # solve with NSGA-II
     JarSolver.solve(
         solver_name='NSGAII', config_name='tmp_config',
-        problem=name, objectiveOrder=order_NRP, iterations=6,
+        problem=name, objectiveOrder=order_NRP, iterations=3,
         populationSize=1000, maxEvaluations=100000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='nsgaii', exec_time=-1
@@ -49,7 +49,7 @@ for name in names_FSP:
     # solve with NSGA-II
     JarSolver.solve(
         solver_name='NSGAII', config_name='tmp_config',
-        problem=name, objectiveOrder=order_FSP, iterations=6,
+        problem=name, objectiveOrder=order_FSP, iterations=3,
         populationSize=1000, maxEvaluations=100000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='nsgaii', exec_time=-1
