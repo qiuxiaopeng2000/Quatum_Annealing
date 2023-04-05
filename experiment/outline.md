@@ -60,11 +60,11 @@ FSP: 'BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, 'Amazon'-79, 'E-sho
 
 RQ1： small-scale problems
 NRP：'rp'-25, 'ms'-50, 'Baan'-100
-FSP：'ERS'-36, 'WebPortal'-43, 'Amazon'-79
+FSP：'ERS'-36, 'WebPortal'-43, 'Drupal'-48
 
 RQ2： small-scale problems
 NRP：'rp'-25, 'ms'-50, 'Baan'-100
-FSP：'ERS'-36, 'WebPortal'-43, 'Amazon'-79
+FSP：'ERS'-36, 'WebPortal'-43, 'Drupal'-48
 
 RQ3：medium-large scale problems
 NRP：'classic-1'-240, 'classic-2'-1120, 'classic-3'-2000

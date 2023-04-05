@@ -7,7 +7,7 @@ sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer
 
-names_FSP = ['ERS', 'WebPortal', 'Drupal']
+names_FSP = ['ERS', 'WebPortal', 'Amazon']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
@@ -32,17 +32,7 @@ for name in names_FSP:
     sa_result.load(evaluate=True, single_flag=True)
     soqa_result = MethodResult('soqa', problem_result_soqa.path, problem)
     soqa_result.load(evaluate=True, single_flag=True)
-
-    problem_result.add(sa_result)
-    problem_result.add(soqa_result)
-
-    # compare
-    scores = problem_result.statistical_analysis(method1="sa", method2="soqa", weights=weight_FSP)
-    table = Visualizer.tabulate_single_problem(
-        name, ['sa', 'soqa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-        scores, {'time': 6, 'statistic': 8, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
-    )
-    Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))
+    # print(name, " : {}".format(soqa_result.))
 
 for name in names_NRP:
     problem = Problem(name)
@@ -58,13 +48,3 @@ for name in names_NRP:
     soqa_result = MethodResult('soqa', problem_result_soqa.path, problem)
     soqa_result.load(evaluate=True, single_flag=True)
 
-    problem_result.add(sa_result)
-    problem_result.add(soqa_result)
-
-    # compare
-    scores = problem_result.statistical_analysis(method1="sa", method2="soqa", weights=weight_NRP)
-    table = Visualizer.tabulate_single_problem(
-        name, ['sa', 'soqa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-        scores, {'time': 6, 'statistic': 8, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
-    )
-    Visualizer.tabluate(table, 'so-sa-compare-{}.csv'.format(name))

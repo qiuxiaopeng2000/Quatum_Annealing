@@ -1,14 +1,16 @@
 {
-  "problem": "classic-3",
+  "problem": "uClinux",
   "objectiveOrder": [
-    "cost",
-    "revenue"
+    "COST",
+    "USED_BEFORE",
+    "DEFECTS",
+    "DESELECTED"
   ],
   "iterations": 30,
   "populationSize": 1000,
-  "maxEvaluations": 20000,
+  "maxEvaluations": 50000,
   "crossoverProbability": 0.8,
-  "mutationProbability": 0.0005,
+  "mutationProbability": 0.0005405405405405405,
   "resultFolder": "nsgaii",
   "methodName": "nsgaii",
   "exec_time": -1

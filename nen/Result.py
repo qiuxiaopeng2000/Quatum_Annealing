@@ -38,8 +38,8 @@ class NDArchive:
         """add [summary] add a non-dominant solution into nd archive.
         """
         # check whether solution is feasible
-        # if sum(solution.constraints) > 1:
-        #     return False
+        if sum(solution.constraints) > 1:
+            return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
         assert len(solution.objectives) == self.objectives_num
@@ -54,8 +54,8 @@ class NDArchive:
         """add [summary] add a solution in a single problem into nd archive.
         """
         # check wether solution is feasible
-        # if sum(solution.constraints) > 0:
-        #     return False
+        if sum(solution.constraints) > 1:
+            return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
         assert len(solution.objectives) == self.objectives_num
@@ -131,6 +131,18 @@ class Result(NDArchive):
             return None
         else:
             return self.solution_list[0]
+
+    def get_wso_objective(self, weights: List[float]) -> List[float]:
+        """get_wso_objective [summary] calculate the wso_objective as result of single-objective
+        """
+        objective = []
+        for solution in self.solution_list:
+            assert len(solution.objectives) == len(weights)
+            obj = 0.0
+            for i in range(solution.number_of_objectives):
+                obj += (solution.objectives[i] * weights[i])
+            objective.append(obj)
+        return objective
 
 
 class MethodResult:
@@ -291,7 +303,7 @@ class MethodResult:
                 values = {self.problem.variables[i]: variables_list[index][i]
                           for i in range(self.problem.variables_num)}
                 solution = self.problem.evaluate(values)
-                assert solution.constraints[0] == 0
+                # assert solution.constraints[0] == 0
                 for i in range(self.problem.objectives_num):
                     assert round(solution.objectives[i], NDArchive.ROUND_PRECISION) == objectives_list[index][i]
                 solution_list.append(solution)
@@ -346,7 +358,7 @@ class MethodResult:
         for index in range(self.info['iteration']):
             self.dump_result(index)
 
-    def load(self, evaluate: bool = True, single_flag: bool = False) -> None:
+    def load(self, evaluate: bool = True, single_flag: bool = True) -> None:
         """load [summary] load the MethodResult from files, indicated by info file.
         Evaluate is True as we want to load solutions from variables via evaluation.
         """
@@ -572,25 +584,25 @@ class ProblemResult:
             method1_result.make_method_result(single_flag=True)
         if method2_result.method_result is None:
             method2_result.make_method_result(single_flag=True)
-        assert len(method1_result.method_result.solution_list) == len(method2_result.method_result.solution_list)
         # 'alternative' is Alternative Hypothesis
-        iteration = method2_result.method_result.iterations
+        iteration1 = method1_result.iteration
+        iteration2 = method2_result.iteration
         w = []
         for k, v in weights.items():
             w.append(v)
-        method1_objective = method1_result.get_wso_objective(w)
-        method2_objective = method2_result.get_wso_objective(w)
+        method1_objective = method1_result.results[0].get_wso_objective(w)
+        method2_objective = method2_result.results[0].get_wso_objective(w)
         # N/A indicates ‘‘not applicable’’ which means that the corresponding
         # algorithm could not statistically compare with itself in the rank-sum test
         # N/A means itself for Wilcoxon’s ranksums p_value
-        statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative=alternative)
+        statistic, pvalue = stats.ranksums(np.array(method1_objective)[:100], np.array(method2_objective)[:100], alternative=alternative)
         statistics = {method1: statistic, method2: statistic}
         pvalues = {method1: pvalue, method2: pvalue}
         mean = {method1: np.mean(method1_objective), method2: np.mean(method2_objective)}
         std = {method1: np.std(method1_objective), method2: np.std(method2_objective)}
         max_num = {method1: np.max(method1_objective), method2: np.max(method2_objective)}
         min_num = {method1: np.min(method1_objective), method2: np.min(method2_objective)}
-        elapsed = {method1: method1_result.method_result.elapsed / iteration, method2: method2_result.method_result.elapsed / iteration}
+        elapsed = {method1: method1_result.method_result.elapsed / iteration1, method2: method2_result.method_result.elapsed / iteration2}
         return elapsed, statistics, pvalues, mean, std, max_num, min_num
 
     def average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:

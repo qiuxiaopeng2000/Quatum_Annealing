@@ -6,7 +6,7 @@
 from nen import QP, ProblemResult, MethodResult, Quadratic
 from nen.Solver import QAWSOSolver, SolverUtil, EmbeddingSampler
 
-names_FSP = ['ERS', 'WebPortal', 'Amazon']
+names_FSP = ['ERS', 'WebPortal', 'Drupal']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 

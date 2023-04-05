@@ -17,20 +17,20 @@ order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
 
-# for name in names_FSP:
-#     result_folder = 'moqa-{}'.format(name)
-#     problem = QP(name, order_FSP)
-#     problem_result = ProblemResult(name, problem, result_folder)
-#     moqa_method_result = MethodResult('moqa', problem_result.path, problem)
-#     for _ in range(3):
-#         result = MOQASolver.solve(problem=problem, sample_times=10, num_reads=100)
-#         moqa_method_result.add(result)
-#
-#     # add result to method result, problem result
-#     problem_result.add(moqa_method_result)
-#
-#     # dump result to result/given_path folder
-#     problem_result.dump()
+for name in names_FSP:
+    result_folder = 'moqa-{}'.format(name)
+    problem = QP(name, order_FSP)
+    problem_result = ProblemResult(name, problem, result_folder)
+    moqa_method_result = MethodResult('moqa', problem_result.path, problem)
+    for _ in range(3):
+        result = MOQASolver.solve(problem=problem, sample_times=10, num_reads=100)
+        moqa_method_result.add(result)
+
+    # add result to method result, problem result
+    problem_result.add(moqa_method_result)
+
+    # dump result to result/given_path folder
+    problem_result.dump()
 
 for name in names_NRP:
     result_folder = 'moqa-{}'.format(name)

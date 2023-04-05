@@ -210,7 +210,7 @@ class Problem:
         """_empty_solution [summary] prepare a empty BinarySolution.
         """
         # NOTE: we use one int BinarySolution.constraint to record violated constraints num.
-        solution = BinarySolution(self.variables_num, self.objectives_num, 1)
+        solution = BinarySolution(self.variables_num, self.objectives_num, self.constraints_num)
         solution.constraints[0] = 0
         return solution
 
