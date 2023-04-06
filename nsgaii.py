@@ -48,8 +48,8 @@ for name in names_FSP:
     # solve with NSGA-II
     JarSolver.solve(
         solver_name='NSGAII', config_name='tmp_config',
-        problem=name, objectiveOrder=order_FSP, iterations=3,
-        populationSize=1000, maxEvaluations=200000,
+        problem=name, objectiveOrder=order_FSP, iterations=1,
+        populationSize=2000, maxEvaluations=200000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='nsgaii', exec_time=-1
     )
