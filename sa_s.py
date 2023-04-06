@@ -1,6 +1,9 @@
 import sys
 import os
 
+import multiprocessing
+multiprocessing.set_start_method('spawn')
+
 from nen.Solver.FSAQPSolver import FSAQPSolver
 
 curPath = os.path.abspath(os.path.dirname(__file__))
