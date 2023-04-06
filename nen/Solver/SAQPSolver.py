@@ -61,7 +61,7 @@ class SASampler(EmbeddingSampler):
                 if (d <= 0) or (random.random() < exp((-d) / t)):
                     s = sn
                 if len(b) == 0 or SASampler.fitness(s, H) < SASampler.fitness(b, H) \
-                        or problem.evaluate(s).constraints[0] < problem.evaluate(b).constraints:
+                        or problem.evaluate(s).constraints[0] < problem.evaluate(b).constraints[0]:
                     b = s
                 t *= alpha
             values_list.append(b)
