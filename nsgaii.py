@@ -4,7 +4,7 @@ from nen.Solver import JarSolver
 
 from nen import ProblemResult, MethodResult
 
-names_FSP = ['E-Shop', 'eCos', 'uClinux']
+names_FSP = ['uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
