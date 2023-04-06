@@ -11,7 +11,7 @@ from nen.Term import Quadratic, Constraint
 from nen.Solver.MetaSolver import SolverUtil
 
 import multiprocessing
-multiprocessing.set_start_method('spawn')
+multiprocessing.get_context('spawn')
 
 from sko.SA import SA
 # from nen.Solver.SA import SAFast

@@ -2,7 +2,7 @@ import sys
 import os
 
 import multiprocessing
-multiprocessing.set_start_method('spawn')
+multiprocessing.get_context('spawn')
 
 from nen.Solver.FSAQPSolver import FSAQPSolver
 
