@@ -15,7 +15,7 @@ names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-result_folder = 'sa'
+result_folder = 'sa_m'
 
 for name in names_FSP:
     problem = QP(name, order_FSP)
