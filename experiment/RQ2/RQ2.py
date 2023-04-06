@@ -6,7 +6,8 @@ sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer
 
-names_FSP = ['ERS', 'WebPortal', 'Amazon']
+# names_FSP = ['ERS', 'WebPortal', 'Drupal']
+names_FSP = ['ERS', 'WebPortal']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
@@ -14,6 +15,8 @@ names_NRP = ['rp', 'ms', 'Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
+nsgaii_result_folder = 'nsgaii'
+moqa_result_folder = 'moqa'
 
 # compare MOQA with NSGA-II
 for name in names_FSP:
@@ -21,24 +24,24 @@ for name in names_FSP:
     problem.vectorize(order_FSP)
 
     # prepare the problem result folder before solving
-    result_folder = 'QA-GA-{}'.format(name)
-    problem_result = ProblemResult(name, problem, result_folder)
+    nsgaii_problem_result = ProblemResult(name, problem, nsgaii_result_folder)
+    moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
-    ga_result = MethodResult('ga', problem_result.path, problem)
-    ga_result.load(evaluate=False)
-    qa_result = MethodResult('moqa', problem_result.path, problem)
-    qa_result.load(evaluate=False)
+    ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
+    ga_result.load(evaluate=True, single_flag=False)
+    qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
+    qa_result.load(evaluate=True, single_flag=False)
 
-    problem_result.add(ga_result)
-    problem_result.add(qa_result)
+    moqa_problem_result.add(ga_result)
+    moqa_problem_result.add(qa_result)
 
     # compare
-    scores_ga = problem_result.average_compare(union_method='moqa', average_method='ga')
+    scores_ga = moqa_problem_result.average_compare(union_method='moqa', average_method='nsgaii')
     table_ga = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+        name, ['moqa', 'nsgaii'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
         scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
     )
-    Visualizer.tabluate(table_ga, 'moqa-ga-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table_ga, 'moqa-nsgaii-compare-{}.csv'.format(name))
 
 
 for name in names_NRP:
@@ -46,21 +49,22 @@ for name in names_NRP:
     problem.vectorize(order_NRP)
 
     # prepare the problem result folder before solving
-    result_folder = 'QA-GA-{}'.format(name)
-    problem_result = ProblemResult(name, problem, result_folder)
+    # prepare the problem result folder before solving
+    nsgaii_problem_result = ProblemResult(name, problem, nsgaii_result_folder)
+    moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
-    ga_result = MethodResult('ga', problem_result.path, problem)
-    ga_result.load(evaluate=False)
-    qa_result = MethodResult('moqa', problem_result.path, problem)
-    qa_result.load(evaluate=False)
+    ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
+    ga_result.load(evaluate=True, single_flag=False)
+    qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
+    qa_result.load(evaluate=True, single_flag=False)
 
-    problem_result.add(ga_result)
-    problem_result.add(qa_result)
+    moqa_problem_result.add(ga_result)
+    moqa_problem_result.add(qa_result)
 
     # compare
-    scores_ga = problem_result.average_compare(union_method='moqa', average_method='ga')
+    scores_ga = moqa_problem_result.average_compare(union_method='moqa', average_method='nsgaii')
     table_ga = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'ga'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+        name, ['moqa', 'nsgaii'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
         scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
     )
-    Visualizer.tabluate(table_ga, 'moqa-ga-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table_ga, 'moqa-nsgaii-compare-{}.csv'.format(name))

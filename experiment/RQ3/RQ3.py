@@ -6,11 +6,11 @@ sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer
 
-names_FSP = ['E-Shop', 'eCos', 'uClinux']
+names_FSP = ['eCos', 'uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['classic-1', 'classic-2', 'classic-3']
+names_NRP = ['classic-2', 'classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
@@ -37,11 +37,11 @@ for name in names_NRP:
     sa_problem_result = ProblemResult(name, problem, sa_result_folder)
     soqa_problem_result = ProblemResult(name, problem, soqa_result_folder)
 
-    # ga_result = MethodResult('ga', nsgaii_problem_result.path, problem)
-    # ga_result.load()
-    # qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
-    # qa_result.load()
-    hy_result = MethodResult('hymoo-{}'.format(name), hymoo_problem_result.path, problem)
+    ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
+    ga_result.load()
+    qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
+    qa_result.load()
+    hy_result = MethodResult('hymoo', hymoo_problem_result.path, problem)
     hy_result.load(evaluate=True, single_flag=False)
 
     # hymoo_problem_result.add(ga_result)
@@ -49,12 +49,19 @@ for name in names_NRP:
     hymoo_problem_result.add(hy_result)
 
     # compare
-    scores_hy = hymoo_problem_result.average_compare(union_method='moqa', average_method='hymoo-{}'.format(name))
+    scores_hy = hymoo_problem_result.average_compare(union_method='moqa', average_method='hymoo')
     table_hy = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'hymoo-{}'.format(name)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+        name, ['moqa', 'hymoo'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
         scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
     )
-    Visualizer.tabluate(table_hy, 'ea-hy-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table_hy, 'moqa-hy-compare-{}.csv'.format(name))
+
+    scores_ga = hymoo_problem_result.average_compare(union_method='moqa', average_method='hymoo')
+    table_ga = Visualizer.tabulate_single_problem(
+        name, ['moqa', 'hymoo'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+        scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+    )
+    Visualizer.tabluate(table_hy, 'nsgaii-hy-compare-{}.csv'.format(name))
 
 for name in names_FSP:
     problem = Problem(name)

@@ -326,7 +326,7 @@ class MethodResult:
         else:
             for solution in solution_list:
                 result.add(solution)
-                result.all_solution_num += 1
+                # result.all_solution_num += 1
         self.results.append(result)
 
     def dump_info(self) -> None:
@@ -632,7 +632,7 @@ class ProblemResult:
         hv_all: List[Dict[str, float]] = []
         sp_all: List[Dict[str, float]] = []
         tts_all: List[Dict[str, float]] = []
-        iteration = average_method_result.iteration
+        iteration = union_method_result.iteration
         for i in range(iteration):
             problem_archive = \
                 ProblemArchive(self.problem, {union_method: union_method_result.results[i], average_method: average_method_result.results[i]})

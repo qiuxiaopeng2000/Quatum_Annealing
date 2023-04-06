@@ -68,7 +68,7 @@ FSP：'ERS'-36, 'WebPortal'-43, 'Drupal'-48
 
 RQ3：medium-large scale problems
 NRP：'classic-1'-240, 'classic-2'-1120, 'classic-3'-2000
-FSP：'E-shop'-290, 'eCos'-1244, 'uClinux'-1850
+FSP：'E-Shop'-290, 'eCos'-1244, 'uClinux'-1850
 
 RQ4: medium-large scale problems, decomposer: [0.3, 0.5, 0.7]
 NRP：'classic-3'-2000

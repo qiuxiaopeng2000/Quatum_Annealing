@@ -7,11 +7,12 @@ from nen import QP, ProblemResult, MethodResult
 from nen.Solver import MOQASolver
 
 
-names_FSP = ['ERS', 'WebPortal', 'Amazon']
+names_FSP = ['Drupal']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['rp', 'ms', 'Baan']
+names_NRP = ['Baan']
+# names_NRP = ['rp', 'ms', 'Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
