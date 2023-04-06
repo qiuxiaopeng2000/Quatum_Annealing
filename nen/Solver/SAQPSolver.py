@@ -42,27 +42,26 @@ class SASampler(EmbeddingSampler):
         return result
 
     def sample_hamiltonian(self, H: Quadratic, variables: List[str], num_reads: int,
-                           t_max: float, t_min: float, alpha: float, exec_time: float
+                           t_max: float, t_min: float, alpha: float, exec_time: float,
+                           problem: QP
                            ) -> Tuple[List[Dict[Any, bool]], float]:
         """sample_hamiltonian [summary] sample qubo or hamiltionian without any embedding.
         """
         values_list: List[Dict[Any, bool]] = []
         start = SolverUtil.time()
-        b: Dict[Any, bool] = {}
         # loop num_reads time
         for _ in range(num_reads):
             t = t_max
             s = SASampler.random_values(variables)
-            # if len(b) != 0 and SASampler.fitness(b, H) < SASampler.fitness(s, H):
-            #     s = b
-
+            b: Dict[Any, bool] = {}
             # start annealing
             while t > t_min:
                 sn = SASampler.random_neighbour(s)
                 d = SASampler.fitness(sn, H) - SASampler.fitness(s, H)
                 if (d <= 0) or (random.random() < exp((-d) / t)):
                     s = sn
-                if len(b) == 0 or SASampler.fitness(s, H) < SASampler.fitness(b, H):
+                if len(b) == 0 or SASampler.fitness(s, H) < SASampler.fitness(b, H) \
+                        or problem.evaluate(s).constraints[0] < problem.evaluate(b).constraints:
                     b = s
                 t *= alpha
             values_list.append(b)
@@ -128,13 +127,14 @@ class SASampler(EmbeddingSampler):
 
     def sa_sample(self, H: Quadratic, variables: List[str],
                   if_embed: bool, num_reads: int,
-                  t_max: float, t_min: float, alpha: float, exec_time: float
+                  t_max: float, t_min: float, alpha: float, exec_time: float,
+                  problem: QP
                   ) -> Tuple[List[Dict[str, bool]], float]:
         random.seed(datetime.now())
         if if_embed:
             return self.embed_sample(H, variables, num_reads, t_max, t_min, alpha)
         else:
-            return self.sample_hamiltonian(H, variables, num_reads, t_max, t_min, alpha, exec_time)
+            return self.sample_hamiltonian(H, variables, num_reads, t_max, t_min, alpha, exec_time, problem)
 
 
 class SAQPSolver:
@@ -154,7 +154,7 @@ class SAQPSolver:
         # sample
         sampler = SASampler()
         values_list, elapsed = \
-            sampler.sa_sample(H, problem.variables, if_embed, num_reads, t_max, t_min, alpha, exec_time)
+            sampler.sa_sample(H, problem.variables, if_embed, num_reads, t_max, t_min, alpha, exec_time, problem)
         # add into result
         result = Result(problem)
         for values in values_list:
