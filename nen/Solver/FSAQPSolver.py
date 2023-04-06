@@ -19,7 +19,7 @@ class FSAQPSolver:
 
     @staticmethod
     def solve(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
-              L: int = 300, max_stay: int = 150, num_reads: int = 1000) -> Result:
+              L: int = 300, max_stay: int = 150, num_reads: int = 1000, exec_time: float = 1e6) -> Result:
         print("{} start Simulated Annealing to solve single-problem!!!".format(problem.name))
         result = Result(problem)
         for _ in range(num_reads):
@@ -27,6 +27,8 @@ class FSAQPSolver:
                                          L=L, max_stay=max_stay)
             result.wso_add(res.single)
             result.elapsed += res.elapsed
+            if res.elapsed > exec_time:
+                break
         result.iterations = num_reads
         print("{} Simulated Annealing end!!!".format(problem.name))
         return result
