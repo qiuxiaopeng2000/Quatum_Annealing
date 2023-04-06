@@ -43,7 +43,7 @@ class SASampler(EmbeddingSampler):
 
     def sample_hamiltonian(self, H: Quadratic, variables: List[str], num_reads: int,
                            t_max: float, t_min: float, alpha: float, exec_time: float,
-                           problem: QP
+                           problem: QP, max_stay: int
                            ) -> Tuple[List[Dict[Any, bool]], float]:
         """sample_hamiltonian [summary] sample qubo or hamiltionian without any embedding.
         """
@@ -56,6 +56,7 @@ class SASampler(EmbeddingSampler):
             b: Dict[Any, bool] = {}
             # start annealing
             while t > t_min:
+                stay_counter = 0
                 sn = SASampler.random_neighbour(s)
                 d = SASampler.fitness(sn, H) - SASampler.fitness(s, H)
                 if (d <= 0) or (random.random() < exp((-d) / t)):
@@ -63,6 +64,11 @@ class SASampler(EmbeddingSampler):
                 if len(b) == 0 or SASampler.fitness(s, H) < SASampler.fitness(b, H) \
                         or problem.evaluate(s).constraints[0] < problem.evaluate(b).constraints[0]:
                     b = s
+                    stay_counter = 0
+                else:
+                    stay_counter += 1
+                if stay_counter > max_stay:
+                    break
                 t *= alpha
             values_list.append(b)
             if (SolverUtil.time() - start) > exec_time:

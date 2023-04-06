@@ -54,7 +54,9 @@ class NDArchive:
         """add [summary] add a solution in a single problem into nd archive.
         """
         # check wether solution is feasible
-        if sum(solution.constraints) > 1:
+        if solution is None:
+            return False
+        if sum(solution.constraints) > 10:
             return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num

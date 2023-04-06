@@ -31,10 +31,9 @@ class SimulatedAnnealingBase(SkoBase):
     See https://github.com/guofei9987/scikit-opt/blob/master/examples/demo_sa.py
     """
 
-    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, num_reads=1000, alpha: float = 0.7, **kwargs):
+    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, alpha: float = 0.7, **kwargs):
         assert T_max > T_min > 0, 'T_max > T_min > 0'
 
-        self.num_reads = num_reads
         self.func = func
         self.T_max = T_max  # initial temperature
         self.T_min = T_min  # end temperature
@@ -90,9 +89,9 @@ class SimulatedAnnealingBase(SkoBase):
             else:
                 stay_counter = 0
 
-            if self.iter_cycle > self.num_reads:
-                stop_code = 'Reach the max num_reads'
-                break
+            # if self.iter_cycle > self.num_reads:
+            #     stop_code = 'Reach the max num_reads'
+            #     break
 
             if self.T < self.T_min:
                 stop_code = 'Cooled to final temperature'
@@ -111,8 +110,8 @@ class SimulatedAnnealingValue(SimulatedAnnealingBase):
     SA on real value function
     """
 
-    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, num_reads: int = 1000, **kwargs):
-        super().__init__(func, x0, T_max, T_min, L, max_stay_counter, num_reads, **kwargs)
+    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, **kwargs):
+        super().__init__(func, x0, T_max, T_min, L, max_stay_counter, **kwargs)
         lb, ub = kwargs.get('lb', None), kwargs.get('ub', None)
 
         if lb is not None and ub is not None:
@@ -141,8 +140,8 @@ class SAFast(SimulatedAnnealingValue):
     T_new = T0 * exp(-c * k**quench)
     """
 
-    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, num_reads=1000, **kwargs):
-        super().__init__(func, x0, T_max, T_min, L, max_stay_counter, num_reads, **kwargs)
+    def __init__(self, func, x0, T_max=100, T_min=1e-7, L=300, max_stay_counter=150, **kwargs):
+        super().__init__(func, x0, T_max, T_min, L, max_stay_counter, **kwargs)
         self.m, self.n, self.quench = kwargs.get('m', 1), kwargs.get('n', 1), kwargs.get('quench', 1)
         self.c = self.m * np.exp(-self.n * self.quench)
 

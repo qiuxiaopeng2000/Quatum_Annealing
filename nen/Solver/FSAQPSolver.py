@@ -19,15 +19,15 @@ class FSAQPSolver:
 
     @staticmethod
     def solve(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
-              L: int = 300, max_stay: int = 150, sample_times: int = 1, num_reads: int = 1000) -> Result:
+              L: int = 300, max_stay: int = 150, num_reads: int = 1000) -> Result:
         print("{} start Simulated Annealing to solve single-problem!!!".format(problem.name))
         result = Result(problem)
-        for _ in range(sample_times):
+        for _ in range(num_reads):
             res = FSAQPSolver.solve_once(problem=problem, weights=weights, t_max=t_max, t_min=t_min,
-                                         L=L, max_stay=max_stay, num_reads=num_reads)
-            result.solution_list.append(res.single)
+                                         L=L, max_stay=max_stay)
+            result.wso_add(res.single)
             result.elapsed += res.elapsed
-        result.iterations = sample_times
+        result.iterations = num_reads
         print("{} Simulated Annealing end!!!".format(problem.name))
         return result
 
@@ -68,7 +68,7 @@ class FSAQPSolver:
 
     @staticmethod
     def solve_once(problem: QP, weights: Dict[str, float], t_max: float, t_min: float,
-                   L: int = 300, max_stay: int = 150, num_reads: int = 1000) -> Result:
+                   L: int = 300, max_stay: int = 150) -> Result:
         """
         t_max: initial temperature
         t_min: end temperature
@@ -95,7 +95,7 @@ class FSAQPSolver:
             x0.append(bool(random.randint(0, 1)))
 
         start = SolverUtil.time()
-        sampler = SAFast(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0, num_reads=num_reads)
+        sampler = SAFast(func=fitness, T_max=t_max, T_min=t_min, L=L, max_stay_counter=max_stay, x0=x0)
         best_x, best_y = sampler.run()
         end = SolverUtil.time()
         # restore the result
