@@ -1,5 +1,5 @@
 {
-  "problem": "uClinux",
+  "problem": "eCos",
   "objectiveOrder": [
     "COST",
     "USED_BEFORE",
@@ -8,10 +8,10 @@
   ],
   "iterations": 30,
   "populationSize": 1000,
-  "maxEvaluations": 50000,
+  "maxEvaluations": 200000,
   "crossoverProbability": 0.8,
-  "mutationProbability": 0.0005405405405405405,
-  "resultFolder": "nsgaii",
-  "methodName": "nsgaii",
-  "exec_time": -1
+  "mutationProbability": 0.0008038585209003215,
+  "resultFolder": "hymoo",
+  "methodName": "temp",
+  "exec_time": 122.73091189999977
 }

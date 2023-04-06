@@ -6,7 +6,7 @@
 from nen import QP, ProblemResult, MethodResult
 from nen.Solver import HybridSolver
 
-names_FSP = ['uClinux']
+names_FSP = ['E-Shop', 'eCos']
 # names_FSP = ['E-Shop', 'eCos', 'uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
@@ -22,8 +22,8 @@ for name in names_FSP:
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('hymoo-{}'.format(name), problem_result.path, problem)
     for _ in range(1):
-        result = HybridSolver.solve(problem=problem, num_reads=100, sample_times=10, sub_size=100, maxEvaluations=20000,
-                                    order=order_FSP, problem_result=problem_result, result_folder=result_folder)
+        result = HybridSolver.solve(problem=problem, num_reads=100, sample_times=10, sub_size=100, maxEvaluations=200000,
+                                    order=order_FSP, problem_result=problem_result, result_folder=result_folder, annealing_time=30)
         moqa_method_result.add(result)
 
     # add result to method result, problem result
@@ -38,8 +38,8 @@ for name in names_FSP:
 #     problem_result = ProblemResult(name, problem, result_folder)
 #     moqa_method_result = MethodResult('hymoo-{}'.format(name), problem_result.path, problem)
 #     for _ in range(1):
-#         result = HybridSolver.solve(problem=problem, num_reads=100, sample_times=10, sub_size=100, maxEvaluations=50000,
-#                                     order=order_NRP, problem_result=problem_result, result_folder=result_folder
+#         result = HybridSolver.solve(problem=problem, num_reads=100, sample_times=10, sub_size=100, maxEvaluations=200000,
+#                                     order=order_NRP, problem_result=problem_result, result_folder=result_folder, annealing_time=30
 #                                     )
 #         moqa_method_result.add(result)
 #

@@ -23,7 +23,7 @@ for name in names_FSP:
     moqa_method_result = MethodResult('hysoo', problem_result.path, problem)
     for _ in range(3):
         result = HybridSolver.single_solve(problem=problem, num_reads=1000, weights=weight_FSP, sub_size=100,
-                                           t_max=100, t_min=1e-6, alpha=0.9)
+                                           t_max=100, t_min=1e-6, alpha=0.99)
         moqa_method_result.add(result)
 
     # add result to method result, problem result
@@ -39,7 +39,7 @@ for name in names_NRP:
     moqa_method_result = MethodResult('hysoo', problem_result.path, problem)
     for _ in range(30):
         result = HybridSolver.single_solve(problem=problem, num_reads=1000, weights=weight_NRP, sub_size=100,
-                                           t_max=100, t_min=1e-6, alpha=0.9)
+                                           t_max=100, t_min=1e-6, alpha=0.99)
         moqa_method_result.add(result)
 
     # add result to method result, problem result

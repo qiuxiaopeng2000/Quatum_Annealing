@@ -14,7 +14,13 @@ names_NRP = ['classic-1', 'classic-2', 'classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-result_folder = 'hymoo'
+hymoo_result_folder = 'hymoo'
+nsgaii_result_folder = 'nsgaii'
+moqa_result_folder = 'moqa'
+
+hysoo_result_folder = 'hysoo'
+sa_result_folder = 'sa'
+soqa_result_folder = 'soqa'
 
 # compare CQHA with NSGA-II
 for name in names_NRP:
@@ -23,26 +29,29 @@ for name in names_NRP:
 
     # prepare the problem result folder before solving
 
-    problem_result = ProblemResult(name, problem, result_folder)
+    hymoo_problem_result = ProblemResult(name, problem, hymoo_result_folder)
+    nsgaii_problem_result = ProblemResult(name, problem, nsgaii_result_folder)
+    moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
-    hy_result_folder = 'HY-GA-{}'.format(name)
-    hy_problem_result = ProblemResult(name, problem, hy_result_folder)
+    hysoo_problem_reuslt = ProblemResult(name, problem, hysoo_result_folder)
+    sa_problem_result = ProblemResult(name, problem, sa_result_folder)
+    soqa_problem_result = ProblemResult(name, problem, soqa_result_folder)
 
-    ga_result = MethodResult('ga', problem_result.path, problem)
-    ga_result.load()
-    qa_result = MethodResult('moqa', problem_result.path, problem)
-    qa_result.load()
-    hy_result = MethodResult('hybrid', hy_problem_result.path, problem)
-    hy_result.load()
+    # ga_result = MethodResult('ga', nsgaii_problem_result.path, problem)
+    # ga_result.load()
+    # qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
+    # qa_result.load()
+    hy_result = MethodResult('hymoo-{}'.format(name), hymoo_problem_result.path, problem)
+    hy_result.load(evaluate=True, single_flag=False)
 
-    problem_result.add(ga_result)
-    problem_result.add(qa_result)
-    problem_result.add(hy_result)
+    # hymoo_problem_result.add(ga_result)
+    # hymoo_problem_result.add(qa_result)
+    hymoo_problem_result.add(hy_result)
 
     # compare
-    scores_hy = problem_result.average_compare(union_method='moqa', average_method='hybrid')
+    scores_hy = hymoo_problem_result.average_compare(union_method='moqa', average_method='hymoo-{}'.format(name))
     table_hy = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'hybrid'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+        name, ['moqa', 'hymoo-{}'.format(name)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
         scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
     )
     Visualizer.tabluate(table_hy, 'ea-hy-compare-{}.csv'.format(name))
@@ -52,24 +61,33 @@ for name in names_FSP:
     problem.vectorize(order_FSP)
 
     # prepare the problem result folder before solving
-    hy_result_folder = 'HY-GA-{}'.format(name)
-    hy_problem_result = ProblemResult(name, problem, hy_result_folder)
 
-    ga_result = MethodResult('ga', hy_problem_result.path, problem)
-    ga_result.load()
-    hy_result = MethodResult('hybrid', hy_problem_result.path, problem)
-    hy_result.load()
+    hymoo_problem_result = ProblemResult(name, problem, hymoo_result_folder)
+    # nsgaii_problem_result = ProblemResult(name, problem, nsgaii_result_folder)
+    # moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
+    #
+    # hysoo_problem_reuslt = ProblemResult(name, problem, hysoo_result_folder)
+    # sa_problem_result = ProblemResult(name, problem, sa_result_folder)
+    # soqa_problem_result = ProblemResult(name, problem, soqa_result_folder)
 
-    hy_problem_result.add(ga_result)
-    hy_problem_result.add(hy_result)
+    # ga_result = MethodResult('ga', nsgaii_problem_result.path, problem)
+    # ga_result.load()
+    # qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
+    # qa_result.load()
+    hy_result = MethodResult('hymoo-{}'.format(name), hymoo_problem_result.path, problem)
+    hy_result.load(evaluate=True, single_flag=False)
+
+    # hymoo_problem_result.add(ga_result)
+    # hymoo_problem_result.add(qa_result)
+    hymoo_problem_result.add(hy_result)
 
     # compare
-    scores_hybrid = hy_problem_result.average_compare(union_method='hybrid', average_method='ga')
-    table_hybrid = Visualizer.tabulate_single_problem(
-        name, ['hybrid', 'ga'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-        scores_hybrid, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+    scores_hy = hymoo_problem_result.average_compare(union_method='moqa', average_method='hymoo-{}'.format(name))
+    table_hy = Visualizer.tabulate_single_problem(
+        name, ['moqa', 'hymoo-{}'.format(name)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+        scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
     )
-    Visualizer.tabluate(table_hybrid, 'hybrid-ga-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table_hy, 'ea-hy-compare-{}.csv'.format(name))
 
 '''++++++++++++++++++++++++++++++++++++++++++++++'''
 

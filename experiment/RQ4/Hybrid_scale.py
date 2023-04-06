@@ -36,7 +36,7 @@ for name in names_NRP:
         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, qp)
         for _ in range(3):
             result = HybridSolver.solve(problem=qp, sample_times=10, num_reads=100, maxEvaluations=20000, seed=1,
-                                        sub_size=100, rate=rate)
+                                        sub_size=100, rate=rate, annealing_time=40)
             hy_result.add(result)
 
         # dump the results
@@ -61,7 +61,7 @@ for name in names_FSP:
         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, qp)
         for _ in range(3):
             result = HybridSolver.solve(problem=qp, sample_times=10, num_reads=100, maxEvaluations=20000, seed=1,
-                                        sub_size=100, rate=rate)
+                                        sub_size=100, rate=rate, annealing_time=40)
             hy_result.add(result)
 
         # dump the results

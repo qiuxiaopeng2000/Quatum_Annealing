@@ -27,7 +27,7 @@ class HybridSolver:
 
     @staticmethod
     def solve(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int, order: List[str],
-              problem_result: ProblemResult, result_folder: str, sample_times: int = 1, rate: float = 1.0) -> Result:
+              problem_result: ProblemResult, result_folder: str, sample_times: int = 1, rate: float = 1.0, **parameters) -> Result:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
         print("{} start Hybrid Solver to solve multi-objective problem!!!".format(problem.name))
@@ -56,7 +56,7 @@ class HybridSolver:
             states = states[:int(length * rate)]
             e1 = SolverUtil.time()
             '''Sampler'''
-            subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
+            subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads, **parameters)
             '''Composer'''
             s2 = SolverUtil.time()
             HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads,
@@ -94,7 +94,7 @@ class HybridSolver:
 
     @staticmethod
     def single_solve(problem: QP, weights: Dict[str, float], num_reads: int, sub_size: int, t_max: float,
-                     t_min: float, alpha: float, rate: float = 1.0) -> Result:
+                     t_min: float, alpha: float, rate: float = 1.0, **parameters) -> Result:
         print("{} start Hybrid Solver to solve single-objective problem!!!".format(problem.name))
         # sample for sample_times times
         samplesets: List[SampleSet] = []
@@ -116,7 +116,7 @@ class HybridSolver:
         '''Sampler'''
         length = int(len(states) * rate)
         states = states[:length]
-        subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads)
+        subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads, **parameters)
         '''Composer'''
         s2 = SolverUtil.time()
         HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads, solution_list=solution_list)
@@ -164,14 +164,14 @@ class HybridSolver:
         return states
 
     @staticmethod
-    def Sampler(states: List[State], num_reads: int) -> Tuple[List[SampleSet], float]:
+    def Sampler(states: List[State], num_reads: int, **parameters) -> Tuple[List[SampleSet], float]:
         elapseds = 0.0
         subsamplesets = []
         for state in states:
             pro_bqm = state.subproblem
             qubo, offset = pro_bqm.to_qubo()
             sampler = EmbeddingSampler()
-            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw')
+            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw', **parameters)
             subsamplesets.append(sampleset)
             elapseds += elapsed
         return subsamplesets, elapseds
