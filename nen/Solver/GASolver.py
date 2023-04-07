@@ -20,7 +20,7 @@ class GASolver:
     @staticmethod
     def solve(problem: Problem, populationSize: int, maxEvaluations: int,
               seed: int, crossoverProbability: float, mutationProbability: int,
-              verbose: bool = False, iterations: int = 1e6, exec_time: float = 1e6) -> Result:
+              verbose: bool = False, iterations: int = 1, exec_time: float = 1e6) -> Result:
         """
         seed : integer
             The random seed to be used.
@@ -46,7 +46,6 @@ class GASolver:
         print("{} start Genetic Algorithm to solve multi-objective problem!!!".format(problem.name))
         result = Result(problem)
         termination = DefaultMultiObjectiveTermination(
-            n_max_gen=iterations,
             n_max_evals=maxEvaluations
         )
         pro = PymooProblem(problem)
