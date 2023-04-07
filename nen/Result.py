@@ -592,12 +592,12 @@ class ProblemResult:
         w = []
         for k, v in weights.items():
             w.append(v)
-        method1_objective = method1_result.results[0].get_wso_objective(w)
-        method2_objective = method2_result.results[0].get_wso_objective(w)
+        method1_objective = method1_result.get_wso_objective(w)
+        method2_objective = method2_result.get_wso_objective(w)
         # N/A indicates ‘‘not applicable’’ which means that the corresponding
         # algorithm could not statistically compare with itself in the rank-sum test
         # N/A means itself for Wilcoxon’s ranksums p_value
-        statistic, pvalue = stats.ranksums(np.array(method1_objective)[:100], np.array(method2_objective)[:100], alternative=alternative)
+        statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative=alternative)
         statistics = {method1: statistic, method2: statistic}
         pvalues = {method1: pvalue, method2: pvalue}
         mean = {method1: np.mean(method1_objective), method2: np.mean(method2_objective)}

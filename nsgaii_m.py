@@ -14,27 +14,27 @@ weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
 result_folder = 'nsgaii_m'
 
-for name in names_NRP:
-    problem = Problem(name)
-    problem.vectorize(order_NRP)
-
-    # prepare the problem result folder before solving
-    problem_result = ProblemResult(name, problem, result_folder)
-
-    # solve with NSGA-II
-    JarSolver.solve(
-        solver_name='NSGAII', config_name='tmp_config',
-        problem=name, objectiveOrder=order_NRP, iterations=10,
-        populationSize=100, maxEvaluations=20000,
-        crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
-        resultFolder=result_folder, methodName='nsgaii', exec_time=-1
-    )
-    # load results
-    ea_result = MethodResult('nsgaii', problem_result.path, problem)
-    ea_result.load(evaluate=True, single_flag=True)
-    ea_result.make_method_result(single_flag=True)
-    problem_result.add(ea_result)
-    problem_result.dump()
+# for name in names_NRP:
+#     problem = Problem(name)
+#     problem.vectorize(order_NRP)
+#
+#     # prepare the problem result folder before solving
+#     problem_result = ProblemResult(name, problem, result_folder)
+#
+#     # solve with NSGA-II
+#     JarSolver.solve(
+#         solver_name='NSGAII', config_name='tmp_config',
+#         problem=name, objectiveOrder=order_NRP, iterations=10,
+#         populationSize=100, maxEvaluations=20000,
+#         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
+#         resultFolder=result_folder, methodName='nsgaii', exec_time=-1
+#     )
+#     # load results
+#     ea_result = MethodResult('nsgaii', problem_result.path, problem)
+#     ea_result.load(evaluate=True, single_flag=True)
+#     ea_result.make_method_result(single_flag=True)
+#     problem_result.add(ea_result)
+#     problem_result.dump()
 
 for name in names_FSP:
     # result_folder = 'nsgaii-{}'.format(name)
@@ -55,7 +55,6 @@ for name in names_FSP:
 
     # load results
     ea_result = MethodResult('nsgaii', problem_result.path, problem)
-    ea_result.load()
     ea_result.load(evaluate=True, single_flag=True)
     ea_result.make_method_result(single_flag=True)
     problem_result.add(ea_result)
