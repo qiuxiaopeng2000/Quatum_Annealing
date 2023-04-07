@@ -2,15 +2,13 @@
 import sys
 import os
 
-from nen.Solver.GASolver import GASolver
-
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from nen import Problem
 from nen.Solver import JarSolver
-
+from nen.Solver.GASolver import GASolver
 from nen import ProblemResult, MethodResult
 
 names_FSP = ['ERS', 'WebPortal', 'Drupal', 'E-Shop', 'eCos', 'uClinux']

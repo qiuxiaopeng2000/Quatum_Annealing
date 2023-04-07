@@ -632,13 +632,19 @@ class ProblemResult:
         hv_all: List[Dict[str, float]] = []
         sp_all: List[Dict[str, float]] = []
         tts_all: List[Dict[str, float]] = []
-        iteration = union_method_result.iteration
+        iteration1 = union_method_result.iteration
+        iteration2 = average_method_result.iteration
+        iteration = max(iteration1, iteration2)
         for i in range(iteration):
+            index1 = i % iteration1
+            index2 = i % iteration2
             problem_archive = \
-                ProblemArchive(self.problem, {union_method: union_method_result.results[i], average_method: average_method_result.results[i]})
-            elapsed.append({union_method: union_method_result.results[i].elapsed, average_method: average_method_result.results[i].elapsed})
-            found.append({union_method: union_method_result.results[i].all_solution_num,
-                          average_method: average_method_result.results[i].all_solution_num})
+                ProblemArchive(self.problem, {union_method: union_method_result.results[index1],
+                                              average_method: average_method_result.results[index2]})
+            elapsed.append({union_method: union_method_result.results[index1].elapsed,
+                            average_method: average_method_result.results[index2].elapsed})
+            found.append({union_method: len(union_method_result.results[index1].solution_list),
+                          average_method: len(average_method_result.results[index2].solution_list)})
             front_all.append({k: float(v) for k, v in problem_archive.on_pareto_count().items()})
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())
