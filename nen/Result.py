@@ -360,7 +360,7 @@ class MethodResult:
         for index in range(self.info['iteration']):
             self.dump_result(index)
 
-    def load(self, evaluate: bool = True, single_flag: bool = True) -> None:
+    def load(self, evaluate: bool = False, single_flag: bool = False) -> None:
         """load [summary] load the MethodResult from files, indicated by info file.
         Evaluate is True as we want to load solutions from variables via evaluation.
         """
