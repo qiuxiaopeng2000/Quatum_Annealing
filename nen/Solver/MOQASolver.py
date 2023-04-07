@@ -47,7 +47,7 @@ class MOQASolver:
             sampler = EmbeddingSampler()
             # read num_reads from once sample, but some answer is duplicate,
             # so the number return less than num_reads
-            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads)
+            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw')
             samplesets.append(sampleset)
             elapseds.append(elapsed)
 
