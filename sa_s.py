@@ -1,8 +1,6 @@
 import sys
 import os
 
-import multiprocessing
-multiprocessing.get_context('spawn')
 
 from nen.Solver.FSAQPSolver import FSAQPSolver
 
