@@ -43,7 +43,7 @@ class SASampler(EmbeddingSampler):
 
     def sample_hamiltonian(self, H: Quadratic, variables: List[str], num_reads: int,
                            t_max: float, t_min: float, alpha: float, exec_time: float,
-                           problem: QP, max_stay: int
+                           problem: QP, max_stay: int = 150
                            ) -> Tuple[List[Dict[Any, bool]], float]:
         """sample_hamiltonian [summary] sample qubo or hamiltionian without any embedding.
         """
