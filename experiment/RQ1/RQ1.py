@@ -7,7 +7,7 @@ sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer
 
-names_FSP = ['WebPortal', 'Drupal']
+names_FSP = ['ERS', 'WebPortal', 'Drupal']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
@@ -15,7 +15,7 @@ names_NRP = ['rp', 'ms', 'Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-result_folder_sa = 'sa'
+result_folder_sa = 'sa_s'
 result_folder_soqa = 'soqa'
 
 # compare SOQA with SA

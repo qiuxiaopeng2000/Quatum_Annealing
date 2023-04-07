@@ -38,8 +38,8 @@ class NDArchive:
         """add [summary] add a non-dominant solution into nd archive.
         """
         # check whether solution is feasible
-        if sum(solution.constraints) > 1:
-            return False
+        # if sum(solution.constraints) > 1:
+        #     return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
         assert len(solution.objectives) == self.objectives_num
@@ -54,10 +54,10 @@ class NDArchive:
         """add [summary] add a solution in a single problem into nd archive.
         """
         # check wether solution is feasible
-        if solution is None:
-            return False
-        if sum(solution.constraints) > 10:
-            return False
+        # if solution is None:
+        #     return False
+        # if sum(solution.constraints) > 10:
+        #     return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
         assert len(solution.objectives) == self.objectives_num
@@ -597,7 +597,7 @@ class ProblemResult:
         # N/A indicates ‘‘not applicable’’ which means that the corresponding
         # algorithm could not statistically compare with itself in the rank-sum test
         # N/A means itself for Wilcoxon’s ranksums p_value
-        statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative=alternative)
+        statistic, pvalue = stats.ranksums(np.array(method1_objective)[:100], np.array(method2_objective)[:100], alternative=alternative)
         statistics = {method1: statistic, method2: statistic}
         pvalues = {method1: pvalue, method2: pvalue}
         mean = {method1: np.mean(method1_objective), method2: np.mean(method2_objective)}
