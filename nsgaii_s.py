@@ -4,11 +4,11 @@ from nen.Solver import JarSolver
 
 from nen import ProblemResult, MethodResult
 
-names_FSP = ['ERS', 'WebPortal', 'Drupal']
+names_FSP = ['ERS', 'WebPortal', 'Drupal', 'E-Shop', 'eCos', 'uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['rp', 'ms', 'Baan']
+names_NRP = ['rp', 'ms', 'Baan', 'classic-1', 'classic-2', 'classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
