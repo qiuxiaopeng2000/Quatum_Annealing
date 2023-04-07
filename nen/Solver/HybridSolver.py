@@ -8,6 +8,7 @@ from hybrid import State, min_sample, EnergyImpactDecomposer
 from jmetal.core.solution import BinarySolution
 
 from nen.Solver import MOQASolver, JarSolver
+from nen.Solver.GASolver import GASolver
 from nen.Solver.SAQPSolver import SAQPSolver
 from nen.Term import Constraint, Quadratic
 from nen.Problem import QP
@@ -26,8 +27,8 @@ class HybridSolver:
     """
 
     @staticmethod
-    def solve(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int, order: List[str],
-              problem_result: ProblemResult, result_folder: str, sample_times: int = 1, rate: float = 1.0, **parameters) -> Result:
+    def solve(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int,
+              sample_times: int = 1, rate: float = 1.0, **parameters) -> Result:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
         print("{} start Hybrid Solver to solve multi-objective problem!!!".format(problem.name))
@@ -66,10 +67,10 @@ class HybridSolver:
             elapseds.append(t)
         '''NSGA-II'''
         HybridSolver.NSGAII(populationSize=num_reads * sample_times, maxEvaluations=maxEvaluations, problem=problem,
-                            time=t, solution_list=solution_list, order=order, problem_result=problem_result, result_folder=result_folder)
+                            time=t, solution_list=solution_list)
         '''Selection'''
         # solution_list.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
-        solution_list.sort(key=lambda x: (x.constraints[0], x.objectives))
+        solution_list.sort(key=lambda x: x.objectives)
         # solution_list.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
         solution_list = solution_list[:sample_times * num_reads]
 
@@ -126,7 +127,8 @@ class HybridSolver:
         HybridSolver.SA(t_max=t_max, t_min=t_min, num_reads=num_reads, weight=weights,
                         time=t, problem=problem, solution_list=solution_list, alpha=alpha)
         '''Selection'''
-        solution_list.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
+        # solution_list.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
+        solution_list.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
         solution_list = solution_list[:num_reads]
 
         # put samples into result
@@ -204,19 +206,12 @@ class HybridSolver:
         return True
 
     @staticmethod
-    def NSGAII(populationSize: int, maxEvaluations: int, problem: QP, result_folder: str, problem_result: ProblemResult,
-               time: float, solution_list: List[BinarySolution], order: List[str]):
-        JarSolver.solve(
-            solver_name='NSGAII', config_name='tmp_config',
-            problem=problem.name, objectiveOrder=order, iterations=30,
-            populationSize=populationSize, maxEvaluations=maxEvaluations,
-            crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
-            resultFolder=result_folder, methodName='temp', exec_time=time
-        )
-        ea_result = MethodResult('temp', problem_result.path, problem)
-        ea_result.load(evaluate=False)
-        for result in ea_result.results:
-            solution_list += result.solution_list
+    def NSGAII(populationSize: int, maxEvaluations: int, problem: QP,
+               time: float, solution_list: List[BinarySolution]):
+        result = GASolver.solve(populationSize=populationSize, maxEvaluations=maxEvaluations, crossoverProbability=0.8,
+                                mutationProbability=(1 / problem.variables_num), seed=1,
+                                problem=problem, exec_time=time)
+        solution_list += result.solution_list
 
     @staticmethod
     def SA(t_max: float, t_min: float, num_reads: int, alpha: float,

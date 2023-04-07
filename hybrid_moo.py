@@ -6,7 +6,7 @@
 from nen import QP, ProblemResult, MethodResult
 from nen.Solver import HybridSolver
 
-names_FSP = ['Fiasco']
+names_FSP = ['eCos']
 # names_FSP = ['E-Shop', 'eCos', 'uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
@@ -23,8 +23,7 @@ for name in names_FSP:
     moqa_method_result = MethodResult('hymoo-{}'.format(name), problem_result.path, problem)
     for _ in range(1):
         result = HybridSolver.solve(problem=problem, num_reads=100, sample_times=10, sub_size=100,
-                                    maxEvaluations=200000, order=order_FSP, problem_result=problem_result,
-                                    result_folder=result_folder, annealing_time=30)
+                                    maxEvaluations=50000, annealing_time=20)
         moqa_method_result.add(result)
 
     # add result to method result, problem result
