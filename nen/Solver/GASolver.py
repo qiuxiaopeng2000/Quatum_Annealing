@@ -68,7 +68,7 @@ class GASolver:
                 val = list(sol.X.flatten())
                 values = problem.convert_to_BinarySolution(val)
                 solution = problem.evaluate(values)
-                result.add(solution)
+                result.wso_add(solution)
             if result.elapsed > exec_time:
                 break
         result.iterations = iterations
