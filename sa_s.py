@@ -24,7 +24,7 @@ for name in names_FSP:
     moqa_method_result = MethodResult('sa', problem_result.path, problem)
     for _ in range(30):
         result = SAQPSolver.solve(problem=problem, num_reads=30, weights=weight_FSP, if_embed=False,
-                                  t_max=100, t_min=1e-3, alpha=0.98)
+                                  t_max=100, t_min=1e-2, alpha=0.98)
         moqa_method_result.add(result)
 
     # add result to method result, problem result
@@ -40,7 +40,7 @@ for name in names_NRP:
     moqa_method_result = MethodResult('sa', problem_result.path, problem)
     for _ in range(30):
         result = SAQPSolver.solve(problem=problem, num_reads=30, weights=weight_NRP, if_embed=False,
-                                  t_max=100, t_min=1e-3, alpha=0.98)
+                                  t_max=100, t_min=1e-2, alpha=0.98)
         moqa_method_result.add(result)
 
     # add result to method result, problem result
