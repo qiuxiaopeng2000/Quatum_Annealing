@@ -1,12 +1,15 @@
 # Put this file at Nen/ (Project Root Path)
 import sys
 import os
+
+from nen.Solver import HybridSolver
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
-from nen.Solver.DwaveHybridSolver import HybridSolver
+
 from nen.Solver.GASolver import GASolver
 
 

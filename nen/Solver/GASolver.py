@@ -1,5 +1,5 @@
 from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.operators.crossover.pntx import TwoPointCrossover
+from pymoo.operators.crossover.pntx import TwoPointCrossover, SinglePointCrossover
 from pymoo.operators.mutation.bitflip import BitflipMutation
 from pymoo.operators.sampling.rnd import BinaryRandomSampling
 from pymoo.optimize import minimize
@@ -20,7 +20,7 @@ class GASolver:
     @staticmethod
     def solve(problem: Problem, populationSize: int, maxEvaluations: int,
               seed: int, crossoverProbability: float, mutationProbability: int,
-              verbose: bool = False, iterations: int = 1) -> Result:
+              verbose: bool = False, iterations: int = 1e6, exec_time: float = 1e6) -> Result:
         """
         seed : integer
             The random seed to be used.
@@ -54,10 +54,11 @@ class GASolver:
                     # n_offsprings=10,
                     sampling=BinaryRandomSampling(),
                     # crossover=SBX(prob=crossoverProbability, eta=15),
-                    crossover=TwoPointCrossover(),
+                    crossover=SinglePointCrossover(prob=crossoverProbability),
                     # mutation=PolynomialMutation(eta=20, prob=mutationProbability),
-                    mutation=BitflipMutation(),
-                    eliminate_duplicates=True)
+                    mutation=BitflipMutation(prob=mutationProbability),
+                    # eliminate_duplicates=True
+                    )
 
         for _ in range(iterations):
             res = minimize(pro, alg, termination, seed=seed, verbose=verbose, return_least_infeasible=True)
@@ -69,6 +70,8 @@ class GASolver:
                 values = problem.convert_to_BinarySolution(val)
                 solution = problem.evaluate(values)
                 result.add(solution)
+            if result.elapsed > exec_time:
+                break
         result.iterations = iterations
         result.total_num_anneals = populationSize * iterations
         print("Genetic Algorithm end!!!")
