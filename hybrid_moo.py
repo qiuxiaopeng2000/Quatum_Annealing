@@ -32,19 +32,18 @@ for name in names_FSP:
     # dump result to result/given_path folder
     problem_result.dump()
 
-# for name in names_NRP:
-#     result_folder = 'hymoo'.format(name)
-#     problem = QP(name, order_NRP)
-#     problem_result = ProblemResult(name, problem, result_folder)
-#     moqa_method_result = MethodResult('hymoo-{}'.format(name), problem_result.path, problem)
-#     for _ in range(1):
-#         result = HybridSolver.solve(problem=problem, num_reads=100, sample_times=10, sub_size=100, maxEvaluations=200000,
-#                                     order=order_NRP, problem_result=problem_result, result_folder=result_folder, annealing_time=30
-#                                     )
-#         moqa_method_result.add(result)
-#
-#     # add result to method result, problem result
-#     problem_result.add(moqa_method_result)
-#
-#     # dump result to result/given_path folder
-#     problem_result.dump()
+for name in names_NRP:
+    result_folder = 'hymoo'.format(name)
+    problem = QP(name, order_NRP)
+    problem_result = ProblemResult(name, problem, result_folder)
+    moqa_method_result = MethodResult('hymoo-{}'.format(name), problem_result.path, problem)
+    for _ in range(1):
+        result = HybridSolver.solve(problem=problem, num_reads=100, sample_times=10, sub_size=100,
+                                    maxEvaluations=200000, annealing_time=20)
+        moqa_method_result.add(result)
+
+    # add result to method result, problem result
+    problem_result.add(moqa_method_result)
+
+    # dump result to result/given_path folder
+    problem_result.dump()
