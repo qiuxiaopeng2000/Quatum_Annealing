@@ -451,7 +451,7 @@ class ProblemArchive:
         # pareto_count = self.on_pareto_count()
         # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
         # return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
-        return {k: v.all_solution_num / v.total_num_anneals for k, v in self.method_archives.items()}
+        return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
@@ -592,20 +592,41 @@ class ProblemResult:
         w = []
         for k, v in weights.items():
             w.append(v)
-        method1_objective = method1_result.get_wso_objective(w)
-        method2_objective = method2_result.get_wso_objective(w)
-        # N/A indicates ‘‘not applicable’’ which means that the corresponding
-        # algorithm could not statistically compare with itself in the rank-sum test
-        # N/A means itself for Wilcoxon’s ranksums p_value
-        statistic, pvalue = stats.ranksums(np.array(method1_objective)[:100], np.array(method2_objective)[:100], alternative=alternative)
-        statistics = {method1: statistic, method2: statistic}
-        pvalues = {method1: pvalue, method2: pvalue}
-        mean = {method1: np.mean(method1_objective), method2: np.mean(method2_objective)}
-        std = {method1: np.std(method1_objective), method2: np.std(method2_objective)}
-        max_num = {method1: np.max(method1_objective), method2: np.max(method2_objective)}
-        min_num = {method1: np.min(method1_objective), method2: np.min(method2_objective)}
-        elapsed = {method1: method1_result.method_result.elapsed / iteration1, method2: method2_result.method_result.elapsed / iteration2}
-        return elapsed, statistics, pvalues, mean, std, max_num, min_num
+
+        # calculate
+        elapsed: List[Dict[str, float]] = []
+        statistics: List[Dict[str, float]] = []
+        pvalues: List[Dict[str, float]] = []
+        mean: List[Dict[str, float]] = []
+        std: List[Dict[str, float]] = []
+        max_num: List[Dict[str, float]] = []
+        min_num: List[Dict[str, float]] = []
+        iteration = max(iteration1, iteration2)
+        for i in range(iteration):
+            index1 = i % iteration1
+            index2 = i % iteration2
+            method1_objective = method1_result.results[index1].get_wso_objective(w)
+            method2_objective = method2_result.results[index2].get_wso_objective(w)
+            # N/A indicates ‘‘not applicable’’ which means that the corresponding
+            # algorithm could not statistically compare with itself in the rank-sum test
+            # N/A means itself for Wilcoxon’s ranksums p_value
+            statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative=alternative)
+            statistics.append({method1: statistic, method2: statistic})
+            pvalues.append({method1: pvalue, method2: pvalue})
+            mean.append({method1: np.mean(method1_objective), method2: np.mean(method2_objective)})
+            std.append({method1: np.std(method1_objective), method2: np.std(method2_objective)})
+            max_num.append({method1: np.max(method1_objective), method2: np.max(method2_objective)})
+            min_num.append({method1: np.min(method1_objective), method2: np.min(method2_objective)})
+            elapsed.append({method1: method1_result.method_result.elapsed / iteration1, method2: method2_result.method_result.elapsed / iteration2})
+        scores = [
+            ProblemResult.average_of_dicts(elapsed),
+            ProblemResult.average_of_dicts(statistics),
+            ProblemResult.average_of_dicts(pvalues),
+            ProblemResult.average_of_dicts(mean),
+            ProblemResult.average_of_dicts(std),
+            ProblemResult.average_of_dicts(max_num),
+            ProblemResult.average_of_dicts(min_num)]
+        return scores
 
     def average_compare(self, union_method: str, average_method: str) -> List[Dict[str, float]]:
         """union_average_compare [summary] return union method compared with average method with scores indicated by

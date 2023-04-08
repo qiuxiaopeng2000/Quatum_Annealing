@@ -7,7 +7,7 @@ sys.path.append(rootPath)
 from nen import Problem, ProblemResult, MethodResult, Visualizer
 
 # names_FSP = ['ERS', 'WebPortal', 'Drupal']
-names_FSP = ['ERS', 'WebPortal']
+names_FSP = ['ERS', 'WebPortal', 'Drupal']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
@@ -28,9 +28,9 @@ for name in names_FSP:
     moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
     ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
-    ga_result.load(evaluate=True, single_flag=False)
+    ga_result.load()
     qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
-    qa_result.load(evaluate=True, single_flag=False)
+    qa_result.load()
 
     moqa_problem_result.add(ga_result)
     moqa_problem_result.add(qa_result)
@@ -54,9 +54,9 @@ for name in names_NRP:
     moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
     ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
-    ga_result.load(evaluate=True, single_flag=False)
+    ga_result.load()
     qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
-    qa_result.load(evaluate=True, single_flag=False)
+    qa_result.load()
 
     moqa_problem_result.add(ga_result)
     moqa_problem_result.add(qa_result)

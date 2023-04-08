@@ -18,13 +18,13 @@ weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 result_folder = 'sa'
 
 for name in names_FSP:
-    result_folder = 'sa-{}'.format(name)
+    # result_folder = 'sa_-{}'.format(name)
     problem = QP(name, order_FSP)
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('sa', problem_result.path, problem)
     for _ in range(30):
-        result = SAQPSolver.solve(problem=problem, num_reads=1000, weights=weight_FSP, if_embed=False,
-                                  t_max=100, t_min=1e-6, alpha=0.99)
+        result = SAQPSolver.solve(problem=problem, num_reads=30, weights=weight_FSP, if_embed=False,
+                                  t_max=100, t_min=1e-2, alpha=0.98)
         moqa_method_result.add(result)
 
     # add result to method result, problem result
@@ -34,13 +34,13 @@ for name in names_FSP:
     problem_result.dump()
 
 for name in names_NRP:
-    # result_folder = 'sa-{}'.format(name)
+    # result_folder = 'sa_-{}'.format(name)
     problem = QP(name, order_NRP)
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('sa', problem_result.path, problem)
     for _ in range(30):
-        result = SAQPSolver.solve(problem=problem, num_reads=1000, weights=weight_NRP, if_embed=False,
-                                  t_max=100, t_min=1e-6, alpha=0.99)
+        result = SAQPSolver.solve(problem=problem, num_reads=30, weights=weight_NRP, if_embed=False,
+                                  t_max=100, t_min=1e-2, alpha=0.98)
         moqa_method_result.add(result)
 
     # add result to method result, problem result

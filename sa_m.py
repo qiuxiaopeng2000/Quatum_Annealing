@@ -20,7 +20,7 @@ result_folder = 'sa_m'
 for name in names_FSP:
     problem = QP(name, order_FSP)
     problem_result = ProblemResult(name, problem, result_folder)
-    moqa_method_result = MethodResult('sa', problem_result.path, problem)
+    moqa_method_result = MethodResult('sa_', problem_result.path, problem)
     for _ in range(1):
         result = SAQPSolver.solve(problem=problem, num_reads=1000, weights=weight_FSP, if_embed=False,
                                   t_max=100, t_min=1e-3, alpha=0.9)
@@ -33,10 +33,10 @@ for name in names_FSP:
     problem_result.dump()
 
 for name in names_NRP:
-    # result_folder = 'sa-{}'.format(name)
+    # result_folder = 'sa_-{}'.format(name)
     problem = QP(name, order_NRP)
     problem_result = ProblemResult(name, problem, result_folder)
-    moqa_method_result = MethodResult('sa', problem_result.path, problem)
+    moqa_method_result = MethodResult('sa_', problem_result.path, problem)
     for _ in range(1):
         result = SAQPSolver.solve(problem=problem, num_reads=1000, weights=weight_NRP, if_embed=False,
                                   t_max=100, t_min=1e-3, alpha=0.9)

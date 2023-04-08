@@ -15,7 +15,7 @@ names_NRP = ['rp', 'ms', 'Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-result_folder_sa = 'sa_s'
+result_folder_sa = 'sa'
 result_folder_soqa = 'soqa'
 
 # compare SOQA with SA
@@ -49,7 +49,7 @@ for name in names_NRP:
     problem.vectorize(order_NRP)
 
     # prepare the problem result folder before solving
-    # result_folder = 'so-sa-{}'.format(name)
+    # result_folder = 'so-sa_-{}'.format(name)
     problem_result = ProblemResult(name, problem, result_folder_sa)
     problem_result_soqa = ProblemResult(name, problem, result_folder_soqa)
 

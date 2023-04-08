@@ -79,10 +79,10 @@ for name in names_NRP:
     problem.vectorize(order_NRP)
 
     # prepare the problem result folder before solving
-    result_folder = 'hy-sa-{}'.format(name)
+    result_folder = 'hy-sa_-{}'.format(name)
     problem_result = ProblemResult(name, problem, result_folder)
 
-    sa_result = MethodResult('sa', problem_result.path, problem)
+    sa_result = MethodResult('sa_', problem_result.path, problem)
     sa_result.load()
     hy_result = MethodResult('hybrid', problem_result.path, problem)
     hy_result.load()
@@ -91,12 +91,12 @@ for name in names_NRP:
     problem_result.add(hy_result)
 
     # compare
-    scores = problem_result.statistical_analysis(method1="hybrid", method2="sa", weights=weight_NRP)
+    scores = problem_result.statistical_analysis(method1="hybrid", method2="sa_", weights=weight_NRP)
     table = Visualizer.tabulate_single_problem(
-        name, ['hybrid', 'sa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+        name, ['hybrid', 'sa_'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
         scores, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
     )
-    Visualizer.tabluate(table, 'hybrid-sa-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table, 'hybrid-sa_-compare-{}.csv'.format(name))
 
 
 for name in names_FSP:
@@ -104,10 +104,10 @@ for name in names_FSP:
     problem.vectorize(order_FSP)
 
     # prepare the problem result folder before solving
-    result_folder = 'hy-sa-{}'.format(name)
+    result_folder = 'hy-sa_-{}'.format(name)
     problem_result = ProblemResult(name, problem, result_folder)
 
-    sa_result = MethodResult('sa', problem_result.path, problem)
+    sa_result = MethodResult('sa_', problem_result.path, problem)
     sa_result.load()
     hy_result = MethodResult('hybrid', problem_result.path, problem)
     hy_result.load()
@@ -116,10 +116,10 @@ for name in names_FSP:
     problem_result.add(hy_result)
 
     # compare
-    scores = problem_result.statistical_analysis(method1="hybrid", method2="sa", weights=weight_FSP)
+    scores = problem_result.statistical_analysis(method1="hybrid", method2="sa_", weights=weight_FSP)
     table = Visualizer.tabulate_single_problem(
-        name, ['hybrid', 'sa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+        name, ['hybrid', 'sa_'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
         scores, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
     )
-    Visualizer.tabluate(table, 'hybrid-sa-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table, 'hybrid-sa_-compare-{}.csv'.format(name))
 

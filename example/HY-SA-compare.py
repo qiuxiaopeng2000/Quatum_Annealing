@@ -25,7 +25,7 @@ for name in names:
     # solve with Genetic Algorithm
     result1 = FSAQPSolver.solve(problem=qp, weights=weights, t_max=100, t_min=0.0001, L=100,
                                 max_stay=50, num_reads=20)
-    sa_result = MethodResult('sa', problem_result.path, qp)
+    sa_result = MethodResult('sa_', problem_result.path, qp)
     sa_result.add(result1)
 
     # dump the results

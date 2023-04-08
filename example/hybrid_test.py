@@ -13,7 +13,7 @@ from nen.Solver.HybridSolver import HybridSolver
 
 name = 'ms'
 order = ['cost', 'revenue']
-result_folder = 'sa'
+result_folder = 'sa_'
 
 problem = Problem(name)
 problem.vectorize(order)
@@ -25,7 +25,7 @@ weights = {'cost': 1/2, 'revenue': 1/2}
 
 # solve with Genetic Algorithm
 result = HybridSolver.solve(problem=qp, sample_times=1, num_reads=5, seed=1, sub_size=10, maxEvaluations=100)
-sa_result = MethodResult('sa', problem_result.path, qp)
+sa_result = MethodResult('sa_', problem_result.path, qp)
 sa_result.add(result)
 
 # dump the results

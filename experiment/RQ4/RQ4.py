@@ -6,15 +6,18 @@ sys.path.append(rootPath)
 
 from nen import Problem, ProblemResult, MethodResult, Visualizer
 
-names_FSP = ['eCos', 'Freebsd', 'Fiasco']
+names_FSP = ['uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['classic-1', 'classic-2', 'classic-3']
+names_NRP = ['classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
 rates = [0.3, 0.5, 0.7]
+
+hymoo_result_folder = 'hymoo'
+hysoo_result_folder = 'hysoo'
 
 # compare CQHA with NSGA-II
 for name in names_NRP:
@@ -22,8 +25,8 @@ for name in names_NRP:
     problem.vectorize(order_NRP)
 
     # prepare the problem result folder before solving
-    hy_result_folder = 'HY-GA-{}'.format(name)
-    hy_problem_result = ProblemResult(name, problem, hy_result_folder)
+    # hy_result_folder = 'HY-GA-{}'.format(name)
+    hy_problem_result = ProblemResult(name, problem, hymoo_result_folder)
 
     hy_result = MethodResult('hybrid', hy_problem_result.path, problem)
     hy_result.load()
@@ -46,8 +49,8 @@ for name in names_FSP:
     problem.vectorize(order_FSP)
 
     # prepare the problem result folder before solving
-    hy_result_folder = 'HY-GA-{}'.format(name)
-    hy_problem_result = ProblemResult(name, problem, hy_result_folder)
+    # hy_result_folder = 'HY-GA-{}'.format(name)
+    hy_problem_result = ProblemResult(name, problem, hymoo_result_folder)
 
     hy_result = MethodResult('hybrid', hy_problem_result.path, problem)
     hy_result.load()
@@ -73,8 +76,8 @@ for name in names_NRP:
     problem.vectorize(order_NRP)
 
     # prepare the problem result folder before solving
-    result_folder = 'hy-sa-{}'.format(name)
-    problem_result = ProblemResult(name, problem, result_folder)
+    # result_folder = 'hy-sa_-{}'.format(name)
+    problem_result = ProblemResult(name, problem, hysoo_result_folder)
 
     hy_result = MethodResult('hybrid', problem_result.path, problem)
     hy_result.load()
@@ -100,8 +103,8 @@ for name in names_FSP:
     problem.vectorize(order_FSP)
 
     # prepare the problem result folder before solving
-    result_folder = 'hy-sa-{}'.format(name)
-    problem_result = ProblemResult(name, problem, result_folder)
+    # result_folder = 'hy-sa_-{}'.format(name)
+    problem_result = ProblemResult(name, problem, hysoo_result_folder)
 
     hy_result = MethodResult('hybrid', problem_result.path, problem)
     hy_result.load()
