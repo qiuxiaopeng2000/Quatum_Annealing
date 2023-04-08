@@ -195,8 +195,9 @@ class HybridSolver:
                     if var not in problem.variables:
                         continue
                     values_array[var].append(subsample[0][var_index[var]])
-        if len(values_array) != problem.variables_num:
-            return False
+        for var in problem.variables:
+            if len(values_array[var]) == 0:
+                values_array[var] += [0.0 for _ in range(len(subsamplesets[0].record))]
         pos = 0
         while pos < num_reads:
             values = {var: bool(values_array[var][pos]) for var in problem.variables}
