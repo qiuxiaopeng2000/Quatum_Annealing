@@ -39,8 +39,8 @@ for name in names_NRP:
     for rate in rates:
         scores_hy = hy_problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
         table_hy = Visualizer.tabulate_single_problem(
-            name, ['hybrid', 'hybrid{}'.format(rate)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-            scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+            name, ['hybrid', 'hybrid{}'.format(rate)], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+            scores_hy, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
         )
         Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
 
@@ -63,64 +63,64 @@ for name in names_FSP:
     for rate in rates:
         scores_hy = hy_problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
         table_hy = Visualizer.tabulate_single_problem(
-            name, ['hybrid', 'hybrid{}'.format(rate)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-            scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+            name, ['hybrid', 'hybrid{}'.format(rate)], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+            scores_hy, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
         )
         Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
 
 '''++++++++++++++++++++++++++++++++++++++++++++++'''
 
 # compare Hybrid with SA
-for name in names_NRP:
-    problem = Problem(name)
-    problem.vectorize(order_NRP)
+# for name in names_NRP:
+#     problem = Problem(name)
+#     problem.vectorize(order_NRP)
 
-    # prepare the problem result folder before solving
-    # result_folder = 'hy-sa_-{}'.format(name)
-    problem_result = ProblemResult(name, problem, hysoo_result_folder)
+#     # prepare the problem result folder before solving
+#     # result_folder = 'hy-sa_-{}'.format(name)
+#     problem_result = ProblemResult(name, problem, hysoo_result_folder)
 
-    hy_result = MethodResult('hybrid', problem_result.path, problem)
-    hy_result.load()
-    for rate in rates:
-        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-        hy_result.load()
-        problem_result.add(hy_result)
+#     hy_result = MethodResult('hybrid', problem_result.path, problem)
+#     hy_result.load()
+#     for rate in rates:
+#         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
+#         hy_result.load()
+#         problem_result.add(hy_result)
 
-    problem_result.add(hy_result)
+#     problem_result.add(hy_result)
 
-    # compare
-    for rate in rates:
-        scores_hy = problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
-        table_hy = Visualizer.tabulate_single_problem(
-            name, ['hybrid', 'hybrid{}'.format(rate)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-            scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
-        )
-        Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
+#     # compare
+#     for rate in rates:
+#         scores_hy = problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
+#         table_hy = Visualizer.tabulate_single_problem(
+#             name, ['hybrid', 'hybrid{}'.format(rate)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+#             scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+#         )
+#         Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
 
 
-for name in names_FSP:
-    problem = Problem(name)
-    problem.vectorize(order_FSP)
+# for name in names_FSP:
+#     problem = Problem(name)
+#     problem.vectorize(order_FSP)
 
-    # prepare the problem result folder before solving
-    # result_folder = 'hy-sa_-{}'.format(name)
-    problem_result = ProblemResult(name, problem, hysoo_result_folder)
+#     # prepare the problem result folder before solving
+#     # result_folder = 'hy-sa_-{}'.format(name)
+#     problem_result = ProblemResult(name, problem, hysoo_result_folder)
 
-    hy_result = MethodResult('hybrid', problem_result.path, problem)
-    hy_result.load()
-    for rate in rates:
-        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-        hy_result.load()
-        problem_result.add(hy_result)
+#     hy_result = MethodResult('hybrid', problem_result.path, problem)
+#     hy_result.load()
+#     for rate in rates:
+#         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
+#         hy_result.load()
+#         problem_result.add(hy_result)
 
-    problem_result.add(hy_result)
+#     problem_result.add(hy_result)
 
-    # compare
-    for rate in rates:
-        scores_hy = problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
-        table_hy = Visualizer.tabulate_single_problem(
-            name, ['hybrid', 'hybrid{}'.format(rate)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-            scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
-        )
-        Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
+#     # compare
+#     for rate in rates:
+#         scores_hy = problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
+#         table_hy = Visualizer.tabulate_single_problem(
+#             name, ['hybrid', 'hybrid{}'.format(rate)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+#             scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+#         )
+#         Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
 

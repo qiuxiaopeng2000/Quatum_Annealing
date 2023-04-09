@@ -67,7 +67,7 @@ class HybridSolver:
             elapseds.append(t)
         '''NSGA-II'''
         HybridSolver.NSGAII(populationSize=num_reads * sample_times, maxEvaluations=maxEvaluations, problem=problem,
-                            time=t, solution_list=solution_list)
+                            time=e2-s1, solution_list=solution_list)
         '''Selection'''
         # solution_list.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
         solution_list.sort(key=lambda x: x.objectives)
@@ -125,10 +125,12 @@ class HybridSolver:
         '''SA'''
         t = e1 - s1 + e2 - s2 + runtime
         HybridSolver.SA(t_max=t_max, t_min=t_min, num_reads=num_reads, weight=weights,
-                        time=t, problem=problem, solution_list=solution_list, alpha=alpha)
+                        time=e2-s1, problem=problem, solution_list=solution_list, alpha=alpha)
         '''Selection'''
         # solution_list.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
-        solution_ = solution_list
+        # solution_ = []
+        # solution_ += solution_list
+        # solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
         solution_list.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
         solution_list = solution_list[:num_reads]
 
@@ -213,12 +215,14 @@ class HybridSolver:
         result = GASolver.solve(populationSize=populationSize, maxEvaluations=maxEvaluations, crossoverProbability=0.8,
                                 mutationProbability=(1 / problem.variables_num), seed=1,
                                 problem=problem, exec_time=time)
-        solution_list += result.solution_list
+        for solution in result.solution_list:
+            solution_list.append(solution)
 
     @staticmethod
     def SA(t_max: float, t_min: float, num_reads: int, alpha: float,
            time: float, problem: QP, solution_list: List[BinarySolution], weight: Dict[str, float]):
         result = SAQPSolver.solve(problem=problem, num_reads=num_reads, weights=weight, if_embed=False,
                                   t_max=t_max, t_min=t_min, alpha=alpha, exec_time=time)
-        solution_list += result.solution_list
+        for solution in result.solution_list:
+            solution_list.append(solution)
 
