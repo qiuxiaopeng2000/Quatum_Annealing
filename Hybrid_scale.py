@@ -62,23 +62,41 @@ for name in names_FSP:
 '''++++++++++++++++++++++++++++++++++++++++++++++++++++'''
 
 # compare Hybrid with SA
+# for name in names_NRP:
+#     for rate in rates:
+#         problem = QP(name, order_NRP)
+
+#         # prepare the problem result folder before solving
+#         problem_result = ProblemResult(name, problem, hysoo_result_folder)
+
+#         # solve with cplex
+#         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
+#         for _ in range(15):
+#             result = HybridSolver.single_solve(problem=problem, weights=weight_NRP, num_reads=30, t_max=100,
+#                                                t_min=1e-3, sub_size=100, rate=rate, alpha=0.98)
+#             hy_result.add(result)
+
+#         # dump the results
+#         problem_result.add(hy_result)
+#         problem_result.dump()
+
 for name in names_NRP:
-    for rate in rates:
-        problem = QP(name, order_NRP)
+    rate = 0.7
+    problem = QP(name, order_NRP)
 
-        # prepare the problem result folder before solving
-        problem_result = ProblemResult(name, problem, hysoo_result_folder)
+    # prepare the problem result folder before solving
+    problem_result = ProblemResult(name, problem, hysoo_result_folder)
 
-        # solve with cplex
-        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-        for _ in range(15):
-            result = HybridSolver.single_solve(problem=problem, weights=weight_NRP, num_reads=30, t_max=100,
-                                               t_min=1e-3, sub_size=100, rate=rate, alpha=0.98)
-            hy_result.add(result)
+    # solve with cplex
+    hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
+    for _ in range(15):
+        result = HybridSolver.single_solve(problem=problem, weights=weight_NRP, num_reads=30, t_max=100,
+                                            t_min=1e-3, sub_size=100, rate=rate, alpha=0.98)
+        hy_result.add(result)
 
-        # dump the results
-        problem_result.add(hy_result)
-        problem_result.dump()
+    # dump the results
+    problem_result.add(hy_result)
+    problem_result.dump()
 
 
 for name in names_FSP:
