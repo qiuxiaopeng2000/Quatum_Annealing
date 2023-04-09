@@ -43,6 +43,8 @@ for name in names_NRP:
 
 for name in names_FSP:
     for rate in rates:
+        if rate == 0.7:
+            continue
         problem = QP(name, order_FSP)
 
         # prepare the problem result folder before solving
