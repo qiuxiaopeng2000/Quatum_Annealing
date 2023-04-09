@@ -4,7 +4,10 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
-from nen import Problem, ProblemResult, MethodResult, Visualizer
+from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
+from nen.Solver.HybridSolver import HybridSolver
+from nen.Solver.GASolver import GASolver
+
 
 names_FSP = ['uClinux', 'LinuxX86']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
@@ -14,7 +17,7 @@ names_NRP = ['classic-4', 'classic-5']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-subsizes = [100, 500, 100]
+subsizes = [100, 500, 700]
 
 # compare CQHA with NSGA-II
 for name in names_NRP:
