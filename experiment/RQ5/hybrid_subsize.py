@@ -81,11 +81,10 @@ for name in names_NRP:
         # prepare the problem result folder before solving
         problem_result = ProblemResult(name, problem, hysoo_result_folder)
         qp = QP(name, order)
-        lp = LP(name, order)
 
         # solve with cplex
         hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, qp)
-        for _ in range(15):
+        for _ in range(6):
             result = HybridSolver.single_solve(problem=qp, weights=weight_NRP, num_reads=30, t_max=100,
                                                t_min=1e-3, sub_size=size, alpha=0.98)
             hy_result.add(result)
@@ -108,9 +107,9 @@ for name in names_FSP:
 
         # solve with cplex
         hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, qp)
-        for _ in range(15):
-            result = HybridSolver.single_solve(problem=qp, weights=weight_FSP, num_reads=30, sub_size=size,
-                                               t_max=100,  t_min=0.0001, alpha=0.98)
+        for _ in range(6):
+            result = HybridSolver.single_solve(problem=qp, weights=weight_FSP, num_reads=30, t_max=100,
+                                               t_min=1e-3, sub_size=size, alpha=0.98)
             hy_result.add(result)
 
         # dump the results

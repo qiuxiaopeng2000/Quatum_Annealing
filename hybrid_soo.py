@@ -37,7 +37,7 @@ for name in names_FSP:
     problem = QP(name, order_FSP)
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('hysoo', problem_result.path, problem)
-    for i in range(9):
+    for i in range(6):
         result = HybridSolver.single_solve(problem=problem, num_reads=30, weights=weight_FSP, sub_size=100,
                                            t_max=100, t_min=1e-3, alpha=0.98)
         print(i)
