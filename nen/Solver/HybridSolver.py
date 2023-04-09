@@ -128,6 +128,7 @@ class HybridSolver:
                         time=t, problem=problem, solution_list=solution_list, alpha=alpha)
         '''Selection'''
         # solution_list.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
+        solution_ = solution_list
         solution_list.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
         solution_list = solution_list[:num_reads]
 
