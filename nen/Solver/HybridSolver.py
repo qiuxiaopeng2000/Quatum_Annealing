@@ -113,14 +113,15 @@ class HybridSolver:
         '''Decomposer'''
         s1 = SolverUtil.time()
         states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables)
-        e1 = SolverUtil.time()
-        '''Sampler'''
         length = int(len(states) * rate)
         states = states[:length]
+        e1 = SolverUtil.time()
+        '''Sampler'''
         subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads, **parameters)
         '''Composer'''
         s2 = SolverUtil.time()
-        HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads, solution_list=solution_list)
+        HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads, 
+                              solution_list=solution_list)
         e2 = SolverUtil.time()
         '''SA'''
         t = e1 - s1 + e2 - s2 + runtime
@@ -131,7 +132,11 @@ class HybridSolver:
         # solution_ = []
         # solution_ += solution_list
         # solution_.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
-        solution_list.sort(key=lambda x: np.dot(x.objectives, list(weights.values())))
+        # solution_list.sort(key=lambda x: x.objectives[1] if x.objectives[1] < 0 else x.objectives)
+        w = []
+        for k, v in weights.items():
+            w.append(v)
+        solution_list.sort(key=lambda x: sum(x.objectives[i] * w[i] for i in range(len(weights))))
         solution_list = solution_list[:num_reads]
 
         # put samples into result

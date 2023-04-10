@@ -61,8 +61,7 @@ class SASampler(EmbeddingSampler):
                 d = SASampler.fitness(sn, H) - SASampler.fitness(s, H)
                 if (d <= 0) or (random.random() < exp((-d) / t)):
                     s = sn
-                if len(b) == 0 or SASampler.fitness(s, H) < SASampler.fitness(b, H) \
-                        or problem.evaluate(s).constraints[0] < problem.evaluate(b).constraints[0]:
+                if len(b) == 0 or SASampler.fitness(s, H) < SASampler.fitness(b, H):
                     b = s
                     stay_counter = 0
                 else:
@@ -95,7 +94,8 @@ class SASampler(EmbeddingSampler):
             return False
 
     def embed_sample(self, H: Quadratic, variables: List[str], num_reads: int,
-                     t_max: float, t_min: float, alpha: float
+                     t_max: float, t_min: float, alpha: float, exec_time: float,
+                     problem: QP
                      ) -> Tuple[List[Dict[str, bool]], float]:
         """embed_sample [summary] embed in a Quantum Annealing way and then sample.
         """
@@ -117,7 +117,8 @@ class SASampler(EmbeddingSampler):
 
         # sample
         embeded_values_list, elapsed = \
-            self.sample_hamiltonian(embedded_H, list(embedded_variables), num_reads, t_max, t_min, alpha)
+            self.sample_hamiltonian(embedded_H, list(embedded_variables), num_reads, t_max, t_min,
+                                    alpha, exec_time, problem)
 
         # unembed values
         values_list: List[Dict[str, bool]] = []
@@ -138,7 +139,7 @@ class SASampler(EmbeddingSampler):
                   ) -> Tuple[List[Dict[str, bool]], float]:
         random.seed(datetime.now())
         if if_embed:
-            return self.embed_sample(H, variables, num_reads, t_max, t_min, alpha)
+            return self.embed_sample(H, variables, num_reads, t_max, t_min, alpha, exec_time, problem)
         else:
             return self.sample_hamiltonian(H, variables, num_reads, t_max, t_min, alpha, exec_time, problem)
 
