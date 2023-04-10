@@ -6,7 +6,7 @@
 from nen import QP, ProblemResult, MethodResult
 from nen.Solver import HybridSolver
 
-names_FSP = ['eCos', 'uClinux']
+names_FSP = ['uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
@@ -40,7 +40,7 @@ for name in names_FSP:
     for i in range(6):
         result = HybridSolver.single_solve(problem=problem, num_reads=30, weights=weight_FSP, sub_size=100,
                                            t_max=100, t_min=1e-3, alpha=0.98)
-        print(i)
+        print(i + 1)
         moqa_method_result.add(result)
 
     # add result to method result, problem result

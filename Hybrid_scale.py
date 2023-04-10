@@ -107,7 +107,7 @@ for name in names_NRP:
 
     # solve with cplex
     hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-    for _ in range(9):
+    for _ in range(6):
         result = HybridSolver.single_solve(problem=problem, weights=weight_NRP, num_reads=30, t_max=100,
                                             t_min=1e-3, sub_size=100, rate=rate, alpha=0.98)
         hy_result.add(result)
@@ -126,7 +126,7 @@ for name in names_FSP:
 
         # solve with cplex
         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-        for _ in range(9):
+        for _ in range(6):
             result = HybridSolver.single_solve(problem=problem, weights=weight_FSP, num_reads=30, sub_size=100,
                                                t_max=100,  t_min=1e-3, rate=rate, alpha=0.98)
             hy_result.add(result)
