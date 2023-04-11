@@ -28,8 +28,9 @@ for name in names_NRP:
     # hy_result_folder = 'HY-GA-{}'.format(name)
     hy_problem_result = ProblemResult(name, problem, hymoo_result_folder)
 
-    hy_result = MethodResult('hybrid', hy_problem_result.path, problem)
+    hy_result = MethodResult('hymoo', hy_problem_result.path, problem)
     hy_result.load()
+    hy_problem_result.add(hy_result)
     for rate in rates:
         hy_result = MethodResult('hybrid{}'.format(rate), hy_problem_result.path, problem)
         hy_result.load()
@@ -37,9 +38,9 @@ for name in names_NRP:
 
     # compare
     for rate in rates:
-        scores_hy = hy_problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
+        scores_hy = hy_problem_result.average_compare(union_method='hymoo', average_method='hybrid{}'.format(rate))
         table_hy = Visualizer.tabulate_single_problem(
-            name, ['hybrid', 'hybrid{}'.format(rate)], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+            name, ['hymoo', 'hybrid{}'.format(rate)], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
             scores_hy, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
         )
         Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
@@ -52,8 +53,9 @@ for name in names_FSP:
     # hy_result_folder = 'HY-GA-{}'.format(name)
     hy_problem_result = ProblemResult(name, problem, hymoo_result_folder)
 
-    hy_result = MethodResult('hybrid', hy_problem_result.path, problem)
+    hy_result = MethodResult('hymoo', hy_problem_result.path, problem)
     hy_result.load()
+    hy_problem_result.add(hy_result)
     for rate in rates:
         hy_result = MethodResult('hybrid{}'.format(rate), hy_problem_result.path, problem)
         hy_result.load()
@@ -61,9 +63,9 @@ for name in names_FSP:
 
     # compare
     for rate in rates:
-        scores_hy = hy_problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
+        scores_hy = hy_problem_result.average_compare(union_method='hymoo', average_method='hybrid{}'.format(rate))
         table_hy = Visualizer.tabulate_single_problem(
-            name, ['hybrid', 'hybrid{}'.format(rate)], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+            name, ['hymoo', 'hybrid{}'.format(rate)], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
             scores_hy, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
         )
         Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))

@@ -367,6 +367,7 @@ def load_xuan(name):
         for _ in range(dependencies_num):
             dependency = [x for x in nrp_file.readline().strip().split(' ') if x != '']
             assert len(dependency) == 2
+            # problem.constraints.append(['r{}'.format(dependency[1]), '=>', 'r{}'.format(dependency[0])])
             problem.constraints.append(['r{}'.format(dependency[1]), '=>', 'r{}'.format(dependency[0])])
         assert dependencies_num == len(problem.constraints)
         # read customers
@@ -440,11 +441,11 @@ def load_Baan():
 
 
 if __name__ == '__main__':
-    # FSP
-    fsp_problems = ['Freebsd', 'Fiasco']
-    for fsp_name in fsp_problems:
-        problem = load_fsp_new(fsp_name)
-        problem.dump(fsp_name)
+    # # FSP
+    # fsp_problems = ['Freebsd', 'Fiasco']
+    # for fsp_name in fsp_problems:
+    #     problem = load_fsp_new(fsp_name)
+    #     problem.dump(fsp_name)
     # # NRP: rp
     # rp_problems = ['ms', 'rp']
     # for rp_name in rp_problems:
@@ -455,15 +456,15 @@ if __name__ == '__main__':
     # for tsm_name in tsm_problems:
     #     problem = load_tsm(tsm_name)
     #     problem.dump(tsm_name)
-    # # NRP: Xuan
-    # xuan = ['classic-1', 'classic-2', 'classic-3', 'classic-4', 'classic-5',
-    #         'realistic-e1', 'realistic-e2', 'realistic-e3', 'realistic-e4',
-    #         'realistic-g1', 'realistic-g2', 'realistic-g3', 'realistic-g4',
-    #         'realistic-m1', 'realistic-m2', 'realistic-m3', 'realistic-m4'
-    #         ]
-    # for xuan_name in xuan:
-    #     problem = load_xuan(xuan_name)
-    #     problem.dump(xuan_name)
-    # # NRP: Baan
-    # problem = load_Baan()
-    # problem.dump('Baan')
+    # NRP: Xuan
+    xuan = ['classic-1', 'classic-2', 'classic-3', 'classic-4', 'classic-5',
+            'realistic-e1', 'realistic-e2', 'realistic-e3', 'realistic-e4',
+            'realistic-g1', 'realistic-g2', 'realistic-g3', 'realistic-g4',
+            'realistic-m1', 'realistic-m2', 'realistic-m3', 'realistic-m4'
+            ]
+    for xuan_name in xuan:
+        problem = load_xuan(xuan_name)
+        problem.dump(xuan_name)
+    # NRP: Baan
+    problem = load_Baan()
+    problem.dump('Baan')

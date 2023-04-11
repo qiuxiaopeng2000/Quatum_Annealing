@@ -7,7 +7,7 @@ from dimod import BinaryQuadraticModel
 from hybrid import State, min_sample, EnergyImpactDecomposer
 from jmetal.core.solution import BinarySolution
 
-from nen.Solver import MOQASolver, JarSolver
+from nen.Solver import MOQASolver, JarSolver, SASolver, QAWSOSolver
 from nen.Solver.GASolver import GASolver
 from nen.Solver.SAQPSolver import SAQPSolver
 from nen.Term import Constraint, Quadratic
@@ -15,6 +15,7 @@ from nen.Problem import QP
 from nen.Result import Result, MethodResult, ProblemResult
 from nen.Solver.MetaSolver import SolverUtil
 from nen.Solver.EmbeddingSampler import EmbeddingSampler, SampleSet
+from dwave.system import DWaveSampler
 
 
 class HybridSolver:
@@ -124,6 +125,7 @@ class HybridSolver:
                               solution_list=solution_list)
         e2 = SolverUtil.time()
         '''SA'''
+        # x0 = QAWSOSolver.best_solution(solution_list, problem, weights)
         t = e1 - s1 + e2 - s2 + runtime
         HybridSolver.SA(t_max=t_max, t_min=t_min, num_reads=num_reads, weight=weights,
                         time=e2-s1, problem=problem, solution_list=solution_list, alpha=alpha)
@@ -136,7 +138,7 @@ class HybridSolver:
         w = []
         for k, v in weights.items():
             w.append(v)
-        solution_list.sort(key=lambda x: sum(x.objectives[i] * w[i] for i in range(len(weights))))
+        solution_list.sort(key=lambda x: sum([x.objectives[i] * w[i] for i in range(problem.objectives_num)]))
         solution_list = solution_list[:num_reads]
 
         # put samples into result
@@ -197,7 +199,7 @@ class HybridSolver:
                 if var not in problem.variables:
                     continue
                 var_index[var] = subsampleset.variables.index(var)
-            assert len(subsampleset.record) == num_reads
+            # assert len(subsampleset.record) == num_reads
             for subsample in subsampleset.record:
                 for var in subsampleset.variables:
                     if var not in problem.variables:
@@ -226,8 +228,8 @@ class HybridSolver:
     @staticmethod
     def SA(t_max: float, t_min: float, num_reads: int, alpha: float,
            time: float, problem: QP, solution_list: List[BinarySolution], weight: Dict[str, float]):
-        result = SAQPSolver.solve(problem=problem, num_reads=num_reads, weights=weight, if_embed=False,
-                                  t_max=t_max, t_min=t_min, alpha=alpha, exec_time=time)
+        result = SASolver.solve(problem=problem, num_reads=num_reads, weights=weight,
+                                t_max=t_max, t_min=t_min, alpha=alpha, exec_time=time)
         for solution in result.solution_list:
             solution_list.append(solution)
 

@@ -63,6 +63,9 @@ class NDArchive:
         assert len(solution.objectives) == self.objectives_num
         # round objectives with NDArchive.ROUND_PRECISION
         solution.objectives = [round(x, NDArchive.ROUND_PRECISION) for x in solution.objectives]
+        # for i in range(len(solution.objectives)):
+        #     if solution.objectives[i] > 0:
+        #         solution.objectives[i] /= 10
         self.solution_list.append(solution)
         return True
 
@@ -142,6 +145,7 @@ class Result(NDArchive):
             assert len(solution.objectives) == len(weights)
             obj = 0.0
             for i in range(solution.number_of_objectives):
+                
                 obj += (solution.objectives[i] * weights[i])
             objective.append(obj)
         return objective
@@ -265,7 +269,7 @@ class MethodResult:
                 for solution in solutions:
                     var_file.write(NDArchive.bool_list_to_str(solution.variables[0]) + '\n')
 
-    def load_result(self, index: int, evaluate: bool, single_flag: bool = False) -> None:
+    def load_result(self, index: int, evaluate: bool = False, single_flag: bool = False) -> None:
         """load_result [summary] load the result with archive (objectives and variables) from files (.obj and .var).
         It would involve problem information, thus need a problem.
 
@@ -666,6 +670,52 @@ class ProblemResult:
                             average_method: average_method_result.results[index2].elapsed})
             found.append({union_method: len(union_method_result.results[index1].solution_list),
                           average_method: len(average_method_result.results[index2].solution_list)})
+            front_all.append({k: float(v) for k, v in problem_archive.on_pareto_count().items()})
+            igd_all.append(problem_archive.compute_igd())
+            hv_all.append(problem_archive.compute_hv())
+            sp_all.append(problem_archive.compute_sp())
+            tts_all.append(problem_archive.compute_tts())
+        # collect scores
+        scores = [ProblemResult.average_of_dicts(elapsed),
+                  ProblemResult.average_of_dicts(found),
+                  ProblemResult.average_of_dicts(front_all),
+                  ProblemResult.average_of_dicts(igd_all),
+                  ProblemResult.average_of_dicts(hv_all),
+                  ProblemResult.average_of_dicts(sp_all),
+                  ProblemResult.average_of_dicts(tts_all)]
+        return scores
+    
+    def average_list_compare(self, methods: List[str]) -> List[Dict[str, float]]:
+        """union_average_compare [summary] return union method compared with average method with scores indicated by
+        [elapsed time, found, front, igd, hv, spacing].
+        """
+        # prepare result
+        method_results = []
+        iteration = 0
+        for method in methods:
+            assert method in self.methods_results
+            method_result = self.methods_results[method].make_method_result(single_flag=False)
+            method_results.append({method: method_result})
+            iteration = max(iteration, self.methods_results[method].iteration)
+
+        # compare
+        elapsed: List[Dict[str, float]] = []
+        found: List[Dict[str, float]] = []
+        front_all: List[Dict[str, float]] = []
+        igd_all: List[Dict[str, float]] = []
+        hv_all: List[Dict[str, float]] = []
+        sp_all: List[Dict[str, float]] = []
+        tts_all: List[Dict[str, float]] = []
+
+        for i in range(iteration):
+            problem_archive = \
+                ProblemArchive(self.problem, 
+                               {method: self.methods_results[method].results[i % self.methods_results[method].iteration] \
+                                 for method in methods})
+            elapsed.append({method: self.methods_results[method].results[i % self.methods_results[method].iteration].elapsed \
+                                 for method in methods})
+            found.append({method: len(self.methods_results[method].results[i % self.methods_results[method].iteration].solution_list) \
+                                 for method in methods})
             front_all.append({k: float(v) for k, v in problem_archive.on_pareto_count().items()})
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())

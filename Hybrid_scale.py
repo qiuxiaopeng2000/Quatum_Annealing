@@ -17,65 +17,47 @@ names_FSP = ['uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-rates = [0.3, 0.5, 0.7]
+rates = [0.9]
 
 hymoo_result_folder = 'hymoo'
 hysoo_result_folder = 'hysoo'
 
-# for name in names_NRP:
-#     for rate in rates:
-#         problem = QP(name, order_NRP)
+for name in names_NRP:
+    for rate in rates:
+        problem = QP(name, order_NRP)
 
-#         # prepare the problem result folder before solving
-#         problem_result = ProblemResult(name, problem, hymoo_result_folder)
+        # prepare the problem result folder before solving
+        problem_result = ProblemResult(name, problem, hymoo_result_folder)
 
-#         # solve with cplex
-#         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-#         for _ in range(3):
-#             result = HybridSolver.solve(problem=problem, num_reads=100, sample_times=10, sub_size=100,
-#                                         maxEvaluations=20000, annealing_time=20, rate=rate)
-#             hy_result.add(result)
+        # solve with cplex
+        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
+        for _ in range(3):
+            result = HybridSolver.solve(problem=problem, num_reads=100, sample_times=10, sub_size=100,
+                                        maxEvaluations=20000, annealing_time=20, rate=rate)
+            hy_result.add(result)
 
-#         # dump the results
-#         problem_result.add(hy_result)
-#         problem_result.dump()
+        # dump the results
+        problem_result.add(hy_result)
+        problem_result.dump()
 
-
-# for name in names_FSP:
-#     for rate in rates:
-#         problem = QP(name, order_FSP)
-
-#         # prepare the problem result folder before solving
-#         problem_result = ProblemResult(name, problem, hymoo_result_folder)
-
-#         # solve with cplex
-#         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-#         for _ in range(3):
-#             result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, sub_size=100,
-#                                         maxEvaluations=50000, annealing_time=20, rate=rate)
-#             hy_result.add(result)
-
-#         # dump the results
-#         problem_result.add(hy_result)
-#         problem_result.dump()
 
 for name in names_FSP:
-    rate = 0.5
-    problem = QP(name, order_FSP)
+    for rate in rates:
+        problem = QP(name, order_FSP)
 
-    # prepare the problem result folder before solving
-    problem_result = ProblemResult(name, problem, hymoo_result_folder)
+        # prepare the problem result folder before solving
+        problem_result = ProblemResult(name, problem, hymoo_result_folder)
 
-    # solve with cplex
-    hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-    for _ in range(3):
-        result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, sub_size=100,
-                                    maxEvaluations=50000, annealing_time=20, rate=rate)
-        hy_result.add(result)
+        # solve with cplex
+        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
+        for _ in range(3):
+            result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, sub_size=100,
+                                        maxEvaluations=50000, annealing_time=20, rate=rate)
+            hy_result.add(result)
 
-    # dump the results
-    problem_result.add(hy_result)
-    problem_result.dump()
+        # dump the results
+        problem_result.add(hy_result)
+        problem_result.dump()
 
 '''++++++++++++++++++++++++++++++++++++++++++++++++++++'''
 
@@ -99,7 +81,7 @@ for name in names_FSP:
 #         problem_result.dump()
 
 for name in names_NRP:
-    rate = 0.7
+    rate = 0.9
     problem = QP(name, order_NRP)
 
     # prepare the problem result folder before solving

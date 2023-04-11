@@ -15,7 +15,7 @@
 97
 ^ Number of dependencies
 1 85
-^ Id of RequirementA1	Id of RequirementB1 
+^ Id of RequirementA1	Id of RequirementB1
 2 98
 ^ Id of RequirementA2	Id of RequirementB2
 2 37

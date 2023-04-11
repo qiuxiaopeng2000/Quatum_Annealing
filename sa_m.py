@@ -5,7 +5,7 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 from nen import QP, ProblemResult, MethodResult
-from nen.Solver import SAQPSolver
+from nen.Solver import SAQPSolver, SASolver
 
 names_FSP = ['E-Shop', 'Fiasco', 'uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
@@ -17,29 +17,29 @@ weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
 result_folder = 'sa_m'
 
-for name in names_FSP:
-    problem = QP(name, order_FSP)
-    problem_result = ProblemResult(name, problem, result_folder)
-    moqa_method_result = MethodResult('sa_', problem_result.path, problem)
-    for _ in range(1):
-        result = SAQPSolver.solve(problem=problem, num_reads=1000, weights=weight_FSP, if_embed=False,
-                                  t_max=100, t_min=1e-3, alpha=0.9)
-        moqa_method_result.add(result)
+# for name in names_FSP:
+#     problem = QP(name, order_FSP)
+#     problem_result = ProblemResult(name, problem, result_folder)
+#     moqa_method_result = MethodResult('sa_', problem_result.path, problem)
+#     for _ in range(1):
+#         result = SAQPSolver.solve(problem=problem, num_reads=1000, weights=weight_FSP, if_embed=False,
+#                                   t_max=100, t_min=1e-3, alpha=0.9)
+#         moqa_method_result.add(result)
 
-    # add result to method result, problem result
-    problem_result.add(moqa_method_result)
+#     # add result to method result, problem result
+#     problem_result.add(moqa_method_result)
 
-    # dump result to result/given_path folder
-    problem_result.dump()
+#     # dump result to result/given_path folder
+#     problem_result.dump()
 
 for name in names_NRP:
     # result_folder = 'sa_-{}'.format(name)
     problem = QP(name, order_NRP)
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('sa_', problem_result.path, problem)
-    for _ in range(1):
-        result = SAQPSolver.solve(problem=problem, num_reads=1000, weights=weight_NRP, if_embed=False,
-                                  t_max=100, t_min=1e-3, alpha=0.9)
+    for _ in range(3):
+        result = SASolver.solve(problem=problem, weights=weight_NRP, num_reads=30,
+                                t_max=100, t_min=1e-2, alpha=0.98)
         moqa_method_result.add(result)
 
     # add result to method result, problem result

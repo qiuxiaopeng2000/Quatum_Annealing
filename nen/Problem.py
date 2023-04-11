@@ -46,7 +46,9 @@ class Problem:
         self.objectives = dp.objectives
         for k, v in dp.objectives.items():
             for var in dp.variables:
-                self.objectives[k][var] = v[var] if var in v else 0.0
+                self.objectives[k][var] = v[var]  if var in v else 0.0
+                # if v[var] > 0:
+                #     self.objectives[k][var] *= 10
 
         for constraint_str_list in dp.constraints:
             assert len(constraint_str_list) == 3
@@ -145,7 +147,7 @@ class Problem:
         for obj_name, obj_index in self.objectives_index.items():
             for var, coef in self.objectives[obj_name].items():
                 if values[var]:
-                    obj_values[obj_index] += coef
+                    obj_values[obj_index] += coef 
         return obj_values
 
     def evaluate_single_objective(self, values: Dict[str, bool], weights: Dict[str, float]) -> List[float]:

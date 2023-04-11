@@ -5,6 +5,7 @@ from datetime import datetime
 from jmetal.core.solution import BinarySolution
 from nen.Problem import Problem
 from nen.Result import Result
+from nen.Solver.MetaSolver import SolverUtil
 
 
 class SASolver:
@@ -23,15 +24,15 @@ class SASolver:
         solution.variables = [variables]
         # evaluate solution
         solution = problem.evaluate_solution(solution)
-        while solution.constraints[0] > 0:  # For problems which are not easy to solve, this operator will be very time-consuming.
-            # random variables
-            variables = []
-            for _ in range(problem.variables_num):
-                variables.append(bool(random.randint(0, 1)))
-            solution = problem._empty_solution()
-            solution.variables = [variables]
-            # evaluate solution
-            solution = problem.evaluate_solution(solution)
+        # while solution.constraints[0] > 0:  # For problems which are not easy to solve, this operator will be very time-consuming.
+        #     # random variables
+        #     variables = []
+        #     for _ in range(problem.variables_num):
+        #         variables.append(bool(random.randint(0, 1)))
+        #     solution = problem._empty_solution()
+        #     solution.variables = [variables]
+        #     # evaluate solution
+        #     solution = problem.evaluate_solution(solution)
         return solution
 
     @staticmethod
@@ -63,26 +64,37 @@ class SASolver:
             return SASolver.fitness(s1, weights_list) - SASolver.fitness(s2, weights_list)
 
     @staticmethod
-    def solve(problem: Problem, weights: Dict[str, float],
-              t_max: float, t_min: float, alpha: float) -> Result:
+    def solve(problem: Problem, weights: Dict[str, float], num_reads: int,
+              t_max: float, t_min: float, alpha: float, exec_time: float = 1e6, **kwargs) -> Result:
         """ [summary] solve weighted sum objective with given weights, return a single result.
             t from t_max to t_min, updates with t = t * alpha.
         """
         # check arguments
         assert t_min < t_max
         assert 0 <= alpha <= 1
+        print("{} start SA to solve single-objective problem!!!".format(problem.name))
+        result = Result(problem)
         # prepare weights list
         w = [weights[obj] for obj in problem.objectives_order]
         # annealing
-        s = SASolver.randomSolution(problem)
-        t = t_max
-        while t > t_min:
-            sn = SASolver.randomNeighbor(s, problem)
-            d = SASolver.compare(sn, s, w)
-            if (d <= 0) or (random.random() < exp((-d) / t)):
-                s = sn
-            t *= alpha
+        start = SolverUtil.time()
+        for _ in range(num_reads):
+            if 'x0' in kwargs:
+                s = SASolver.randomNeighbor(kwargs['x0'], problem)
+            else:
+                s = SASolver.randomSolution(problem)
+            t = t_max
+            while t > t_min:
+                sn = SASolver.randomNeighbor(s, problem)
+                d = SASolver.compare(sn, s, w)
+                if (d <= 0) or (random.random() < exp((-d) / t)):
+                    s = sn
+                t *= alpha
+            result.wso_add(s)
+            if SolverUtil.time() - start > exec_time:
+                break
+        end = SolverUtil.time()
+        result.elapsed = end - start
+        print("{} SA Solver end!!!".format(problem.name))
         # return result
-        result = Result(problem)
-        result.add(s)
         return result

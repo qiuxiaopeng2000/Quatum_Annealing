@@ -79,8 +79,8 @@ for name in names_FSP:
     hymoo_problem_result = ProblemResult(name, problem, hymoo_result_folder)
     nsgaii_problem_result = ProblemResult(name, problem, nsgaii_result_folder)
     # Single-objective
-    sa_problem_result = ProblemResult(name, problem, sa_result_folder)
-    hysoo_problem_result = ProblemResult(name, problem, hysoo_result_folder)
+    # sa_problem_result = ProblemResult(name, problem, sa_result_folder)
+    # hysoo_problem_result = ProblemResult(name, problem, hysoo_result_folder)
 
     '''Load result'''
     # Multi-objective
@@ -89,17 +89,18 @@ for name in names_FSP:
     hymoo_result = MethodResult('hymoo', hymoo_problem_result.path, problem)
     hymoo_result.load()
     # Single-objective
-    sa_result = MethodResult('sa', sa_problem_result.path, problem)
-    sa_result.load(single_flag=True)
-    hysoo_result = MethodResult('hysoo', hysoo_problem_result.path, problem)
-    hysoo_result.load(single_flag=True)
+    # sa_result = MethodResult('sa', sa_problem_result.path, problem)
+    # sa_result.load(single_flag=True)
+    # hysoo_result = MethodResult('hysoo', hysoo_problem_result.path, problem)
+    # hysoo_result.load(single_flag=True)
 
     '''Add result'''
+    # Multi-objective
     hymoo_problem_result.add(nsgaii_result)
     hymoo_problem_result.add(hymoo_result)
-
-    hysoo_problem_result.add(hysoo_result)
-    hysoo_problem_result.add(sa_result)
+    # Single-objective
+    # hysoo_problem_result.add(hysoo_result)
+    # hysoo_problem_result.add(sa_result)
 
     # compare
     scores_ga = hymoo_problem_result.average_compare(union_method='nsgaii', average_method='hymoo')
@@ -109,10 +110,10 @@ for name in names_FSP:
     )
     Visualizer.tabluate(table_ga, 'nsgaii-hymoo-compare-{}.csv'.format(name))
 
-    scores_sa = hysoo_problem_result.statistical_analysis(method1="hysoo", method2="sa", weights=weight_FSP)
-    table_sa = Visualizer.tabulate_single_problem(
-        name, ['hysoo', 'sa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-        scores_sa, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
-    )
-    Visualizer.tabluate(table_sa, 'sa-hysoo-compare-{}.csv'.format(name))
+    # scores_sa = hysoo_problem_result.statistical_analysis(method1="hysoo", method2="sa", weights=weight_FSP)
+    # table_sa = Visualizer.tabulate_single_problem(
+    #     name, ['hysoo', 'sa'], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+    #     scores_sa, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+    # )
+    # Visualizer.tabluate(table_sa, 'sa-hysoo-compare-{}.csv'.format(name))
 

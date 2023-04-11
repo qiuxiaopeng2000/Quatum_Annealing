@@ -109,6 +109,7 @@ class EmbeddingSampler:
             parameters['initial_state'] = {u: state[v] for v, chain in embedding.items() for u in chain}
 
         # sample on QPU
+        self.sampler.parameters['anneal_offsets'] = [-0.5]
         response = self.sampler.sample(bqm_embedded, **parameters)
 
         # unembed
