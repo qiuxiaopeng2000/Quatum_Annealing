@@ -11,6 +11,7 @@ order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
 names_NRP = ['classic-1', 'classic-2', 'classic-3']
+# names_NRP = ['classic-1']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
@@ -18,8 +19,8 @@ hymoo_result_folder = 'hymoo'
 nsgaii_result_folder = 'nsgaii'
 moqa_result_folder = 'moqa'
 
-hysoo_result_folder = 'hysoo_'
-sa_result_folder = 'sa_'
+hysoo_result_folder = 'hysoo'
+sa_result_folder = 'sa'
 soqa_result_folder = 'soqa'
 
 # compare CQHA with NSGA-II

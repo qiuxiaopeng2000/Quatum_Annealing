@@ -14,7 +14,7 @@ names_NRP = ['classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-rates = [0.3, 0.5, 0.7]
+rates = [0.3, 0.5, 0.7, 0.9]
 
 hymoo_result_folder = 'hymoo'
 hysoo_result_folder = 'hysoo'

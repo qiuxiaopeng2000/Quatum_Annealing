@@ -13,7 +13,7 @@ class Problem:
 
     Note that, 'Problem' is composed by LINEAR objectives and INTEGER (coefficient) constraints.
     """
-    def __init__(self, name: str = '') -> None:
+    def __init__(self, name: str = '', offset_flag: bool = True) -> None:
         # record the name
         self.constrains_index: Dict[str, int] = {}
         self.name: str = name
@@ -44,11 +44,13 @@ class Problem:
         dp.load(name)
         self.variables = dp.variables
         self.objectives = dp.objectives
+        self.offset_objectives = dp.objectives
         for k, v in dp.objectives.items():
             for var in dp.variables:
-                self.objectives[k][var] = v[var]  if var in v else 0.0
-                # if v[var] > 0:
-                #     self.objectives[k][var] *= 10
+                self.objectives[k][var] = v[var] if var in v else 0.0
+                self.offset_objectives[k][var] = v[var] if var in v else 0.0
+                if offset_flag and self.offset_objectives[k][var] < 0:
+                    self.offset_objectives[k][var] *= 1.15
 
         for constraint_str_list in dp.constraints:
             assert len(constraint_str_list) == 3
@@ -148,6 +150,18 @@ class Problem:
             for var, coef in self.objectives[obj_name].items():
                 if values[var]:
                     obj_values[obj_index] += coef 
+                    
+        return obj_values
+    
+    def evaluate_offset_objectives(self, values: Dict[str, bool]) -> List[float]:
+        """evaluate_objectives [summary] evaluate objectives list with variables values.
+        """
+        obj_values: List[float] = [0.0] * len(self.objectives_index)
+        for obj_name, obj_index in self.objectives_index.items():
+            for var, coef in self.offset_objectives[obj_name].items():
+                if values[var]:
+                    obj_values[obj_index] += coef 
+                    
         return obj_values
 
     def evaluate_single_objective(self, values: Dict[str, bool], weights: Dict[str, float]) -> List[float]:
@@ -182,7 +196,7 @@ class Problem:
                     return 1
             return 0
 
-    def _evaluate(self, values: Dict[str, bool], violated_count: bool = True) -> Tuple[List[float], int]:
+    def _evaluate(self, values: Dict[str, bool], offset_flag: bool = False, violated_count: bool = True) -> Tuple[List[float], int]:
         """_evaluate [summary] evaluate a solution with variables values.
         The violated constraint would be count as a number when violated_count is True,
         otherwise it would only indicate feasible (0) or infeasible(1).
@@ -190,7 +204,10 @@ class Problem:
         Return (objectives values, violated)
         """
         # evaluate objectives
-        obj_values = self.evaluate_objectives(values)
+        if offset_flag:
+            obj_values = self.evaluate_offset_objectives(values)
+        else:
+            obj_values = self.evaluate_objectives(values)
         # evaluate violated
         violated = self.evaluate_constraints(values, violated_count)
         return obj_values, violated
@@ -246,11 +263,11 @@ class Problem:
         solution.objectives, solution.constraints[0] = self._wso_evaluate(values, weights, self.violateds_count)
         return solution
 
-    def evaluate_solution(self, solution: BinarySolution) -> BinarySolution:
+    def evaluate_solution(self, solution: BinarySolution, offset_flag: bool = False) -> BinarySolution:
         """evaluate_solution [summary] evaluate a given solution and return itself.
         """
         values = {var: solution.variables[0][ind] for ind, var in enumerate(self.variables)}
-        solution.objectives, solution.constraints[0] = self._evaluate(values)
+        solution.objectives, solution.constraints[0] = self._evaluate(values, offset_flag)
         return solution
 
     def weighted_objectives_sum(self, objectives_weight: Dict[str, float] = {}) -> Dict[str, float]:
@@ -370,8 +387,8 @@ class LP(Problem):
 class QP(Problem):
     """QP [summary] QP, short for Quadratic Problem.
     """
-    def __init__(self, name: str, objectives_order: List[str] = []) -> None:
-        super().__init__(name=name)
+    def __init__(self, name: str, objectives_order: List[str] = [], offset_flag: bool = True) -> None:
+        super().__init__(name=name, offset_flag=offset_flag)
         # vectorize the problem
         self.vectorize(objectives_order)
         # convert all constrains in quadratic form

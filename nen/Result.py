@@ -56,7 +56,7 @@ class NDArchive:
         # check wether solution is feasible
         # if solution is None:
         #     return False
-        # if sum(solution.constraints) > 10:
+        # if sum(solution.constraints) > 0:
         #     return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
@@ -622,6 +622,67 @@ class ProblemResult:
             max_num.append({method1: np.max(method1_objective), method2: np.max(method2_objective)})
             min_num.append({method1: np.min(method1_objective), method2: np.min(method2_objective)})
             elapsed.append({method1: method1_result.method_result.elapsed / iteration1, method2: method2_result.method_result.elapsed / iteration2})
+        scores = [
+            ProblemResult.average_of_dicts(elapsed),
+            ProblemResult.average_of_dicts(statistics),
+            ProblemResult.average_of_dicts(pvalues),
+            ProblemResult.average_of_dicts(mean),
+            ProblemResult.average_of_dicts(std),
+            ProblemResult.average_of_dicts(max_num),
+            ProblemResult.average_of_dicts(min_num)]
+        return scores
+    
+    def statistical_list_analysis(self, methods: List[str], weights: Dict[str, float], alternative: str = "two-sided"):
+        """
+        p_value [summary] return statistical analysis of two solutions with two different methods indicated by
+        [statistic: float, p_value: float, mean: float, std: float, max: float: min: float].
+
+        alternative: str
+        -------
+        * 'two-sided': one of the distributions (underlying `x` or `y`) is
+          stochastically greater than the other.
+        * 'less': the distribution underlying `x` is stochastically less
+          than the distribution underlying `y`.
+        * 'greater': the distribution underlying `x` is stochastically greater
+          than the distribution underlying `y`.
+        """
+        method_results = []
+        iteration = 0
+        for method in methods:
+            assert method in self.methods_results
+            method_result = self.methods_results[method].make_method_result(single_flag=True)
+            method_results.append({method: method_result})
+            iteration = max(iteration, self.methods_results[method].iteration)
+
+        w = []
+        for k, v in weights.items():
+            w.append(v)
+        # calculate
+        elapsed: List[Dict[str, float]] = []
+        statistics: List[Dict[str, float]] = []
+        pvalues: List[Dict[str, float]] = []
+        mean: List[Dict[str, float]] = []
+        std: List[Dict[str, float]] = []
+        max_num: List[Dict[str, float]] = []
+        min_num: List[Dict[str, float]] = []
+        for i in range(iteration):
+            methods_objective = {method: self.methods_results[method].results[i%self.methods_results[method].iteration].get_wso_objective(w) for method in methods}
+            # N/A indicates ‘‘not applicable’’ which means that the corresponding
+            # algorithm could not statistically compare with itself in the rank-sum test
+            # N/A means itself for Wilcoxon’s ranksums p_value
+            s: Dict[str, float] = {}
+            p: Dict[str, float] = {}
+            for i in range(len(methods)):
+                statistic, pvalue = stats.ranksums(np.array(methods_objective[methods[0]]), np.array(methods_objective[methods[i]]), alternative=alternative)
+                s[methods[i]] = statistic
+                p[methods[i]] = pvalue
+            statistics.append(s)
+            pvalues.append(p)
+            mean.append({method: np.mean(methods_objective[method]) for method in methods})
+            std.append({method: np.std(methods_objective[method]) for method in methods})
+            max_num.append({method: np.max(methods_objective[method]) for method in methods})
+            min_num.append({method: np.min(methods_objective[method]) for method in methods})
+            elapsed.append({method: self.methods_results[method].method_result.elapsed for method in methods})
         scores = [
             ProblemResult.average_of_dicts(elapsed),
             ProblemResult.average_of_dicts(statistics),

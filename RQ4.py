@@ -14,7 +14,7 @@ names_NRP = ['classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-rates = [0.9]
+rates = [0.3, 0.5, 0.7, 0.9]
 
 hymoo_result_folder = 'hymoo'
 hysoo_result_folder = 'hysoo'
@@ -46,7 +46,7 @@ for name in names_NRP:
         name, [method for method in methods], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
         scores_hy, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
     )
-    Visualizer.tabluate(table_hy, 'hy-{}-compare.csv'.format( name))
+    Visualizer.tabluate(table_hy, 'hy-moo-{}-compare.csv'.format( name))
 
 for name in names_FSP:
     problem = Problem(name)
@@ -73,61 +73,64 @@ for name in names_FSP:
         name, [method for method in methods], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
         scores_hy, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
     )
-    Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
+    Visualizer.tabluate(table_hy, 'hy-moo-{}-compare.csv'.format(name))
 
 '''++++++++++++++++++++++++++++++++++++++++++++++'''
 
 # compare Hybrid with SA
-# for name in names_NRP:
-#     problem = Problem(name)
-#     problem.vectorize(order_NRP)
+for name in names_NRP:
+    problem = Problem(name)
+    problem.vectorize(order_NRP)
 
-#     # prepare the problem result folder before solving
-#     # result_folder = 'hy-sa_-{}'.format(name)
-#     problem_result = ProblemResult(name, problem, hysoo_result_folder)
+    # prepare the problem result folder before solving
+    # hy_result_folder = 'HY-GA-{}'.format(name)
+    hy_problem_result = ProblemResult(name, problem, hysoo_result_folder)
 
-#     hy_result = MethodResult('hybrid', problem_result.path, problem)
-#     hy_result.load()
-#     for rate in rates:
-#         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-#         hy_result.load()
-#         problem_result.add(hy_result)
+    hy_result = MethodResult('hysoo', hy_problem_result.path, problem)
+    hy_result.load(single_flag=True)
+    hy_problem_result.add(hy_result)
+    methods = []
+    for rate in rates:
+        methods.append('hybrid{}'.format(rate))
+    for method in methods:
+        hy_result = MethodResult(method, hy_problem_result.path, problem)
+        hy_result.load()
+        hy_problem_result.add(hy_result)
+    methods.append('hysoo')
 
-#     problem_result.add(hy_result)
+    # compare
+    scores_hy = hy_problem_result.statistical_list_analysis(methods=methods, weights=weight_NRP)
+    table_hy = Visualizer.tabulate_single_problem(
+        name, [method for method in methods], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+        scores_hy, {'time': 4, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+    )
+    Visualizer.tabluate(table_hy, 'hy-soo-{}-compare.csv'.format(name))
 
-#     # compare
-#     for rate in rates:
-#         scores_hy = problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
-#         table_hy = Visualizer.tabulate_single_problem(
-#             name, ['hybrid', 'hybrid{}'.format(rate)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-#             scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
-#         )
-#         Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
+for name in names_FSP:
+    problem = Problem(name)
+    problem.vectorize(order_FSP)
 
+    # prepare the problem result folder before solving
+    # hy_result_folder = 'HY-GA-{}'.format(name)
+    hy_problem_result = ProblemResult(name, problem, hysoo_result_folder)
 
-# for name in names_FSP:
-#     problem = Problem(name)
-#     problem.vectorize(order_FSP)
+    hy_result = MethodResult('hysoo', hy_problem_result.path, problem)
+    hy_result.load(single_flag=True)
+    hy_problem_result.add(hy_result)
+    methods = []
+    for rate in rates:
+        methods.append('hybrid{}'.format(rate))
+    for method in methods:
+        hy_result = MethodResult(method, hy_problem_result.path, problem)
+        hy_result.load()
+        hy_problem_result.add(hy_result)
+    methods.append('hysoo')
+    # compare
+    scores_hy = hy_problem_result.statistical_list_analysis(methods=methods, weights=weight_FSP)
+    table_hy = Visualizer.tabulate_single_problem(
+        name, [method for method in methods], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
+        scores_hy, {'time': 4, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
+    )
+    Visualizer.tabluate(table_hy, 'hy-soo-compare-{}.csv'.format(name))
 
-#     # prepare the problem result folder before solving
-#     # result_folder = 'hy-sa_-{}'.format(name)
-#     problem_result = ProblemResult(name, problem, hysoo_result_folder)
-
-#     hy_result = MethodResult('hybrid', problem_result.path, problem)
-#     hy_result.load()
-#     for rate in rates:
-#         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
-#         hy_result.load()
-#         problem_result.add(hy_result)
-
-#     problem_result.add(hy_result)
-
-#     # compare
-#     for rate in rates:
-#         scores_hy = problem_result.average_compare(union_method='hybrid', average_method='hybrid{}'.format(rate))
-#         table_hy = Visualizer.tabulate_single_problem(
-#             name, ['hybrid', 'hybrid{}'.format(rate)], ['time', 'statistic', 'p_value', 'mean', 'std', 'max', 'min'],
-#             scores_hy, {'time': 6, 'statistic': 12, 'p_value': 18, 'mean': 4, 'std': 4, 'max': 4, 'min': 4}
-#         )
-#         Visualizer.tabluate(table_hy, 'hy-{}-compare-{}.csv'.format(rate, name))
 

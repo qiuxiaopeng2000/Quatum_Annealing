@@ -17,7 +17,7 @@ names_FSP = ['uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-rates = [0.3, 0.5, 0.7]
+rates = [0.3, 0.5, 0.7, 0.9]
 
 hymoo_result_folder = 'hymoo'
 hysoo_result_folder = 'hysoo'
@@ -110,7 +110,7 @@ for name in names_FSP:
         hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, qp)
         for _ in range(15):
             result = HybridSolver.single_solve(problem=qp, weights=weight_FSP, num_reads=30, sub_size=100,
-                                               t_max=100,  t_min=0.0001, rate=rate, alpha=0.98)
+                                               t_max=100,  t_min=1e-3, rate=rate, alpha=0.98)
             hy_result.add(result)
 
         # dump the results

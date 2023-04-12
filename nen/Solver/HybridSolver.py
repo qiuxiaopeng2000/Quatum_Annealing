@@ -16,6 +16,8 @@ from nen.Result import Result, MethodResult, ProblemResult
 from nen.Solver.MetaSolver import SolverUtil
 from nen.Solver.EmbeddingSampler import EmbeddingSampler, SampleSet
 from dwave.system import DWaveSampler
+from nen.DescribedProblem import DescribedProblem
+import dwavebinarycsp
 
 
 class HybridSolver:
@@ -103,7 +105,7 @@ class HybridSolver:
         solution_list: List[BinarySolution] = []
 
         # generate random weights and calculate weighted sum obejctive
-        wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
+        wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.offset_objectives, weights))
         # calculate the penalty and add constraints to objective with penalty
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
         objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
@@ -143,6 +145,8 @@ class HybridSolver:
 
         # put samples into result
         result = Result(problem)
+        # dp = DescribedProblem()
+        # dp.load(problem.name)
         for solution in solution_list:
             result.wso_add(solution)
         # add into method result
@@ -181,6 +185,7 @@ class HybridSolver:
         subsamplesets = []
         for state in states:
             pro_bqm = state.subproblem
+
             qubo, offset = pro_bqm.to_qubo()
             sampler = EmbeddingSampler()
             sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw', **parameters)
