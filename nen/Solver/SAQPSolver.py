@@ -155,7 +155,7 @@ class SAQPSolver:
         assert 0 <= alpha <= 1
         print("start SA to solve {}".format(problem.name))
         # modelling
-        wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
+        wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.offset_objectives, weights))
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
         H = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
         # sample

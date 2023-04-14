@@ -235,6 +235,7 @@ def load_fsp_new(name):
     problem.objectives['USED_BEFORE'] = {k: 1 - v for k, v in problem.objectives['USED_BEFORE'].items()}
     # add another objectives, deselect
     problem.objectives['DESELECTED'] = {k: -1 for k in problem.variables}
+    # problem.objectives['DESELECTED'] = {k: -10 for k in problem.variables}
     # return
     return problem
 
@@ -393,6 +394,7 @@ def load_xuan(name):
             urgency['r{}'.format(req + 1)] = urg
     # construct objectives
     problem.objectives['cost'] = cost
+    # problem.objectives['cost'] = {k: v for k, v in cost.items()}
     problem.objectives['revenue'] = {k: -v for k, v in revenue.items()}
     problem.objectives['urgency'] = {k: -v for k, v in urgency.items()}
     # flatten constraints
@@ -441,11 +443,11 @@ def load_Baan():
 
 
 if __name__ == '__main__':
-    # # FSP
-    # fsp_problems = ['Freebsd', 'Fiasco']
-    # for fsp_name in fsp_problems:
-    #     problem = load_fsp_new(fsp_name)
-    #     problem.dump(fsp_name)
+    # FSP
+    fsp_problems = ['uClinux']
+    for fsp_name in fsp_problems:
+        problem = load_fsp_new(fsp_name)
+        problem.dump(fsp_name + '_offset')
     # # NRP: rp
     # rp_problems = ['ms', 'rp']
     # for rp_name in rp_problems:
@@ -457,14 +459,15 @@ if __name__ == '__main__':
     #     problem = load_tsm(tsm_name)
     #     problem.dump(tsm_name)
     # NRP: Xuan
-    xuan = ['classic-1', 'classic-2', 'classic-3', 'classic-4', 'classic-5',
-            'realistic-e1', 'realistic-e2', 'realistic-e3', 'realistic-e4',
-            'realistic-g1', 'realistic-g2', 'realistic-g3', 'realistic-g4',
-            'realistic-m1', 'realistic-m2', 'realistic-m3', 'realistic-m4'
-            ]
+    # xuan = ['classic-1', 'classic-2', 'classic-3', 'classic-4', 'classic-5',
+    #         'realistic-e1', 'realistic-e2', 'realistic-e3', 'realistic-e4',
+    #         'realistic-g1', 'realistic-g2', 'realistic-g3', 'realistic-g4',
+    #         'realistic-m1', 'realistic-m2', 'realistic-m3', 'realistic-m4'
+    #         ]
+    xuan = ['classic-3']
     for xuan_name in xuan:
         problem = load_xuan(xuan_name)
         problem.dump(xuan_name)
-    # NRP: Baan
-    problem = load_Baan()
-    problem.dump('Baan')
+    # # NRP: Baan
+    # problem = load_Baan()
+    # problem.dump('Baan')

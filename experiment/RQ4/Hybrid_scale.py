@@ -26,17 +26,16 @@ for name in names_NRP:
     for rate in rates:
         order = order_NRP
 
-        problem = Problem(name)
+        problem = QP(name, order)
         problem.vectorize(order)
 
         # prepare the problem result folder before solving
         problem_result = ProblemResult(name, problem, hymoo_result_folder)
-        qp = QP(name, order)
 
         # solve with cplex
-        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, qp)
+        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
         for _ in range(3):
-            result = HybridSolver.solve(problem=qp, sample_times=10, num_reads=100, maxEvaluations=20000, seed=1,
+            result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, maxEvaluations=20000,
                                         sub_size=100, rate=rate, annealing_time=20)
             hy_result.add(result)
 
@@ -49,17 +48,16 @@ for name in names_FSP:
     for rate in rates:
         order = order_FSP
 
-        problem = Problem(name)
+        problem = QP(name, order)
         problem.vectorize(order)
 
         # prepare the problem result folder before solving
         problem_result = ProblemResult(name, problem, hymoo_result_folder)
-        qp = QP(name, order)
 
         # solve with cplex
-        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, qp)
+        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
         for _ in range(3):
-            result = HybridSolver.solve(problem=qp, sample_times=10, num_reads=100, maxEvaluations=50000, seed=1,
+            result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, maxEvaluations=50000,
                                         sub_size=100, rate=rate, annealing_time=20)
             hy_result.add(result)
 
@@ -74,18 +72,16 @@ for name in names_NRP:
     for rate in rates:
         order = order_NRP
 
-        problem = Problem(name)
+        problem = QP(name, order)
         problem.vectorize(order)
 
         # prepare the problem result folder before solving
         problem_result = ProblemResult(name, problem, hysoo_result_folder)
-        qp = QP(name, order)
-        lp = LP(name, order)
 
         # solve with cplex
-        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, qp)
+        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
         for _ in range(15):
-            result = HybridSolver.single_solve(problem=qp, weights=weight_NRP, num_reads=30, t_max=100,
+            result = HybridSolver.single_solve(problem=problem, weights=weight_NRP, num_reads=30, t_max=100,
                                                t_min=1e-3, sub_size=100, rate=rate, alpha=0.98)
             hy_result.add(result)
 
@@ -98,18 +94,16 @@ for name in names_FSP:
     for rate in rates:
         order = order_FSP
 
-        problem = Problem(name)
+        problem = QP(name, order)
         problem.vectorize(order)
 
         # prepare the problem result folder before solving
         problem_result = ProblemResult(name, problem, hysoo_result_folder)
-        qp = QP(name, order)
-        lp = LP(name, order)
 
         # solve with cplex
-        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, qp)
+        hy_result = MethodResult('hybrid{}'.format(rate), problem_result.path, problem)
         for _ in range(15):
-            result = HybridSolver.single_solve(problem=qp, weights=weight_FSP, num_reads=30, sub_size=100,
+            result = HybridSolver.single_solve(problem=problem, weights=weight_FSP, num_reads=30, sub_size=100,
                                                t_max=100,  t_min=1e-3, rate=rate, alpha=0.98)
             hy_result.add(result)
 

@@ -23,46 +23,40 @@ hymoo_result_folder = 'hymoo'
 hysoo_result_folder = 'hysoo'
 
 # compare CQHA with NSGA-II
-for name in names_NRP:
-    for size in subsizes:
-        if size == 100:
-            continue
-        order = order_NRP
+# for name in names_NRP:
+#     for size in subsizes:
+#         order = order_NRP
 
-        problem = Problem(name)
-        problem.vectorize(order)
+#         problem = QP(name, order)
+#         problem.vectorize(order)
 
-        # prepare the problem result folder before solving
-        problem_result = ProblemResult(name, problem, hymoo_result_folder)
-        qp = QP(name, order)
+#         # prepare the problem result folder before solving
+#         problem_result = ProblemResult(name, problem, hymoo_result_folder)
 
-        # solve with cplex
-        hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, qp)
-        for _ in range(1):
-            result = HybridSolver.solve(problem=qp, sample_times=10, num_reads=100, maxEvaluations=20000,
-                                        sub_size=size, annealing_time=20)
-            hy_result.add(result)
+#         # solve with cplex
+#         hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, problem)
+#         for _ in range(1):
+#             result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, maxEvaluations=20000, seed=1,
+#                                         sub_size=size, annealing_time=20)
+#             hy_result.add(result)
 
-        # dump the results
-        problem_result.add(hy_result)
-        problem_result.dump()
+#         # dump the results
+#         problem_result.add(hy_result)
+#         problem_result.dump()
 
 
 for name in names_FSP:
+    order = order_FSP
+    problem = QP(name, order)
+    problem.vectorize(order)
     for size in subsizes:
-        order = order_FSP
-
-        problem = Problem(name)
-        problem.vectorize(order)
-
         # prepare the problem result folder before solving
         problem_result = ProblemResult(name, problem, hymoo_result_folder)
-        qp = QP(name, order)
 
         # solve with cplex
-        hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, qp)
+        hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, problem)
         for _ in range(1):
-            result = HybridSolver.solve(problem=qp, sample_times=10, num_reads=100, maxEvaluations=50000,
+            result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, maxEvaluations=50000, seed=1,
                                         sub_size=size, annealing_time=20)
             hy_result.add(result)
 
@@ -74,20 +68,18 @@ for name in names_FSP:
 
 # compare Hybrid with SA
 for name in names_NRP:
+    order = order_NRP
+    problem = QP(name, order)
+    problem.vectorize(order)
     for size in subsizes:
-        order = order_NRP
-
-        problem = Problem(name)
-        problem.vectorize(order)
 
         # prepare the problem result folder before solving
         problem_result = ProblemResult(name, problem, hysoo_result_folder)
-        qp = QP(name, order)
 
         # solve with cplex
-        hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, qp)
-        for _ in range(6):
-            result = HybridSolver.single_solve(problem=qp, weights=weight_NRP, num_reads=30, t_max=100,
+        hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, problem)
+        for _ in range(3):
+            result = HybridSolver.single_solve(problem=problem, weights=weight_NRP, num_reads=30, t_max=100,
                                                t_min=1e-3, sub_size=size, alpha=0.98)
             hy_result.add(result)
 
@@ -100,17 +92,16 @@ for name in names_FSP:
     for size in subsizes:
         order = order_FSP
 
-        problem = Problem(name)
+        problem = QP(name, order)
         problem.vectorize(order)
 
         # prepare the problem result folder before solving
         problem_result = ProblemResult(name, problem, hysoo_result_folder)
-        qp = QP(name, order)
 
         # solve with cplex
-        hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, qp)
-        for _ in range(6):
-            result = HybridSolver.single_solve(problem=qp, weights=weight_FSP, num_reads=30, t_max=100,
+        hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, problem)
+        for _ in range(3):
+            result = HybridSolver.single_solve(problem=problem, weights=weight_FSP, num_reads=30, t_max=100,
                                                t_min=1e-3, sub_size=size, alpha=0.98)
             hy_result.add(result)
 

@@ -233,7 +233,7 @@ class HybridSolver:
     @staticmethod
     def SA(t_max: float, t_min: float, num_reads: int, alpha: float,
            time: float, problem: QP, solution_list: List[BinarySolution], weight: Dict[str, float]):
-        result = SASolver.solve(problem=problem, num_reads=num_reads, weights=weight,
+        result = SAQPSolver.solve(problem=problem, num_reads=num_reads, weights=weight, if_embed=False,
                                 t_max=t_max, t_min=t_min, alpha=alpha, exec_time=time)
         for solution in result.solution_list:
             solution_list.append(solution)

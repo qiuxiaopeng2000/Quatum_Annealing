@@ -38,7 +38,7 @@ for name in names_NRP:
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('sa_', problem_result.path, problem)
     for _ in range(3):
-        result = SASolver.solve(problem=problem, weights=weight_NRP, num_reads=30,
+        result = SAQPSolver.solve(problem=problem, weights=weight_NRP, num_reads=30, if_embed=False,
                                 t_max=100, t_min=1e-2, alpha=0.98)
         moqa_method_result.add(result)
 
