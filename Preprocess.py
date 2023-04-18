@@ -436,7 +436,7 @@ def load_Baan():
                     problem.constraints.append([team_list[team], '<=', int(line[team])])
             req += 1
     # objectives
-    problem.objectives['cost'] = cost
+    problem.objectives['cost'] = {k: v * 10 for k, v in cost.items()}
     problem.objectives['revenue'] = {k: -v for k, v in revenue.items()}
     problem.objectives['urgency'] = {k: -v for k, v in urgency.items()}
     return problem
@@ -444,10 +444,10 @@ def load_Baan():
 
 if __name__ == '__main__':
     # FSP
-    fsp_problems = ['uClinux']
-    for fsp_name in fsp_problems:
-        problem = load_fsp_new(fsp_name)
-        problem.dump(fsp_name + '_offset')
+    # fsp_problems = ['uClinux']
+    # for fsp_name in fsp_problems:
+    #     problem = load_fsp_new(fsp_name)
+    #     problem.dump(fsp_name + '_offset')
     # # NRP: rp
     # rp_problems = ['ms', 'rp']
     # for rp_name in rp_problems:
@@ -464,10 +464,10 @@ if __name__ == '__main__':
     #         'realistic-g1', 'realistic-g2', 'realistic-g3', 'realistic-g4',
     #         'realistic-m1', 'realistic-m2', 'realistic-m3', 'realistic-m4'
     #         ]
-    xuan = ['classic-3']
-    for xuan_name in xuan:
-        problem = load_xuan(xuan_name)
-        problem.dump(xuan_name + '_offset')
-    # # NRP: Baan
-    # problem = load_Baan()
-    # problem.dump('Baan')
+    # xuan = ['classic-3']
+    # for xuan_name in xuan:
+    #     problem = load_xuan(xuan_name)
+    #     problem.dump(xuan_name + '_offset')
+    # NRP: Baan
+    problem = load_Baan()
+    problem.dump('Baan')

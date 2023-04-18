@@ -31,7 +31,7 @@ class HybridSolver:
 
     @staticmethod
     def solve(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int,
-              sample_times: int = 1, rate: float = 1.0, **parameters) -> Result:
+              sample_times: int = 1, rate: float = 1.0, seed: int = 1, **parameters) -> Result:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
         print("{} start Hybrid Solver to solve multi-objective problem!!!".format(problem.name))
@@ -70,7 +70,7 @@ class HybridSolver:
             elapseds.append(t)
         '''NSGA-II'''
         HybridSolver.NSGAII(populationSize=num_reads * sample_times, maxEvaluations=maxEvaluations, problem=problem,
-                            time=e2-s1, solution_list=solution_list)
+                            time=e2-s1, solution_list=solution_list, seed=seed)
         '''Selection'''
         # solution_list.sort(key=lambda x: (x.constraints[0], np.dot(x.objectives, list(weights.values()))))
         solution_list.sort(key=lambda x: x.objectives)
@@ -223,9 +223,9 @@ class HybridSolver:
 
     @staticmethod
     def NSGAII(populationSize: int, maxEvaluations: int, problem: QP,
-               time: float, solution_list: List[BinarySolution]):
+               time: float, solution_list: List[BinarySolution], seed: int = 1):
         result = GASolver.solve(populationSize=populationSize, maxEvaluations=maxEvaluations, crossoverProbability=0.8,
-                                mutationProbability=(1 / problem.variables_num), seed=1,
+                                mutationProbability=(1 / problem.variables_num), seed=seed,
                                 problem=problem, exec_time=time)
         for solution in result.solution_list:
             solution_list.append(solution)

@@ -8,11 +8,11 @@ from nen import Problem, ProblemResult, MethodResult, Visualizer, QP, LP
 from nen.Solver.HybridSolver import HybridSolver
 from nen.Solver.GASolver import GASolver
 
-names_FSP = ['LinuxX86']
+names_FSP = ['uClinux']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['classic-4']
+names_NRP = ['classic-3']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
@@ -36,7 +36,7 @@ hysoo_result_folder = 'hysoo'
 #         # solve with cplex
 #         hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, problem)
 #         for _ in range(1):
-#             result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, maxEvaluations=20000, seed=1,
+#             result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, maxEvaluations=20000,
 #                                         sub_size=size, annealing_time=20)
 #             hy_result.add(result)
 
@@ -56,7 +56,7 @@ for name in names_FSP:
         # solve with cplex
         hy_result = MethodResult('hybrid{}'.format(size), problem_result.path, problem)
         for _ in range(1):
-            result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, maxEvaluations=50000, seed=1,
+            result = HybridSolver.solve(problem=problem, sample_times=10, num_reads=100, maxEvaluations=50000,
                                         sub_size=size, annealing_time=20)
             hy_result.add(result)
 

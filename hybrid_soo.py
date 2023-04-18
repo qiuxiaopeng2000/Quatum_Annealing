@@ -6,12 +6,13 @@
 from nen import QP, ProblemResult, MethodResult
 from nen.Solver import HybridSolver
 
-names_FSP = ['E-Shop', 'eCos', 'uClinux']
+# names_FSP = ['E-Shop', 'eCos', 'uClinux']
+names_FSP = ['Amazon']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['classic-1', 'classic-2', 'classic-3']
-# names_NRP = ['classic-1']
+# names_NRP = ['classic-1', 'classic-2', 'classic-3']
+names_NRP = ['Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
@@ -33,20 +34,20 @@ for name in names_NRP:
     # dump result to result/given_path folder
     problem_result.dump()
 
-# for name in names_FSP:
-#     problem = QP(name, order_FSP)
-#     problem_result = ProblemResult(name, problem, result_folder)
-#     moqa_method_result = MethodResult('hysoo', problem_result.path, problem)
-#     for i in range(6):
-#         result = HybridSolver.single_solve(problem=problem, num_reads=30, weights=weight_FSP, sub_size=100,
-#                                            t_max=100, t_min=1e-2, alpha=0.98)
-#         print(i + 1)
-#         moqa_method_result.add(result)
+for name in names_FSP:
+    problem = QP(name, order_FSP)
+    problem_result = ProblemResult(name, problem, result_folder)
+    moqa_method_result = MethodResult('hysoo', problem_result.path, problem)
+    for i in range(6):
+        result = HybridSolver.single_solve(problem=problem, num_reads=30, weights=weight_FSP, sub_size=100,
+                                           t_max=100, t_min=1e-2, alpha=0.98)
+        print(i + 1)
+        moqa_method_result.add(result)
 
-#     # add result to method result, problem result
-#     problem_result.add(moqa_method_result)
+    # add result to method result, problem result
+    problem_result.add(moqa_method_result)
 
-#     # dump result to result/given_path folder
-#     problem_result.dump()
+    # dump result to result/given_path folder
+    problem_result.dump()
 
 

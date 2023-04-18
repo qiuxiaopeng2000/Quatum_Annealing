@@ -673,7 +673,7 @@ class ProblemResult:
             s: Dict[str, float] = {}
             p: Dict[str, float] = {}
             for i in range(len(methods)):
-                statistic, pvalue = stats.ranksums(np.array(methods_objective[methods[0]]), np.array(methods_objective[methods[i]]), alternative=alternative)
+                statistic, pvalue = stats.ranksums(np.array(methods_objective[methods[-1]]), np.array(methods_objective[methods[i]]), alternative=alternative)
                 s[methods[i]] = statistic
                 p[methods[i]] = pvalue
             statistics.append(s)
