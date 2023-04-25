@@ -1,11 +1,13 @@
+from typing import Any, Tuple, List, Dict
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.operators.crossover.pntx import TwoPointCrossover, SinglePointCrossover
 from pymoo.operators.mutation.bitflip import BitflipMutation
 from pymoo.operators.sampling.rnd import BinaryRandomSampling
 from pymoo.optimize import minimize
-from pymoo.termination.default import DefaultMultiObjectiveTermination
-
-from nen.Problem import PymooProblem, QP
+from pymoo.termination.default import DefaultMultiObjectiveTermination, DefaultSingleObjectiveTermination
+from pymoo.algorithms.base.genetic import GeneticAlgorithm
+from pymoo.algorithms.soo.nonconvex.ga import GA
+from nen.Problem import PymooProblem, QP, PysooProblem
 from nen.Problem import Problem
 from nen.Result import Result
 
@@ -18,9 +20,10 @@ class GASolver:
         make sure the environment is configured successfully accordingly.
         """
     @staticmethod
-    def solve(problem: Problem, populationSize: int, maxEvaluations: int,
-              seed: int, crossoverProbability: float, mutationProbability: int,
-              verbose: bool = False, iterations: int = 1, exec_time: float = 1e6) -> Result:
+    def solve(problem: Problem, populationSize: int, maxEvaluations: int, seed: int,
+              crossoverProbability: float, mutationProbability: int, verbose: bool = False, 
+              iterations: int = 1, exec_time: float = 1e6, single_flag: bool = False, 
+              weights: Dict[str, float] = None) -> Result:
         """
         seed : integer
             The random seed to be used.
@@ -43,9 +46,12 @@ class GASolver:
         res.history: The history of the algorithm. (only if save_history has been enabled during the algorithm initialization)
         res.time: The time required to run the algorithm
         """
-        print("{} start Genetic Algorithm to solve multi-objective problem!!!".format(problem.name))
+        
         result = Result(problem)
         termination = DefaultMultiObjectiveTermination(
+            n_max_evals=maxEvaluations
+        )
+        termination_single = DefaultSingleObjectiveTermination(
             n_max_evals=maxEvaluations
         )
         pro = PymooProblem(problem)
@@ -58,9 +64,26 @@ class GASolver:
                     mutation=BitflipMutation(prob=mutationProbability),
                     # eliminate_duplicates=True
                     )
+        if single_flag:
+            pro_single = PysooProblem(problem=problem, weights=weights)
+            alg_single = GA(
+                        pop_size=populationSize,
+                        # n_offsprings=10,
+                        sampling=BinaryRandomSampling(),
+                        # crossover=SBX(prob=crossoverProbability, eta=15),
+                        crossover=SinglePointCrossover(prob=crossoverProbability),
+                        # mutation=PolynomialMutation(eta=20, prob=mutationProbability),
+                        mutation=BitflipMutation(prob=mutationProbability),
+                        # eliminate_duplicates=False
+                        )
 
         for _ in range(iterations):
-            res = minimize(pro, alg, termination, seed=seed, verbose=verbose, return_least_infeasible=True)
+            if single_flag:
+                print("{} start Genetic Algorithm to solve single objective problem!!!".format(problem.name))
+                res = minimize(pro_single, alg_single, termination_single, seed=seed, verbose=verbose, return_least_infeasible=True)
+            else: 
+                print("{} start Genetic Algorithm to solve multi-objective problem!!!".format(problem.name))
+                res = minimize(pro, alg, termination, seed=seed, verbose=verbose, return_least_infeasible=True)
             # return_least_infeasible=True
 
             result.elapsed += res.exec_time

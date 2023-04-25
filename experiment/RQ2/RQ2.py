@@ -28,9 +28,9 @@ for name in names_FSP:
     moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
     ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
-    ga_result.load()
+    ga_result.load(evaluate=True)
     qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
-    qa_result.load()
+    qa_result.load(evaluate=True)
 
     moqa_problem_result.add(ga_result)
     moqa_problem_result.add(qa_result)
@@ -54,9 +54,9 @@ for name in names_NRP:
     moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
     ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
-    ga_result.load()
+    ga_result.load(evaluate=True)
     qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
-    qa_result.load()
+    qa_result.load(evaluate=True)
 
     moqa_problem_result.add(ga_result)
     moqa_problem_result.add(qa_result)

@@ -9,6 +9,8 @@ from nen.Problem import QP
 from nen.Result import Result
 from nen.Solver.MetaSolver import SolverUtil
 from nen.Solver.EmbeddingSampler import EmbeddingSampler, SampleSet
+from greedy import SteepestDescentSolver
+from dimod.binary_quadratic_model import BinaryQuadraticModel
 
 
 class MOQASolver:
@@ -22,7 +24,7 @@ class MOQASolver:
     """
 
     @staticmethod
-    def solve(problem: QP, num_reads: int, sample_times: int = 1) -> Result:
+    def solve(problem: QP, num_reads: int, sample_times: int = 1, annealing_time: float = 20, postprocess: bool = True) -> Result:
         """solve [summary] solve qp, results are recorded in result.
         num_reads:
             read the num of solution from the solver result, not all the solution on the pareto.
@@ -35,6 +37,7 @@ class MOQASolver:
         # sample for sample_times times
         samplesets: List[SampleSet] = []
         elapseds: List[float] = []
+        annealing_schedule = [[0.0, 0.0], [400, 0.5], [1400, 0.5], [2000, 1.0]]
         for _ in range(sample_times):
             # generate random weights and calculate weighted sum obejctive
             weights = MOQASolver.random_normalized_weights(basic_weights)
@@ -43,20 +46,31 @@ class MOQASolver:
             penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
             objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
             qubo = Constraint.quadratic_to_qubo_dict(objective)
+            bqm = BinaryQuadraticModel.from_qubo(qubo)
             # Solve in QA
             sampler = EmbeddingSampler()
             # read num_reads from once sample, but some answer is duplicate,
             # so the number return less than num_reads
-            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw')
+            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw', 
+                                                # anneal_schedule=annealing_schedule,
+                                                annealing_time=annealing_time,
+                                                )
+            if postprocess:
+                local_solver = SteepestDescentSolver()
+                sampleset = local_solver.sample(bqm=bqm, initial_states=sampleset)
             samplesets.append(sampleset)
             elapseds.append(elapsed)
 
+        solution_list = []
         # put samples into result
         result = Result(problem)
         for sampleset in samplesets:
             for values in EmbeddingSampler.get_values(sampleset, problem.variables):
                 solution = problem.evaluate(values)
+                solution_list.append(solution)
+                problem.constraint_sum
                 result.wso_add(solution)
+        solution_list.sort(key=lambda x: (x.constraints[0], x.objectives))
         # add into method result
         result.elapsed = sum(elapseds)
         for sampleset in samplesets:

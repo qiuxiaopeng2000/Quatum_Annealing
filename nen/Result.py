@@ -33,13 +33,16 @@ class NDArchive:
         self.all_solution_num: float = 0.0
         self.total_num_anneals = 0
         self.iterations = 0
+        self.feasible_num = 0
 
     def add(self, solution: BinarySolution) -> bool:
         """add [summary] add a non-dominant solution into nd archive.
         """
         # check whether solution is feasible
-        # if sum(solution.constraints) > 1:
-        #     return False
+        if solution is None:
+            return False
+        if sum(solution.constraints) > 0:
+            return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
         assert len(solution.objectives) == self.objectives_num
@@ -54,10 +57,10 @@ class NDArchive:
         """add [summary] add a solution in a single problem into nd archive.
         """
         # check wether solution is feasible
-        # if solution is None:
-        #     return False
-        # if sum(solution.constraints) > 0:
-        #     return False
+        if solution is None:
+            return False
+        if sum(solution.constraints) > 0:
+            return False
         # check variables size and objectives size
         assert len(solution.variables[0]) == self.variables_num
         assert len(solution.objectives) == self.objectives_num
@@ -66,7 +69,10 @@ class NDArchive:
         # for i in range(len(solution.objectives)):
         #     if solution.objectives[i] > 0:
         #         solution.objectives[i] /= 10
+        if solution not in self.solution_list:
+            self.feasible_num += 1
         self.solution_list.append(solution)
+        
         return True
 
     def set_solution_list(self, solution_list: List[BinarySolution]) -> None:
@@ -140,6 +146,8 @@ class Result(NDArchive):
     def get_wso_objective(self, weights: List[float]) -> List[float]:
         """get_wso_objective [summary] calculate the wso_objective as result of single-objective
         """
+        # if len(self.solution_list) == 0:
+        #     return [float('inf')]
         objective = []
         for solution in self.solution_list:
             assert len(solution.objectives) == len(weights)
@@ -299,7 +307,8 @@ class MethodResult:
             for line in obj_file:
                 if line.strip() == '': continue
                 objectives = NDArchive.str_to_float_list(line.strip())
-                assert len(objectives) == self.problem.objectives_num
+                if not single_flag:
+                    assert len(objectives) == self.problem.objectives_num
                 objectives_list.append(objectives)
         assert len(objectives_list) == len(variables_list)
         # prepare list of BinarySolution
@@ -310,8 +319,10 @@ class MethodResult:
                           for i in range(self.problem.variables_num)}
                 solution = self.problem.evaluate(values)
                 # assert solution.constraints[0] == 0
-                for i in range(self.problem.objectives_num):
-                    assert round(solution.objectives[i], NDArchive.ROUND_PRECISION) == objectives_list[index][i]
+                if solution.constraints[0] != 0:
+                    continue
+                # for i in range(self.problem.objectives_num):
+                #     assert round(solution.objectives[i], NDArchive.ROUND_PRECISION) == objectives_list[index][i]
                 solution_list.append(solution)
         else:
             for index in range(len(variables_list)):
@@ -330,7 +341,7 @@ class MethodResult:
         else:
             for solution in solution_list:
                 result.add(solution)
-                # result.all_solution_num += 1
+                result.all_solution_num += 1
         self.results.append(result)
 
     def dump_info(self) -> None:
@@ -364,7 +375,7 @@ class MethodResult:
         for index in range(self.info['iteration']):
             self.dump_result(index)
 
-    def load(self, evaluate: bool = False, single_flag: bool = False) -> None:
+    def load(self, evaluate: bool = True, single_flag: bool = False, total_num_anneals: int = 1000) -> None:
         """load [summary] load the MethodResult from files, indicated by info file.
         Evaluate is True as we want to load solutions from variables via evaluation.
         """
@@ -378,7 +389,7 @@ class MethodResult:
         for index in range(self.iteration):
             self.load_result(index, evaluate, single_flag)
             self.results[index].elapsed = elapseds[index]
-            self.results[index].total_num_anneals = 1000
+            self.results[index].total_num_anneals = total_num_anneals
         assert len(self.results) == self.iteration
 
 
@@ -455,7 +466,7 @@ class ProblemArchive:
         # pareto_count = self.on_pareto_count()
         # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
         # return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
-        return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
+        return {k: v.all_solution_num / v.total_num_anneals for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
@@ -559,6 +570,8 @@ class ProblemResult:
 
     @staticmethod
     def average_of_dicts(scores: List[Dict[str, float]]) -> Dict[str, float]:
+        if len(scores) == 0:
+            return {}
         result: Dict[str, float] = {key: 0.0 for key in scores[0]}
         for score in scores:
             for key in result:
@@ -598,6 +611,7 @@ class ProblemResult:
             w.append(v)
 
         # calculate
+        feasible_num: List[Dict[str, float]] = []
         elapsed: List[Dict[str, float]] = []
         statistics: List[Dict[str, float]] = []
         pvalues: List[Dict[str, float]] = []
@@ -611,9 +625,14 @@ class ProblemResult:
             index2 = i % iteration2
             method1_objective = method1_result.results[index1].get_wso_objective(w)
             method2_objective = method2_result.results[index2].get_wso_objective(w)
+            if len(method1_objective) == 0:
+                method1_objective = [-1 for _ in range(30)]
+            if len(method2_objective) == 0:
+                method2_objective = [-1 for _ in range(30)]
             # N/A indicates ‘‘not applicable’’ which means that the corresponding
             # algorithm could not statistically compare with itself in the rank-sum test
             # N/A means itself for Wilcoxon’s ranksums p_value
+            feasible_num.append({method1: method1_result.results[index1].feasible_num, method2: method2_result.results[index2].feasible_num})
             statistic, pvalue = stats.ranksums(np.array(method1_objective), np.array(method2_objective), alternative=alternative)
             statistics.append({method1: statistic, method2: statistic})
             pvalues.append({method1: pvalue, method2: pvalue})
@@ -623,6 +642,7 @@ class ProblemResult:
             min_num.append({method1: np.min(method1_objective), method2: np.min(method2_objective)})
             elapsed.append({method1: method1_result.method_result.elapsed / iteration1, method2: method2_result.method_result.elapsed / iteration2})
         scores = [
+            ProblemResult.average_of_dicts(feasible_num),
             ProblemResult.average_of_dicts(elapsed),
             ProblemResult.average_of_dicts(statistics),
             ProblemResult.average_of_dicts(pvalues),
@@ -658,6 +678,7 @@ class ProblemResult:
         for k, v in weights.items():
             w.append(v)
         # calculate
+        feasible_num: List[Dict[str, float]] = []
         elapsed: List[Dict[str, float]] = []
         statistics: List[Dict[str, float]] = []
         pvalues: List[Dict[str, float]] = []
@@ -678,12 +699,14 @@ class ProblemResult:
                 p[methods[i]] = pvalue
             statistics.append(s)
             pvalues.append(p)
+            feasible_num.append({method: self.methods_results[method].results[i%self.methods_results[method]].feasible_num for method in methods})
             mean.append({method: np.mean(methods_objective[method]) for method in methods})
             std.append({method: np.std(methods_objective[method]) for method in methods})
             max_num.append({method: np.max(methods_objective[method]) for method in methods})
             min_num.append({method: np.min(methods_objective[method]) for method in methods})
             elapsed.append({method: self.methods_results[method].method_result.elapsed for method in methods})
         scores = [
+            ProblemResult.average_of_dicts(feasible_num),
             ProblemResult.average_of_dicts(elapsed),
             ProblemResult.average_of_dicts(statistics),
             ProblemResult.average_of_dicts(pvalues),
@@ -701,14 +724,13 @@ class ProblemResult:
         assert average_method in self.methods_results
         # prepare union result
         union_method_result = self.methods_results[union_method]
-        if union_method_result.method_result is None:
-            union_method_result.make_method_result(single_flag=False)
-        union_result = union_method_result.method_result
-        assert union_result is not None
+        # if union_method_result.method_result is None:
+        #     union_method_result.make_method_result(single_flag=False)
+        
         # prepare average results
         average_method_result = self.methods_results[average_method]
-        if average_method_result.method_result is None:
-            average_method_result.make_method_result(single_flag=False)
+        # if average_method_result.method_result is None:
+        #     average_method_result.make_method_result(single_flag=False)
 
         # compare
         elapsed: List[Dict[str, float]] = []

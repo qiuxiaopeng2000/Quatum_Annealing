@@ -50,7 +50,9 @@ class Problem:
                 self.objectives[k][var] = v[var] if var in v else 0.0
                 self.offset_objectives[k][var] = v[var] if var in v else 0.0
                 if offset_flag and self.offset_objectives[k][var] < 0:
-                    self.offset_objectives[k][var] *= 1.15
+                    self.offset_objectives[k][var] *= 1.2
+                # if offset_flag:
+                #     self.offset_objectives[k][var] *= 2
 
         for constraint_str_list in dp.constraints:
             assert len(constraint_str_list) == 3
@@ -60,7 +62,8 @@ class Problem:
             else:
                 self.ieq_constraints_num += 1
             if sense == '<=' or sense == '=':
-                self.constraints.append(Constraint(left, sense, int(right)))
+                # self.constraints.append(Constraint(left, sense, int(right)))
+                self.constraints.append(Constraint(left, sense, right))
             else:
                 self.constraints.append(Constraint(left, sense, right))
         self.variables_num = len(self.variables)
@@ -195,7 +198,7 @@ class Problem:
                 if not constraint.evaluate(values):
                     return 1
             return 0
-
+        
     def _evaluate(self, values: Dict[str, bool], offset_flag: bool = False, violated_count: bool = True) -> Tuple[List[float], int]:
         """_evaluate [summary] evaluate a solution with variables values.
         The violated constraint would be count as a number when violated_count is True,
@@ -359,6 +362,73 @@ class PymooProblem(Pro):
         out["F"] = objs
         out["G"] = cons
 
+class PysooProblem(Pro):
+    """
+    PysooProblem [summary] convert Problem formal to run in pysoo package.
+    """
+    def __init__(self, problem: Problem, weights: Dict[str, float], **kwargs):
+        self.n_var = problem.variables_num
+        self.n_obj = problem.objectives_num
+        # self.n_ieq_constr = problem.ieq_constraints_num
+        # self.n_eq_constr = problem.eq_constraints_num
+        self.problem = problem
+        self.constraints_lp: List[Linear] = []
+        self.vars = problem.variables
+        self.n_eq_constr = 0
+        self.n_ieq_constr = 0
+        self.weights = weights
+        self.objs = []
+        self.cons = []
+
+        for constraint in self.problem.constraints:
+            self.constraints_lp += constraint.to_linear()
+        # self.problem.constraints = self.constraints_lp
+
+        for constraint in self.constraints_lp:
+            if constraint.sense == '=':
+                self.n_eq_constr += 1
+            else:
+                self.n_ieq_constr += 1
+
+        xl = [0 for _ in range(self.problem.variables_num)]
+        xu = [1 for _ in range(self.problem.variables_num)]
+
+        super().__init__(n_var=self.n_var, n_obj=1, vars=self.vars,  n_ieq_constr=self.n_ieq_constr,
+                         n_constr=len(self.constraints_lp), n_eq_constr=self.n_eq_constr, xl=xl, xu=xu, **kwargs)
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        """
+        Assuming the Algorithm has variability size N, the input variable x is a
+        matrix with the [populationSize, N].
+        """
+        # objective
+        objs = 0.0
+        for obj_name, obj_content in self.problem.objectives.items():
+            num = []
+            for k, v in obj_content.items():
+                num.append(v)
+            assert len(x[0]) == len(num), "objective's vars num is not equal x!"
+            # auto transpose
+
+            objs += (np.dot(x, num) * self.weights[obj_name])
+        self.objs = objs
+
+        # constrain
+        ordered_constrains: List[List[float]] = [[0.0] * len(self.problem.variables) for _ in
+                                                 range(len(self.constraints_lp))]
+        for index, constrain in enumerate(self.constraints_lp):
+            for var, coef in constrain.coef.items():
+                assert var in self.problem.variables_index.keys()
+                pos = self.problem.variables_index[var]
+                ordered_constrains[index][pos] = coef
+        cons = []
+        for index, constrain in enumerate(self.constraints_lp):
+            assert len(ordered_constrains[0]) == len(x[0]), "constraints' vars num is not equal x!"
+            cons.append(np.dot(x, ordered_constrains[index]) - constrain.rhs)
+        self.cons = cons
+
+        out["F"] = objs
+        out["G"] = cons
 
 class LP(Problem):
     """LP [summary] LP, short for Linear Problem.
@@ -387,7 +457,7 @@ class LP(Problem):
 class QP(Problem):
     """QP [summary] QP, short for Quadratic Problem.
     """
-    def __init__(self, name: str, objectives_order: List[str] = [], offset_flag: bool = True) -> None:
+    def __init__(self, name: str, objectives_order: List[str] = [], offset_flag: bool = False) -> None:
         super().__init__(name=name, offset_flag=offset_flag)
         # vectorize the problem
         self.vectorize(objectives_order)

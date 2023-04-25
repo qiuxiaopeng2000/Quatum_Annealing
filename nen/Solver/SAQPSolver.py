@@ -157,15 +157,24 @@ class SAQPSolver:
         # modelling
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.offset_objectives, weights))
         penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
-        H = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
+        H = Constraint.quadratic_weighted_add(1, penalty * 1000, wso, problem.constraint_sum)
         # sample
         sampler = SASampler()
         values_list, elapsed = \
             sampler.sa_sample(H, problem.variables, if_embed, num_reads, t_max, t_min, alpha, exec_time, problem)
         # add into result
         result = Result(problem)
+        solution_list = []
         for values in values_list:
-            result.wso_add(problem.evaluate(values))
+            solution = problem.evaluate(values)
+            solution_list.append(solution)
+        # w = []
+        # for k, v in weights.items():
+        #     w.append(v)
+        # solution_list.sort(key=lambda x: (x.constraints[0], sum([x.objectives[i] * w[i] for i in range(problem.objectives_num)])))
+        # solution_list = solution_list[:num_reads]
+        for solution in solution_list:
+            result.wso_add(solution)
         result.elapsed = elapsed
         print("end SA to solve")
         return result

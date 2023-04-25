@@ -14,7 +14,7 @@ names_NRP = ['Baan', 'classic-1']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-hymoo_result_folder = 'hymoo'
+hymoo_result_folder = 'hymoo_'
 nsgaii_result_folder = 'nsgaii'
 moqa_result_folder = 'moqa'
 

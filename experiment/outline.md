@@ -1,11 +1,10 @@
 # Exp. Outline
 
 data: 
-NRP: 'rp'-25, 'ms'-50, 'Baan'-100, 'classic-1'-240, 'classic-2'-1120, 'classic-3'-2000, 'classic-4'-4000, 'classic-5'-2500
+NRP: 'ms'-50, 'Baan'-100, 'classic-1'-240, 'classic-2'-1120, 'classic-3'-2000, 'classic-5'-2500
 > 在MOQA上运行到classic-2时，量子计算机就会无法求解
 
-FSP: 'BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, 'Amazon'-79, 'E-shop'-290, 'eCos'-1244, 'Freebsd'-1396(MemoryError), 
-     'Fiasco'-1638, 'uClinux'-1850, 'LinuxX86'-6888
+FSP: 'BerkeleyDB'-13, 'WebPortal'-43, 'Drupal'-48, 'E-Shop'-290, 'eCos'-1244, 'Fiasco'-1638, 'uClinux'-1850
 
 将数据从变量规模从小到大排列
      
@@ -47,12 +46,12 @@ FSP: 'BerkeleyDB'-13, 'ERS'-36, 'WebPortal'-43, 'Drupal'-48, 'Amazon'-79, 'E-sho
 约定：数据规模小于100的为小规模问题，大于100的为大规模问题
 
 RQ1： small-scale problems
-NRP：'rp'-25, 'ms'-50
-FSP：'ERS'-36, 'WebPortal'-43
+NRP：'rp'-25, 'ms'-50, 'classic-1'-240
+FSP：'ERS'-36, 'WebPortal'-43, 'E-Shop'-290
 
 RQ2： small-scale problems
-NRP：'rp'-25, 'ms'-50
-FSP：'ERS'-36, 'WebPortal'-43
+NRP：'rp'-25, 'ms'-50, 'classic-1'-240
+FSP：'ERS'-36, 'WebPortal'-43, 'E-Shop'-290
 
 RQ3：medium-large scale problems
 
@@ -64,7 +63,7 @@ NRP：'classic-2'-1120, 'classic-3'-2000
 FSP：'eCos'-1244, 'uClinux'-1850
 
 RQ4: medium-large scale problems, decomposer: [0.3, 0.5, 0.7]
-NRP：'classic-3'-2000, 'classic-3-offset'
+NRP：'classic-3'-2000, 
 FSP：'uClinux'-1396
 
 RQ5: large scale problems, solve bound
@@ -74,3 +73,8 @@ sub-size: [100, 300, 500, 700]
 NRP：'classic-3'-2000
 FSP：'uClinux'-1850
 
+大规模分解的subsize用最大embed的大小
+RQ1: FSP large-scale, small-scale
+RQ2: NRP large-scale, small-scale
+RQ3: 相容性：rate, 
+确定合适的sub_size

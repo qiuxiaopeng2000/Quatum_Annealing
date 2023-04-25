@@ -84,6 +84,13 @@ def load_rp(name: str):
     problem.objectives['cost'] = {k: float(v) for k, v in tmp_cost.items()}
     problem.objectives['revenue'] = {k: -v for k, v in tmp_revenue.items()}
     problem.objectives['urgency'] = {k: -v for k, v in tmp_urgency.items()}
+
+    problem.objectives['single'] = {k: 0.0 for k in variables_set}
+    for k, v in tmp_cost.items():
+        problem.objectives['single'][k] += 0.5 * v
+    for k, v in tmp_revenue.items():
+        problem.objectives['single'][k] -= 0.5 * v
+
     for requirement, couplings_list in tmp_couplings.items():
         for coupling in couplings_list:
             problem.constraints.append([coupling, '<=>', requirement])
@@ -444,15 +451,15 @@ def load_Baan():
 
 if __name__ == '__main__':
     # FSP
-    fsp_problems = ['uClinux']
-    for fsp_name in fsp_problems:
-        problem = load_fsp_new(fsp_name)
-        problem.dump(fsp_name + '_offset')
-    # # NRP: rp
-    # rp_problems = ['ms', 'rp']
-    # for rp_name in rp_problems:
-    #     problem = load_rp(rp_name)
-    #     problem.dump(rp_name)
+    # fsp_problems = ['uClinux']
+    # for fsp_name in fsp_problems:
+    #     problem = load_fsp_new(fsp_name)
+    #     problem.dump(fsp_name + '_offset')
+    # NRP: rp
+    rp_problems = ['ms', 'rp']
+    for rp_name in rp_problems:
+        problem = load_rp(rp_name)
+        problem.dump(rp_name + '_single')
     # # TSM
     # tsm_problems = ['make']
     # for tsm_name in tsm_problems:
@@ -464,10 +471,10 @@ if __name__ == '__main__':
     #         'realistic-g1', 'realistic-g2', 'realistic-g3', 'realistic-g4',
     #         'realistic-m1', 'realistic-m2', 'realistic-m3', 'realistic-m4'
     #         ]
-    xuan = ['classic-3']
-    for xuan_name in xuan:
-        problem = load_xuan(xuan_name)
-        problem.dump(xuan_name)
+    # xuan = ['classic-3']
+    # for xuan_name in xuan:
+    #     problem = load_xuan(xuan_name)
+    #     problem.dump(xuan_name)
     # # NRP: Baan
     # problem = load_Baan()
     # problem.dump('Baan')

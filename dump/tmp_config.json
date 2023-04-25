@@ -1,17 +1,17 @@
 {
-  "problem": "eCos",
+  "problem": "Drupal",
   "objectiveOrder": [
     "COST",
     "USED_BEFORE",
     "DEFECTS",
     "DESELECTED"
   ],
-  "iterations": 30,
-  "populationSize": 1000,
-  "maxEvaluations": 200000,
+  "iterations": 15,
+  "populationSize": 500,
+  "maxEvaluations": 50000,
   "crossoverProbability": 0.8,
-  "mutationProbability": 0.0008038585209003215,
-  "resultFolder": "hymoo",
-  "methodName": "temp",
-  "exec_time": 125.45161569999975
+  "mutationProbability": 0.020833333333333332,
+  "resultFolder": "nsgaii_mmm",
+  "methodName": "nsgaii",
+  "exec_time": -1
 }

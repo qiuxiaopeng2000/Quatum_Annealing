@@ -273,7 +273,7 @@ class Constraint:
             # linear equation
             return Constraint.linear_equation_quadratic(self.left.copy(), self.right)
         elif self.sense == '<=':
-            # linear inequation, slacken variables added
+            # linear inequation '<=', slacken variables added
             return Constraint.linear_inequation_quadratic(self.left.copy(), self.right, artificial_list)
         elif self.sense == '<=>':
             # iff. x <=> y is same as x - y = 0
@@ -320,29 +320,69 @@ class Constraint:
             return Constraint.quadratic_sum(alt_list)
         assert False
 
+    # def evaluate(self, values: Dict[str, bool]) -> bool:
+    #     """evaluate [summary] return if this constraint is violated
+    #     """
+    #     if self.sense == '<=' or self.sense == '=':
+    #         left_value = 0
+    #         for var, coef in self.left.items():
+    #             if values[var]: left_value += coef
+    #         if self.sense == '=': return (left_value == self.right)
+    #         else: return left_value <= self.right
+    #     elif self.sense == 'or' or self.sense == 'alt':
+    #         # for each left < right
+    #         if not values[self.right]:
+    #             for left_var in self.left:
+    #                 if values[left_var]: return False
+    #         # sum of left >= right
+    #         right_value = 1 if values[self.right] else 0
+    #         left_value = 0
+    #         for left_var in self.left:
+    #             if values[left_var]: left_value += 1
+    #         if left_value > right_value: return False
+    #         # for alt, sum of left should not be greater than 1
+    #         if self.sense == 'alt' and left_value > 1: return False
+    #         return True
+    #     elif self.sense == '<=>':
+    #         return values[self.left] == values[self.right]
+    #     elif self.sense == '=>':
+    #         return not (values[self.left] and (not values[self.right]))
+    #     elif self.sense == '><':
+    #         return not (values[self.left] and values[self.right])
+    #     assert False, ('cannot evaluate with this constraint', self.__str__())
+
     def evaluate(self, values: Dict[str, bool]) -> bool:
         """evaluate [summary] return if this constraint is violated
         """
+        precision = 1e-9
         if self.sense == '<=' or self.sense == '=':
             left_value = 0
             for var, coef in self.left.items():
                 if values[var]: left_value += coef
-            if self.sense == '=': return (left_value == self.right)
-            else: return left_value <= self.right
-        elif self.sense == 'or' or self.sense == 'alt':
-            # for each left < right
-            if not values[self.right]:
+            if self.sense == '=': return ((left_value <= (self.right + precision)) and (left_value >= (self.right - precision)))
+            else: return left_value <= (self.right + precision)
+        elif self.sense == 'or':
+            if values[self.right]:
+                for left_var in self.left:
+                    if values[left_var]: return True
+                return False
+            else:
                 for left_var in self.left:
                     if values[left_var]: return False
-            # sum of left >= right
-            right_value = 1 if values[self.right] else 0
-            left_value = 0
-            for left_var in self.left:
-                if values[left_var]: left_value += 1
-            if left_value < right_value: return False
-            # for alt, sum of left should not be greater than 1
-            if self.sense == 'alt' and left_value > 1: return False
-            return True
+                return True
+        elif self.sense == 'alt':
+            num: int = 0
+            if values[self.right]:
+                for left_var in self.left:
+                    if values[left_var]: 
+                        num += 1
+                        if num > 1:
+                            return False
+                return num == 1
+            else:
+                for left_var in self.left:
+                    if values[left_var]: return False
+                return True
         elif self.sense == '<=>':
             return values[self.left] == values[self.right]
         elif self.sense == '=>':
