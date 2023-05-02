@@ -11,38 +11,38 @@ names_FSP = ['WebPortal', 'Drupal', 'E-Shop', 'ERS']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['ms', 'Baan', 'classic-1', 'rp']
-# names_NRP = ['Baan']
+# names_NRP = ['ms', 'Baan', 'classic-1', 'rp']
+names_NRP = ['rp', 'ms']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-nsgaii_result_folder = 'nsgaii_mm'
-moqa_result_folder = 'moqa_m'
+nsgaii_result_folder = 'nsgaii_'
+moqa_result_folder = 'moqa_'
 
 # compare MOQA with NSGA-II
-for name in names_FSP:
-    problem = Problem(name)
-    problem.vectorize(order_FSP)
+# for name in names_FSP:
+#     problem = Problem(name)
+#     problem.vectorize(order_FSP)
 
-    # prepare the problem result folder before solving
-    nsgaii_problem_result = ProblemResult(name, problem, nsgaii_result_folder)
-    moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
+#     # prepare the problem result folder before solving
+#     nsgaii_problem_result = ProblemResult(name, problem, nsgaii_result_folder)
+#     moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
-    ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
-    ga_result.load(evaluate=True, total_num_anneals=500)
-    qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
-    qa_result.load(evaluate=True, total_num_anneals=3000)
+#     ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
+#     ga_result.load(evaluate=True, total_num_anneals=100)
+#     qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
+#     qa_result.load(evaluate=True, total_num_anneals=3000)
 
-    moqa_problem_result.add(ga_result)
-    moqa_problem_result.add(qa_result)
+#     moqa_problem_result.add(ga_result)
+#     moqa_problem_result.add(qa_result)
 
-    # compare
-    scores_ga = moqa_problem_result.average_compare(union_method='moqa', average_method='nsgaii')
-    table_ga = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'nsgaii'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
-        scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
-    )
-    Visualizer.tabluate(table_ga, 'moqa-nsgaii-compare-{}.csv'.format(name))
+#     # compare
+#     scores_ga = moqa_problem_result.average_compare(union_method='moqa', average_method='nsgaii')
+#     table_ga = Visualizer.tabulate_single_problem(
+#         name, ['moqa', 'nsgaii'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing'],
+#         scores_ga, {'elapsed time': 4, 'found': 2, 'front': 2, 'igd': 2, 'hv': 2, 'spacing': 2}
+#     )
+#     Visualizer.tabluate(table_ga, 'moqa-nsgaii-compare-{}.csv'.format(name))
 
 
 for name in names_NRP:
@@ -54,7 +54,7 @@ for name in names_NRP:
     moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
     ga_result = MethodResult('nsgaii', nsgaii_problem_result.path, problem)
-    ga_result.load(evaluate=True, total_num_anneals=500)
+    ga_result.load(evaluate=True, total_num_anneals=100)
     qa_result = MethodResult('moqa', moqa_problem_result.path, problem)
     qa_result.load(evaluate=True, total_num_anneals=3000)
 
@@ -64,7 +64,7 @@ for name in names_NRP:
     # compare
     scores_ga = moqa_problem_result.average_compare(union_method='moqa', average_method='nsgaii')
     table_ga = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'nsgaii'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
-        scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
+        name, ['moqa', 'nsgaii'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing'],
+        scores_ga, {'elapsed time': 4, 'found': 2, 'front': 2, 'igd': 2, 'hv': 2, 'spacing': 2}
     )
     Visualizer.tabluate(table_ga, 'moqa-nsgaii-compare-{}.csv'.format(name))

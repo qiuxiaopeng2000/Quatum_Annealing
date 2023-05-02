@@ -334,6 +334,7 @@ class MethodResult:
                 solution_list.append(solution)
         # append to archives
         result = Result(self.problem)
+        result.all_solution_num = 0
         # archive.set_solution_list(solution_list)
         if single_flag:
             for solution in solution_list:
@@ -341,7 +342,7 @@ class MethodResult:
         else:
             for solution in solution_list:
                 result.add(solution)
-                result.all_solution_num += 1
+                # result.all_solution_num += 1
         self.results.append(result)
 
     def dump_info(self) -> None:
@@ -757,7 +758,7 @@ class ProblemResult:
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())
             sp_all.append(problem_archive.compute_sp())
-            tts_all.append(problem_archive.compute_tts())
+            # tts_all.append(problem_archive.compute_tts())
         # collect scores
         scores = [ProblemResult.average_of_dicts(elapsed),
                   ProblemResult.average_of_dicts(found),
@@ -765,7 +766,8 @@ class ProblemResult:
                   ProblemResult.average_of_dicts(igd_all),
                   ProblemResult.average_of_dicts(hv_all),
                   ProblemResult.average_of_dicts(sp_all),
-                  ProblemResult.average_of_dicts(tts_all)]
+                #   ProblemResult.average_of_dicts(tts_all)
+                  ]
         return scores
     
     def average_list_compare(self, methods: List[str]) -> List[Dict[str, float]]:

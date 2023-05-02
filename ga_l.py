@@ -17,7 +17,7 @@ names_NRP = ['classic-2', 'classic-3', 'classic-5']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-result_folder = 'ga_'
+result_folder = 'ga_m'
 
 for name in names_NRP:
     problem = Problem(name)
@@ -30,7 +30,7 @@ for name in names_NRP:
     JarSolver.solve(
         solver_name='GASingle', config_name='tmp_config',
         problem=name, objectiveOrder=order_NRP, iterations=50,
-        populationSize=100, maxEvaluations=200000, weights=weight_NRP,
+        populationSize=500, maxEvaluations=500000, weights=weight_NRP,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='ga', exec_time=-1
     )
@@ -53,7 +53,7 @@ for name in names_FSP:
     JarSolver.solve(
         solver_name='GASingle', config_name='tmp_config',
         problem=name, objectiveOrder=order_FSP, iterations=50,
-        populationSize=100, maxEvaluations=1000000, weights=weight_FSP,
+        populationSize=500, maxEvaluations=2000000, weights=weight_FSP,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='ga', exec_time=-1
     )

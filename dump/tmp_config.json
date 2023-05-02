@@ -1,5 +1,5 @@
 {
-  "problem": "Drupal",
+  "problem": "uClinux",
   "objectiveOrder": [
     "COST",
     "USED_BEFORE",
@@ -8,10 +8,10 @@
   ],
   "iterations": 15,
   "populationSize": 500,
-  "maxEvaluations": 50000,
+  "maxEvaluations": 2000000,
   "crossoverProbability": 0.8,
-  "mutationProbability": 0.020833333333333332,
-  "resultFolder": "nsgaii_mmm",
+  "mutationProbability": 0.0005405405405405405,
+  "resultFolder": "nsgaii_",
   "methodName": "nsgaii",
   "exec_time": -1
 }

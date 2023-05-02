@@ -393,8 +393,8 @@ def load_xuan(name):
         for req, urg in enumerate(content):
             urgency['r{}'.format(req + 1)] = urg
     # construct objectives
-    # problem.objectives['cost'] = cost
-    problem.objectives['cost'] = {k: v * 10 for k, v in cost.items()}
+    problem.objectives['cost'] = cost
+    # problem.objectives['cost'] = {k: v * 10 for k, v in cost.items()}
     problem.objectives['revenue'] = {k: -v for k, v in revenue.items()}
     problem.objectives['urgency'] = {k: -v for k, v in urgency.items()}
     # flatten constraints

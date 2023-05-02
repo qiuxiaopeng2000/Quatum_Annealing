@@ -27,8 +27,8 @@ for name in names_NRP:
     # solve with NSGA-II
     JarSolver.solve(
         solver_name='NSGAII', config_name='tmp_config',
-        problem=name, objectiveOrder=order_NRP, iterations=10,
-        populationSize=100, maxEvaluations=200000,
+        problem=name, objectiveOrder=order_NRP, iterations=15,
+        populationSize=500, maxEvaluations=500000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='nsgaii', exec_time=-1
     )
@@ -40,7 +40,6 @@ for name in names_NRP:
     problem_result.dump()
 
 for name in names_FSP:
-    # result_folder = 'nsgaii-{}'.format(name)
     problem = Problem(name)
     problem.vectorize(order_FSP)
 
@@ -50,8 +49,8 @@ for name in names_FSP:
     # solve with NSGA-II
     JarSolver.solve(
         solver_name='NSGAII', config_name='tmp_config',
-        problem=name, objectiveOrder=order_FSP, iterations=10,
-        populationSize=100, maxEvaluations=1000000,
+        problem=name, objectiveOrder=order_FSP, iterations=15,
+        populationSize=500, maxEvaluations=2000000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='nsgaii', exec_time=-1
     )
