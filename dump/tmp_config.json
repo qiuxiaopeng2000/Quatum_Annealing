@@ -1,5 +1,5 @@
 {
-  "problem": "uClinux",
+  "problem": "Fiasco",
   "objectiveOrder": [
     "COST",
     "USED_BEFORE",
@@ -10,7 +10,7 @@
   "populationSize": 500,
   "maxEvaluations": 2000000,
   "crossoverProbability": 0.8,
-  "mutationProbability": 0.0005405405405405405,
+  "mutationProbability": 0.0006105006105006105,
   "resultFolder": "nsgaii_",
   "methodName": "nsgaii",
   "exec_time": -1

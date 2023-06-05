@@ -12,8 +12,8 @@ names_FSP = [ 'uClinux', 'eCos','Fiasco']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['classic-2', 'classic-3', 'classic-5']
-# names_NRP = ['classic-5']
+# names_NRP = ['classic-2', 'classic-3', 'classic-5']
+names_NRP = ['classic-5']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
@@ -22,7 +22,7 @@ hysoo_result_folder = 'hysoo_m'
 
 # Multi-objective problems
 # for name in names_NRP:
-#     problem = QP(name, order_NRP, offset_flag=True)
+#     problem = QP(name, order_NRP)
 #     problem_result = ProblemResult(name, problem, hymoo_result_folder)
 #     moqa_method_result = MethodResult('hymoo', problem_result.path, problem)
 #     for _ in range(1):

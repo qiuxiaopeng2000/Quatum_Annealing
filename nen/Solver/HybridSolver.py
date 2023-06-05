@@ -108,15 +108,15 @@ class HybridSolver:
     @staticmethod
     def solve_rates(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int, populationSize: int,
               objectiveOrder: List[str], resultFolder: str, problem_result_path: str,
-              rates: List[float], sample_times: int = 1, **parameters) -> Dict[int, Result]:
+              rates: List[float], sample_times: int = 1, **parameters) -> Dict[float, Result]:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
         print("{} start Hybrid Solver to solve multi-objective problem!!!".format(problem.name))
         # scale objectives and get the basic
         basic_weights = SolverUtil.scaled_weights(problem.objectives)
         # sample for sample_times times
-        solution_lists: Dict[int, List[BinarySolution]] = {}
-        rate_elapseds: Dict[int, float] = {}
+        solution_lists: Dict[float, List[BinarySolution]] = {}
+        rate_elapseds: Dict[float, float] = {}
         # annealing_schedule = [[0.0, 0.0], [10, 0.5], [110, 0.5], [120, 1.0]]
         for rate in rates:
             solution_list: List[BinarySolution] = []
@@ -160,7 +160,7 @@ class HybridSolver:
                             objectiveOrder=objectiveOrder, resultFolder=resultFolder, 
                             problem_result_path=problem_result_path)
         '''Selection'''
-        results: Dict[int, Result] = {}
+        results: Dict[float, Result] = {}
         for rate in rates:
             rate_solution_list: List[BinarySolution] = solution_lists[rate]
             rate_solution_list += nsgaii_soluion_list
@@ -228,11 +228,11 @@ class HybridSolver:
     @staticmethod
     def single_solve_rate(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int, populationSize: int,
                         objectiveOrder: List[str], resultFolder: str, problem_result_path: str, weights: Dict[str, float],
-                        rates: List[float], sample_times: int = 1, **parameters) -> Dict[int, Result]:
+                        rates: List[float], sample_times: int = 1, **parameters) -> Dict[float, Result]:
         print("{} start Hybrid Solver to solve single-objective problem!!!".format(problem.name))
-        results: Dict[int, Result] = []
-        solution_lists: Dict[int, List[BinarySolution]] = {}
-        rate_elapseds: Dict[int, float] = {}
+        results: Dict[float, Result] = []
+        solution_lists: Dict[float, List[BinarySolution]] = {}
+        rate_elapseds: Dict[float, float] = {}
 
         # generate random weights and calculate weighted sum obejctive
         wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.offset_objectives, weights))
