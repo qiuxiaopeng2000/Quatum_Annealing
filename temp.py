@@ -26,4 +26,4 @@ for weight in weights:
     print(qubo)
 print(problem.variables_num, problem.constraints_num)
 
-  
+   
