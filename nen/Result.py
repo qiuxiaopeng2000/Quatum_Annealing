@@ -66,9 +66,6 @@ class NDArchive:
         assert len(solution.objectives) == self.objectives_num
         # round objectives with NDArchive.ROUND_PRECISION
         solution.objectives = [round(x, NDArchive.ROUND_PRECISION) for x in solution.objectives]
-        # for i in range(len(solution.objectives)):
-        #     if solution.objectives[i] > 0:
-        #         solution.objectives[i] /= 10
         if solution not in self.solution_list:
             self.feasible_num += 1
         self.solution_list.append(solution)

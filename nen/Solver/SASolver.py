@@ -6,6 +6,7 @@ from jmetal.core.solution import BinarySolution
 from nen.Problem import Problem
 from nen.Result import Result
 from nen.Solver.MetaSolver import SolverUtil
+from nen.Problem import QP
 
 
 class SASolver:
@@ -24,15 +25,47 @@ class SASolver:
         solution.variables = [variables]
         # evaluate solution
         solution = problem.evaluate_solution(solution)
-        # while solution.constraints[0] > 0:  # For problems which are not easy to solve, this operator will be very time-consuming.
-        #     # random variables
-        #     variables = []
-        #     for _ in range(problem.variables_num):
-        #         variables.append(bool(random.randint(0, 1)))
-        #     solution = problem._empty_solution()
-        #     solution.variables = [variables]
-        #     # evaluate solution
-        #     solution = problem.evaluate_solution(solution)
+        return solution
+    
+    @staticmethod
+    def QPrandomSolution(problem: QP) -> BinarySolution:
+        """randomSolution [summary] generate a random solution.
+        """
+        random.seed(datetime.now())
+        # random variables
+        variables = []
+        for _ in range(problem.variables_num):
+            variables.append(bool(random.randint(0, 1)))
+        for _ in range(len(problem.artificial_list)):
+            variables.append(bool(random.randint(0, 1)))
+        solution = problem._empty_solution()
+        solution.variables = [variables]
+        # evaluate solution
+        solution = problem.evaluate_solution(solution)
+        return solution
+    
+    @staticmethod
+    def randomFeasibleSolution(problem: Problem) -> BinarySolution:
+        """randomSolution [summary] generate a random solution.
+        """
+        random.seed(datetime.now())
+        # random variables
+        variables = []
+        for _ in range(problem.variables_num):
+            variables.append(bool(random.randint(0, 1)))
+        solution = problem._empty_solution()
+        solution.variables = [variables]
+        # evaluate solution
+        solution = problem.evaluate_solution(solution)
+        while solution.constraints[0] > 0:  # For problems which are not easy to solve, this operator will be very time-consuming.
+            # random variables
+            variables = []
+            for _ in range(problem.variables_num):
+                variables.append(bool(random.randint(0, 1)))
+            solution = problem._empty_solution()
+            solution.variables = [variables]
+            # evaluate solution
+            solution = problem.evaluate_solution(solution)
         return solution
 
     @staticmethod

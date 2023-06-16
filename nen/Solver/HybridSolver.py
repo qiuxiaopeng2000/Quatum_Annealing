@@ -30,7 +30,6 @@ class HybridSolver:
     The Quantum Annealling Solver is implemeneted with D-Wave Leap,
     make sure the environment is configured successfully accordingly.
     """
-
     @staticmethod
     def solve(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int, populationSize: int,
               objectiveOrder: List[str], resultFolder: str, problem_result_path: str,
@@ -46,6 +45,65 @@ class HybridSolver:
         # annealing_schedule = [[0.0, 0.0], [10, 0.5], [110, 0.5], [120, 1.0]]
         for i in range(sample_times):
             t = 0
+            initial_solutions = [SASolver.randomSolution(problem) for _ in range(num_reads)]
+            # generate random weights and calculate weighted sum obejctive
+            weights = MOQASolver.random_normalized_weights(basic_weights)
+            wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
+            # calculate the penalty and add constraints to objective with penalty
+            penalty = EmbeddingSampler.calculate_penalty(wso, problem.constraint_sum)
+            objective = Constraint.quadratic_weighted_add(1, penalty, wso, problem.constraint_sum)
+            qubo = Constraint.quadratic_to_qubo_dict(objective)
+            # convert qubo to bqm
+            bqm = BinaryQuadraticModel.from_qubo(qubo)
+
+            '''Decomposer'''
+            s1 = SolverUtil.time()
+            states = HybridSolver.Decomposer(sub_size=sub_size, bqm=bqm, variables_num=bqm.num_variables,
+                                             )    
+            length = len(states)
+            states = states[:int(length * rate)]
+            e1 = SolverUtil.time()
+            '''Sampler'''
+            sampleset, runtime = HybridSolver.Sampler_global(problem=problem, states=states, num_reads=num_reads, 
+                                                                bqm=bqm, initial_solutions=initial_solutions, 
+                                                                    # anneal_schedule=annealing_schedule, 
+                                                                **parameters)
+            HybridSolver.Composer(problem=problem, sampleset=List[sampleset], num_reads=num_reads, solution_list=solution_list)
+            assert len(solution_list) == num_reads
+            t = e1 - s1 + runtime
+            elapseds.append(t)
+            print(i)
+            
+        # put samples into result
+        result = Result(problem)
+        for solution in solution_list:
+            result.wso_add(solution)
+        # add into method result
+        result.elapsed = sum(elapseds)
+        # storage parameters
+        result.info['sample_times'] = sample_times
+        result.info['num_reads'] = num_reads
+        result.iterations = sample_times
+        result.total_num_anneals = num_reads * sample_times
+        print("{} Hybrid Solver end!!!".format(problem.name))
+        return result
+
+    @staticmethod
+    def solve_parallel(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int, populationSize: int,
+              objectiveOrder: List[str], resultFolder: str, problem_result_path: str,
+              sample_times: int = 1, rate: float = 1.0, **parameters) -> Result:
+        """solve [summary] solve multi-objective qp, results are recorded in result.
+        """
+        print("{} start Hybrid Solver to solve multi-objective problem!!!".format(problem.name))
+        # scale objectives and get the basic
+        basic_weights = SolverUtil.scaled_weights(problem.objectives)
+        # sample for sample_times times
+        elapseds: List[float] = []
+        solution_list: List[BinarySolution] = []
+        # annealing_schedule = [[0.0, 0.0], [10, 0.5], [110, 0.5], [120, 1.0]]
+        for i in range(sample_times):
+            t = 0
+            initial_solutions = [SASolver.randomSolution(problem) for _ in range(num_reads)]
             # generate random weights and calculate weighted sum obejctive
             weights = MOQASolver.random_normalized_weights(basic_weights)
             wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
@@ -65,8 +123,9 @@ class HybridSolver:
             e1 = SolverUtil.time()
             '''Sampler'''
             subsamplesets, runtime = HybridSolver.Sampler(states=states, num_reads=num_reads, 
+                                                          initial_solutions=initial_solutions, 
                                                             # anneal_schedule=annealing_schedule, 
-                                                            **parameters)
+                                                          **parameters)
             '''Composer'''
             s2 = SolverUtil.time()
             HybridSolver.Composer(problem=problem, subsamplesets=subsamplesets, num_reads=num_reads,
@@ -75,11 +134,7 @@ class HybridSolver:
             t = e1 - s1 + e2 - s2 + runtime
             elapseds.append(t)
             print(i)
-            
-        # solution_list_qa = []
-        # for solution in solution_list:
-        #     solution_list_qa.append(solution)
-        # solution_list_qa.sort(key=lambda x: (x.constraints[0], x.objectives))
+
         '''NSGA-II'''
         HybridSolver.NSGAII(populationSize=populationSize, maxEvaluations=maxEvaluations, problem=problem,
                             time=sum(elapseds), solution_list=solution_list, iterations=sample_times,
@@ -330,6 +385,8 @@ class HybridSolver:
 
     @staticmethod
     def Sampler(states: List[State], num_reads: int, **parameters) -> Tuple[List[SampleSet], float]:
+        """ just solve subproblems and return the answer
+        """
         elapseds = 0.0
         subsamplesets = []
         for state in states:
@@ -345,6 +402,60 @@ class HybridSolver:
             subsamplesets.append(sampleset)
             elapseds += elapsed
         return subsamplesets, elapseds
+    
+    @staticmethod
+    def Sampler_global(problem: QP, states: List[State], num_reads: int, bqm: BinaryQuadraticModel, 
+                       initial_solutions: List[BinarySolution], **parameters) -> Tuple[SampleSet, float]:
+        """ solve the subproblems and update the solution
+        """
+        elapseds = 0.0
+        for state in states:
+            pro_bqm = state.subproblem
+            qubo, offset = pro_bqm.to_qubo()
+            sampler = EmbeddingSampler()
+            sampleset, elapsed = sampler.sample(qubo, num_reads=num_reads, answer_mode='raw', 
+                                                # postprocess='sampling', 
+                                                **parameters)
+            elapseds += elapsed
+            HybridSolver.update_solution(problem=problem, sampleset=sampleset, num_reads=num_reads, solution_list=initial_solutions)
+        variables = list(problem.variables)
+        for var in problem.artificial_list:
+            variables.append(var)
+        sampleset = dimod.SampleSet.from_samples_bqm(samples=dimod.as_samples([{var: initial_solutions[k].variables[index] for index, var in enumerate(variables)} for k in range(num_reads)]), 
+                                                     bqm=bqm)
+        local_solver = SteepestDescentSolver()
+        sampleset = local_solver.sample(bqm=bqm, initial_states=sampleset)
+        return sampleset, elapseds
+
+    @staticmethod
+    def update_solution(problem: QP, sampleset: SampleSet, num_reads: int, solution_list: List[BinarySolution]) -> bool:
+        """ Bring the value of the variable of the subproblem into the original problem, 
+        and if the new solution obtained has lower energy, update the solution
+        """
+        var_index_in_problem: Dict[str, int] = {}
+        for var in problem.variables:
+            var_index_in_problem[var] = problem.variables.index(var)
+        for var in problem.artificial_list:
+            var_index_in_problem[var] = problem.artificial_list.index(var) + len(problem.variables)
+        var_index_in_sampleset: Dict[str, int] = {}
+        for var in sampleset.variables:
+            var_index_in_sampleset[var] = sampleset.variables.index(var)
+        k = 0
+        for subsample in sampleset.record and k < num_reads:
+            solution = solution_list[k]
+            for var in sampleset.variables:
+                assert var in var_index_in_problem
+                solution.variables[var_index_in_problem[var]] = subsample[0][var_index_in_sampleset[var]]
+            solution = problem.evaluate_solution(solution)
+            m_better: bool = True
+            for i in range(len(solution.objectives)):
+                if solution.objectives[i] > solution_list[k].objectives[i]:
+                    m_better = False
+                    break
+            if m_better:
+                solution_list[k] = solution
+            k += 1
+        return True
 
     @staticmethod
     def Composer(problem: QP, subsamplesets: List[SampleSet], num_reads: int, solution_list: List[BinarySolution]) -> bool:
