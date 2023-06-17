@@ -44,7 +44,7 @@ class HybridSolver:
         # annealing_schedule = [[0.0, 0.0], [10, 0.5], [110, 0.5], [120, 1.0]]
         for i in range(sample_times):
             t = 0
-            initial_solutions = [SASolver.randomSolution(problem) for _ in range(num_reads)]
+            initial_solutions = [SASolver.QPrandomSolution(problem) for _ in range(num_reads)]
             # generate random weights and calculate weighted sum obejctive
             weights = MOQASolver.random_normalized_weights(basic_weights)
             wso = Quadratic(linear=SolverUtil.weighted_sum_objective(problem.objectives, weights))
@@ -67,7 +67,7 @@ class HybridSolver:
                                                                 bqm=bqm, initial_solutions=initial_solutions, 
                                                                     # anneal_schedule=annealing_schedule, 
                                                                 **parameters)
-            HybridSolver.Composer(problem=problem, sampleset=List[sampleset], num_reads=num_reads, solution_list=solution_list)
+            HybridSolver.Composer(problem=problem, samplesets=[sampleset], num_reads=num_reads, solution_list=solution_list)
             assert len(solution_list) == num_reads
             t = e1 - s1 + runtime
             elapseds.append(t)
@@ -417,10 +417,29 @@ class HybridSolver:
                                                 **parameters)
             elapseds += elapsed
             HybridSolver.update_solution(problem=problem, sampleset=sampleset, num_reads=num_reads, solution_list=initial_solutions)
-        variables = list(problem.variables)
+        variables = problem.variables
         for var in problem.artificial_list:
             variables.append(var)
-        sampleset = dimod.SampleSet.from_samples_bqm(samples=dimod.as_samples([{var: initial_solutions[k].variables[index] for index, var in enumerate(variables)} for k in range(num_reads)]), 
+        
+        # test
+        # print(len(variables))
+        # print(len(initial_solutions[0].variables[0]))
+        # print(variables)
+        # print(initial_solutions[0].variables[0])
+        # print(bqm.num_variables)
+        # print(bqm.variables)
+        # print(variables)
+        
+        samples = []
+        for k in range(num_reads):
+            dic = {}
+            for index, var in enumerate(variables):
+                dic[var] = np.int8(initial_solutions[k].variables[0][index])
+            samples.append(dic)
+        # samples = dimod.as_samples([{var: initial_solutions[k].variables[0][index] \
+        #                             for index, var in enumerate(variables)} \
+        #                             for k in range(num_reads)])
+        sampleset = dimod.SampleSet.from_samples_bqm(samples_like=dimod.as_samples(samples), 
                                                      bqm=bqm)
         local_solver = SteepestDescentSolver()
         sampleset = local_solver.sample(bqm=bqm, initial_states=sampleset)
@@ -440,7 +459,9 @@ class HybridSolver:
         for var in sampleset.variables:
             var_index_in_sampleset[var] = sampleset.variables.index(var)
         k = 0
-        for subsample in sampleset.record and k < num_reads:
+        for subsample in sampleset.record:
+            if k < num_reads:
+                break
             solution = solution_list[k]
             for var in sampleset.variables:
                 assert var in var_index_in_problem
@@ -457,11 +478,11 @@ class HybridSolver:
         return True
 
     @staticmethod
-    def Composer(problem: QP, subsamplesets: List[SampleSet], num_reads: int, solution_list: List[BinarySolution]) -> bool:
+    def Composer(problem: QP, samplesets: List[SampleSet], num_reads: int, solution_list: List[BinarySolution]) -> bool:
         values_array: Dict[str, List[int]] = {}
         for var in problem.variables:
             values_array[var] = []
-        for subsampleset in subsamplesets:
+        for subsampleset in samplesets:
             var_index: Dict[str, int] = {}
             for var in subsampleset.variables:
                 if var not in problem.variables:
@@ -475,7 +496,7 @@ class HybridSolver:
                     values_array[var].append(subsample[0][var_index[var]])
         for var in problem.variables:
             if len(values_array[var]) == 0:
-                values_array[var] += [0.0 for _ in range(len(subsamplesets[0].record))]
+                values_array[var] += [0.0 for _ in range(len(samplesets[0].record))]
         pos = 0
         while pos < num_reads:
             values = {var: bool(values_array[var][pos]) for var in problem.variables}
