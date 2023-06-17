@@ -19,7 +19,7 @@ class EmbeddingSampler:
     """ [summary] Composite Embedding and Sampling.
     """
     # DW_2000Q_6, Advantage_system6.1
-    def __init__(self, sampler=DWaveSampler(solver='Advantage_system6.1')) -> None:
+    def __init__(self, sampler=DWaveSampler(solver='Advantage_system4.1')) -> None:
         # choose the sampler
         self.sampler = sampler
         self.reverse_sampler = ReverseAdvanceComposite(self.sampler)

@@ -7,10 +7,10 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 
-from nen.Solver.GASolver import GASolver
-from project_path import PROJECT_PATH
+# from nen.Solver.GASolver import GASolver
+# from project_path import PROJECT_PATH
 import sys
-sys.path.append(PROJECT_PATH)
+# sys.path.append(PROJECT_PATH)
 
 from nen import LP, ProblemResult, MethodResult, Problem
 from nen.Solver import ExactECSolver

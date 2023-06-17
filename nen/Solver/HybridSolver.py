@@ -31,8 +31,7 @@ class HybridSolver:
     make sure the environment is configured successfully accordingly.
     """
     @staticmethod
-    def solve(problem: QP, num_reads: int, sub_size: int, maxEvaluations: int, populationSize: int,
-              objectiveOrder: List[str], resultFolder: str, problem_result_path: str,
+    def solve(problem: QP, num_reads: int, sub_size: int,
               sample_times: int = 1, rate: float = 1.0, **parameters) -> Result:
         """solve [summary] solve multi-objective qp, results are recorded in result.
         """
