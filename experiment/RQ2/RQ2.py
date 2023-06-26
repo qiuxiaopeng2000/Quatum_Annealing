@@ -11,7 +11,7 @@ names_FSP = ['ERS', 'WebPortal', 'Drupal']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-names_NRP = ['rp', 'ms', 'Baan']
+names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
@@ -24,6 +24,8 @@ for name in names_FSP:
     problem.vectorize(order_FSP)
 
     # prepare the problem result folder before solving
+    exact_result_folder = 'EA-GA-{}'.format(name)
+    exact_problem_result = ProblemResult(name, problem, exact_result_folder)
     nsgaii_problem_result = ProblemResult(name, problem, nsgaii_result_folder)
     moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
@@ -49,7 +51,8 @@ for name in names_NRP:
     problem.vectorize(order_NRP)
 
     # prepare the problem result folder before solving
-    # prepare the problem result folder before solving
+    exact_result_folder = 'EA-GA-{}'.format(name)
+    exact_problem_result = ProblemResult(name, problem, exact_result_folder)
     nsgaii_problem_result = ProblemResult(name, problem, nsgaii_result_folder)
     moqa_problem_result = ProblemResult(name, problem, moqa_result_folder)
 
