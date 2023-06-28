@@ -15,8 +15,8 @@ names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-nsgaii_result_folder = 'nsgaii'
-moqa_result_folder = 'moqa'
+nsgaii_result_folder = 'nsgaii_mm'
+moqa_result_folder = 'moqa_20_300_100'
 exact_result_folder = 'ea'
 
 # compare MOQA with NSGA-II
@@ -46,7 +46,7 @@ for name in names_FSP:
         name, ['moqa', 'nsgaii', 'ea'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
         scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
     )
-    Visualizer.tabluate(table_ga, 'moqa-nsgaii-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table_ga, 'moqa-nsgaii-ga-compare-{}.csv'.format(name))
 
 
 for name in names_NRP:
@@ -72,7 +72,7 @@ for name in names_NRP:
     # compare
     scores_ga = moqa_problem_result.average_list_compare(methods=['nsgaii', 'moqa', 'ea'])
     table_ga = Visualizer.tabulate_single_problem(
-        name, ['moqa', 'nsgaii', 'ea'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing'],
-        scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4}
+        name, ['moqa', 'nsgaii', 'ea'], ['elapsed time', 'found', 'front', 'igd', 'hv', 'spacing', 'tts'],
+        scores_ga, {'elapsed time': 4, 'found': 5, 'front': 4, 'igd': 4, 'hv': 4, 'spacing': 4, 'tts': 4}
     )
-    Visualizer.tabluate(table_ga, 'moqa-nsgaii-compare-{}.csv'.format(name))
+    Visualizer.tabluate(table_ga, 'moqa-nsgaii-ga-compare-{}.csv'.format(name))

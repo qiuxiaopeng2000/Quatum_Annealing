@@ -27,10 +27,16 @@ public class Results {
     private class Info {
         private int iteration;
         private List<Double> elapseds;
+        private List<Double> total_num_anneals;
 
-        public Info (int iteration, List<Double> elapseds) { this.iteration = iteration; this.elapseds = elapseds; }
+        public Info (int iteration, List<Double> elapseds, List<Double> total_num_anneals) {
+            this.iteration = iteration;
+            this.elapseds = elapseds;
+            this.total_num_anneals = total_num_anneals;
+        }
         public int getIteration () { return this.iteration; }
         public List<Double> getElapseds () { return this.elapseds; }
+        public List<Double> getTotal_num_anneals() {return this.total_num_anneals; }
     }
 
     public void dump (Path folder, String methodName) {
@@ -41,11 +47,15 @@ public class Results {
         for (Result r: this.results) {
             timeList.add(r.getElapsedTime());
         }
+        ArrayList<Double> num_anneal = new ArrayList<Double>();
+        for (Result r: this.results) {
+            num_anneal.add(r.getTotal_num_anneals());
+        }
         // dump info json
         Path infoFile = Paths.get(folder.toString(), methodName + ".info.json");
         try {
             ArrayList<String> tmp = new ArrayList<String>();
-            tmp.add(JSON.toJSONString(new Info(iteration, timeList)));
+            tmp.add(JSON.toJSONString(new Info(iteration, timeList, num_anneal)));
             Files.write(infoFile, tmp, StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.out.println("cannot open file: " + infoFile.toString());

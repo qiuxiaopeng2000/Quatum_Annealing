@@ -26,7 +26,7 @@ public class NSGAII {
         for (int i = 0; i < iterations; ++ i) {
             Algorithm<List<BinarySolution>> algorithm = new NSGAIIBuilder<BinarySolution>(
                 problem,
-                new SinglePointCrossover(crossoverProbability),
+                new SinglePointCrossover(crossoverProbability), 
                 new BitFlipMutation(mutationProbability),
                 populationSize
                 )
@@ -37,7 +37,7 @@ public class NSGAII {
             new AlgorithmRunner.Executor(algorithm).execute();
             long end = System.nanoTime();
             double elapsedTime = (end - start) / 1e9;
-            results.put(new Result(elapsedTime, algorithm.getResult()));
+            results.put(new Result(elapsedTime, maxEvaluations, algorithm.getResult()));
             if (exec_time > 0)
                 if (System.nanoTime() - s > exec_time) break;
         }
@@ -59,7 +59,13 @@ public class NSGAII {
         assert (config.containsKey("resultFolder"));
         assert (config.containsKey("methodName"));
         // run the algorithm
-        Problem problem = new Problem(config.get("problem"), config.getStringList("objectiveOrder"));
+        Problem problem;
+        if (config.containsKey("initial_solution")){
+            problem = new Problem(config.get("problem"), config.getStringList("objectiveOrder"));
+        }
+        else  {
+            problem = new Problem(config.get("problem"), config.getStringList("objectiveOrder"));
+        }
         System.out.println("NSGA-II solving on " + config.get("problem"));
         NSGAII algorithm = new NSGAII();
         // dump the results

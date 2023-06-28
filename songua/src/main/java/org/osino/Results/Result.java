@@ -14,11 +14,17 @@ import org.uma.jmetal.solution.binarysolution.BinarySolution;
 public class Result {
     private double elapsedTime;
     private List<BinarySolution> solutions;
+    private double num_anneals;
 
     public Result () {}
     public Result (double elapsedTime, List<BinarySolution> solutions) {
         setElapsedTime(elapsedTime);
         setSolutions(solutions);
+    }
+    public Result (double elapsedTime, double num_anneals, List<BinarySolution> solutions) {
+        setElapsedTime(elapsedTime);
+        setSolutions(solutions);
+        setTotal_num_anneals(num_anneals);
     }
 
     public double getElapsedTime() {
@@ -26,6 +32,12 @@ public class Result {
     }
     public void setElapsedTime(double elapsedTime) {
         this.elapsedTime = elapsedTime;
+    }
+    public void setTotal_num_anneals(double num_anneals) {
+        this.num_anneals = num_anneals;
+    }
+    public double getTotal_num_anneals() {
+        return num_anneals;
     }
     public List<BinarySolution> getSolutions() {
         return solutions;
@@ -42,6 +54,7 @@ public class Result {
             }
         }
     }
+
 
     public static String booleanListToString (List<Boolean> list) {
         String str = "";

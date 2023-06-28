@@ -1,17 +1,15 @@
 {
-  "problem": "Fiasco",
+  "problem": "classic-1",
   "objectiveOrder": [
-    "COST",
-    "USED_BEFORE",
-    "DEFECTS",
-    "DESELECTED"
+    "cost",
+    "revenue"
   ],
-  "iterations": 15,
-  "populationSize": 500,
-  "maxEvaluations": 2000000,
+  "iterations": 5,
+  "populationSize": 100,
+  "maxEvaluations": 5000,
   "crossoverProbability": 0.8,
-  "mutationProbability": 0.0006105006105006105,
-  "resultFolder": "nsgaii_",
+  "mutationProbability": 0.004166666666666667,
+  "resultFolder": "nsgaii_5_100_5000_20000",
   "methodName": "nsgaii",
   "exec_time": -1
 }

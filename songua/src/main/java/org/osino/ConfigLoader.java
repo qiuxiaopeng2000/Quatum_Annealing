@@ -49,4 +49,12 @@ public class ConfigLoader {
     public boolean getBoolean(String key) {
         return Boolean.parseBoolean(this.content.get(key));
     }
+
+    public HashMap<String, Double> getClass(String key) {
+        return  JSON.parseObject(this.content.get(key), new TypeReference<HashMap<String, Double>>(){});
+    }
+
+    public ArrayList<Integer> getIntegerList(String key) {
+        return  JSON.parseObject(this.content.get(key), new TypeReference<ArrayList<Integer>>(){});
+    }
 }

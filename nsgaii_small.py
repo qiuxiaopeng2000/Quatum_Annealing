@@ -14,7 +14,7 @@ names_NRP = ['classic-1', 'rp', 'ms', 'Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-result_folder = 'nsgaii_mmm_100'
+result_folder = 'nsgaii_5_100_5000_20000'
 
 for name in names_NRP:
     problem = Problem(name)
@@ -26,15 +26,15 @@ for name in names_NRP:
     # solve with NSGA-II
     JarSolver.solve(
         solver_name='NSGAII', config_name='tmp_config',
-        problem=name, objectiveOrder=order_NRP, iterations=3,
-        populationSize=500, maxEvaluations=10000,
+        problem=name, objectiveOrder=order_NRP, iterations=5,
+        populationSize=100, maxEvaluations=5000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='nsgaii', exec_time=-1
     )
     # load results
     ea_result = MethodResult('nsgaii', problem_result.path, problem)
-    ea_result.load(evaluate=True, single_flag=True, total_num_anneals=500)
-    ea_result.make_method_result(single_flag=True)
+    ea_result.load()
+    ea_result.make_method_result()
     problem_result.add(ea_result)
     problem_result.dump()
 
@@ -49,15 +49,15 @@ for name in names_FSP:
     # solve with NSGA-II
     JarSolver.solve(
         solver_name='NSGAII', config_name='tmp_config',
-        problem=name, objectiveOrder=order_FSP, iterations=3,
-        populationSize=500, maxEvaluations=20000,
+        problem=name, objectiveOrder=order_FSP, iterations=5,
+        populationSize=100, maxEvaluations=20000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='nsgaii', exec_time=-1
     )
 
     # load results
     ea_result = MethodResult('nsgaii', problem_result.path, problem)
-    ea_result.load(evaluate=True, single_flag=True, total_num_anneals=500)
-    ea_result.make_method_result(single_flag=True)
+    ea_result.load()
+    ea_result.make_method_result()
     problem_result.add(ea_result)
     problem_result.dump()

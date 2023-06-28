@@ -360,7 +360,7 @@ class MethodResult:
         with open(self.info_file_name(), 'r') as info_in:
             self.info = json.load(info_in)
             info_in.close()
-        return self.info['iteration'], self.info['elapseds']
+        return self.info['iteration'], self.info['elapseds'], self.info['total_num_anneals']
 
     def dump(self) -> None:
         """dump [summary] dump achives (<index>.obj.txt, <index>.var.txt) and info (.info.json).
@@ -373,7 +373,7 @@ class MethodResult:
         for index in range(self.info['iteration']):
             self.dump_result(index)
 
-    def load(self, evaluate: bool = True, single_flag: bool = False, total_num_anneals: int = 1000) -> None:
+    def load(self, evaluate: bool = True, single_flag: bool = False) -> None:
         """load [summary] load the MethodResult from files, indicated by info file.
         Evaluate is True as we want to load solutions from variables via evaluation.
         """
@@ -381,13 +381,13 @@ class MethodResult:
         # check folder
         assert path.isdir(self.path)
         # load info
-        self.iteration, elapseds = self.load_info()
+        self.iteration, elapseds, total_num_anneals = self.load_info()
         assert len(elapseds) == self.iteration
         # load results
         for index in range(self.iteration):
             self.load_result(index, evaluate, single_flag)
             self.results[index].elapsed = elapseds[index]
-            self.results[index].total_num_anneals = total_num_anneals
+            self.results[index].total_num_anneals = total_num_anneals[index]
         assert len(self.results) == self.iteration
 
 
@@ -461,10 +461,10 @@ class ProblemArchive:
     def p_solve(self) -> Dict[str, float]:
         """p_solve [summary] calculate the probability of solving a problem
         """
-        # pareto_count = self.on_pareto_count()
-        # return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
+        pareto_count = self.on_pareto_count()
+        return {k: pareto_count[k] / v.total_num_anneals for k, v in self.method_archives.items()}
         # return {k: len(v.solution_list) / v.total_num_anneals for k, v in self.method_archives.items()}
-        return {k: v.all_solution_num / v.total_num_anneals for k, v in self.method_archives.items()}
+        # return {k: v.all_solution_num / v.total_num_anneals for k, v in self.method_archives.items()}
 
     def reference_point(self) -> List[float]:
         """reference_point [summary] find the reference point from pareto front, not all found solutions.
@@ -502,7 +502,7 @@ class ProblemArchive:
         p_solve = self.p_solve()
 
         for name, res in self.method_archives.items():
-            assert 0 <= p_solve[name] <= 1
+            # assert 0 <= p_solve[name] <= 1
             if p_solve[name] == 0:
                 scores[name] = math.inf
             elif p_solve[name] == 1:
@@ -787,7 +787,7 @@ class ProblemResult:
         igd_all: List[Dict[str, float]] = []
         hv_all: List[Dict[str, float]] = []
         sp_all: List[Dict[str, float]] = []
-        # tts_all: List[Dict[str, float]] = []
+        tts_all: List[Dict[str, float]] = []
 
         for i in range(iteration):
             problem_archive = \
@@ -802,7 +802,7 @@ class ProblemResult:
             igd_all.append(problem_archive.compute_igd())
             hv_all.append(problem_archive.compute_hv())
             sp_all.append(problem_archive.compute_sp())
-            # tts_all.append(problem_archive.compute_tts())
+            tts_all.append(problem_archive.compute_tts())
         # collect scores
         scores = [ProblemResult.average_of_dicts(elapsed),
                   ProblemResult.average_of_dicts(found),
@@ -810,7 +810,7 @@ class ProblemResult:
                   ProblemResult.average_of_dicts(igd_all),
                   ProblemResult.average_of_dicts(hv_all),
                   ProblemResult.average_of_dicts(sp_all),
-                #   ProblemResult.average_of_dicts(tts_all)
+                  ProblemResult.average_of_dicts(tts_all)
                   ]
         return scores
 

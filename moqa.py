@@ -17,12 +17,12 @@ names_FSP = ['ERS', 'WebPortal', 'Drupal', 'E-Shop']
 order_FSP = ['COST', 'USED_BEFORE', 'DEFECTS', 'DESELECTED']
 weight_FSP = {'COST': 1 / 4, 'USED_BEFORE': 1 / 4, 'DEFECTS': 1 / 4, 'DESELECTED': 1 / 4}
 
-# names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
-names_NRP = ['Baan']
+names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
+# names_NRP = ['Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-result_folder = 'moqa_'
+result_folder = 'moqa_20_300_100'
 
 for name in names_NRP:
     # result_folder = 'moqa-{}'.format(name)
@@ -30,7 +30,7 @@ for name in names_NRP:
     problem_result = ProblemResult(name, problem, result_folder)
     moqa_method_result = MethodResult('moqa', problem_result.path, problem)
     for _ in range(1):
-        result = MOQASolver.solve(problem=problem, sample_times=20, num_reads=300)
+        result = MOQASolver.solve(problem=problem, sample_times=5, num_reads=1000, annealing_time=20)
         moqa_method_result.add(result)
 
     # add result to method result, problem result
@@ -39,18 +39,18 @@ for name in names_NRP:
     # dump result to result/given_path folder
     problem_result.dump()
 
-# for name in names_FSP:
-#     problem = QP(name, order_FSP, offset_flag=True)
-#     problem_result = ProblemResult(name, problem, result_folder)
-#     moqa_method_result = MethodResult('moqa', problem_result.path, problem)
-#     for _ in range(1):
-#         result = MOQASolver.solve(problem=problem, sample_times=20, num_reads=300)
-#         moqa_method_result.add(result)
+for name in names_FSP:
+    problem = QP(name, order_FSP, offset_flag=True)
+    problem_result = ProblemResult(name, problem, result_folder)
+    moqa_method_result = MethodResult('moqa', problem_result.path, problem)
+    for _ in range(1):
+        result = MOQASolver.solve(problem=problem, sample_times=5, num_reads=1000, annealing_time=20)
+        moqa_method_result.add(result)
 
-#     # add result to method result, problem result
-#     problem_result.add(moqa_method_result)
+    # add result to method result, problem result
+    problem_result.add(moqa_method_result)
 
-#     # dump result to result/given_path folder
-#     problem_result.dump()
+    # dump result to result/given_path folder
+    problem_result.dump()
 
 
