@@ -1,14 +1,16 @@
 {
-  "problem": "classic-1",
+  "problem": "Drupal",
   "objectiveOrder": [
-    "cost",
-    "revenue"
+    "COST",
+    "USED_BEFORE",
+    "DEFECTS",
+    "DESELECTED"
   ],
   "iterations": 5,
   "populationSize": 100,
-  "maxEvaluations": 5000,
+  "maxEvaluations": 20000,
   "crossoverProbability": 0.8,
-  "mutationProbability": 0.004166666666666667,
+  "mutationProbability": 0.020833333333333332,
   "resultFolder": "nsgaii_5_100_5000_20000",
   "methodName": "nsgaii",
   "exec_time": -1
