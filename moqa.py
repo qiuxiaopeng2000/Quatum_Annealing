@@ -22,7 +22,7 @@ names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-result_folder = 'moqa_20_300_100'
+result_folder = 'moqa_5_1000_20'
 
 for name in names_NRP:
     # result_folder = 'moqa-{}'.format(name)

@@ -15,8 +15,8 @@ names_NRP = ['rp', 'ms', 'Baan', 'classic-1']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-nsgaii_result_folder = 'nsgaii_mm'
-moqa_result_folder = 'moqa_20_300_100'
+nsgaii_result_folder = 'nsgaii_5_100_5000_20000'
+moqa_result_folder = 'moqa_5_1000_20'
 exact_result_folder = 'ea'
 
 # compare MOQA with NSGA-II

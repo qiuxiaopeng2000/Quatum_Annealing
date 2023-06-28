@@ -504,7 +504,8 @@ class ProblemArchive:
         for name, res in self.method_archives.items():
             # assert 0 <= p_solve[name] <= 1
             if p_solve[name] == 0:
-                scores[name] = math.inf
+                # scores[name] = math.inf
+                scores[name] = 0
             elif p_solve[name] == 1:
                 scores[name] = 0
             else:
