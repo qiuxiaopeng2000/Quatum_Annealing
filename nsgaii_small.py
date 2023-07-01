@@ -14,7 +14,7 @@ names_NRP = ['classic-1', 'rp', 'ms', 'Baan']
 order_NRP = ['cost', 'revenue']
 weight_NRP = {'cost': 1 / 2, 'revenue': 1 / 2}
 
-result_folder = 'nsgaii_5_100_5000_20000'
+result_folder = 'nsgaii_5_100_10000_20000'
 
 for name in names_NRP:
     problem = Problem(name)
@@ -27,7 +27,7 @@ for name in names_NRP:
     JarSolver.solve(
         solver_name='NSGAII', config_name='tmp_config',
         problem=name, objectiveOrder=order_NRP, iterations=5,
-        populationSize=100, maxEvaluations=5000,
+        populationSize=100, maxEvaluations=10000,
         crossoverProbability=0.8, mutationProbability=(1 / problem.variables_num),
         resultFolder=result_folder, methodName='nsgaii', exec_time=-1
     )

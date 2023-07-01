@@ -11,7 +11,7 @@
   "maxEvaluations": 20000,
   "crossoverProbability": 0.8,
   "mutationProbability": 0.020833333333333332,
-  "resultFolder": "nsgaii_5_100_5000_20000",
+  "resultFolder": "nsgaii_5_100_10000_20000",
   "methodName": "nsgaii",
   "exec_time": -1
 }
